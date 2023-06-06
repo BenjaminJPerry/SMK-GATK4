@@ -1,1 +1,1 @@
-# SMK-GATK4
+# SMK-SNVS
