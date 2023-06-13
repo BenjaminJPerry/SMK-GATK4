@@ -33,8 +33,8 @@ rule all:
 
 rule bwa_mem:
     input:
-        read1 = "fastq/AHJNKHDSX5/{samples}_R1.fastq.gz",
-        read2 = "fastq/AHJNKHDSX5/{samples}_R2.fastq.gz",
+        read1 = "fastq/BHJNVTDSX5/{samples}_R1.fastq.gz",
+        read2 = "fastq/BHJNVTDSX5/{samples}_R2.fastq.gz",
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
     output: 
         "results/01_mapping/{samples}.bam"
