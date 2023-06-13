@@ -23,7 +23,7 @@ onstart:
     os.system('echo "  CONDA VERSION: $(conda --version)"')
 
 
-SAMPLES, = glob_wildcards("fastq/AHJNKHDSX5{samples}_R1.fastq.gz")
+SAMPLES, = glob_wildcards("fastq/AHJNKHDSX5/{samples}_R1.fastq.gz")
 
 
 rule all:
