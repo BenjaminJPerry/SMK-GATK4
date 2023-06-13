@@ -38,8 +38,6 @@ rule bwa_mem:
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
     output: 
         "results/01_mapping/{samples}.bam"
-    params:
-        readgroup = 
     log:
         "logs/bwa_mem.{samples}.log"
     benchmark:
