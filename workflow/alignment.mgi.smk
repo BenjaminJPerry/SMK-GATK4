@@ -23,7 +23,7 @@ onstart:
     os.system('echo "  CONDA VERSION: $(conda --version)"')
 
 
-SAMPLES, = glob_wildcards("fastq/BHJNVTDSX5/{samples}_R1.fastq.gz")
+SAMPLES, = glob_wildcards("fastq/MGI/{samples}_R1.fastq.gz")
 
 
 rule all:
@@ -52,9 +52,9 @@ rule bwa_mem:
     shell:
         """
         ANIMAL="$(echo {wildcards.samples} | cut -d "_" -f 1)"
-        RUN="$(echo {wildcards.samples} | cut -d "_" -f 4)"
+        RUN="$(echo {wildcards.samples} | cut -d "_" -f 2)"
         LANE="$(echo {wildcards.samples} | cut -d "_" -f 3)"
-        READGROUP="@RG\\tID:$ANIMAL\\tPU:$RUN.$LANE\\tSM:$ANIMAL\\tPL:ILLUMINA\\tLB:ILLUMINA"
+        READGROUP="@RG\\tID:$ANIMAL\\tPU:$RUN.$LANE\\tSM:$ANIMAL\\tPL:DNBseq\\tLB:DNBseq"
 
         bwa mem -Y -R $READGROUP -t {threads} -K 100000000 {input.referenceGenome} {input.read1} {input.read2} | samtools view --threads {threads} -bS -o {output}
 
