@@ -54,7 +54,7 @@ rule bwa_mem:
         ANIMAL="$(echo {wildcards.samples} | cut -d "_" -f 1)"
         RUN="$(echo {wildcards.samples} | cut -d "_" -f 2)"
         LANE="$(echo {wildcards.samples} | cut -d "_" -f 3)"
-        READGROUP="@RG\\tID:$ANIMAL\\tPU:$RUN.$LANE\\tSM:$ANIMAL\\tPL:DNBseq\\tLB:DNBseq"
+        READGROUP="@RG\\tID:$ANIMAL\\tPU:$RUN.$LANE\\tSM:$ANIMAL\\tPL:DNBSEQ\\tLB:DNBSEQ"
 
         bwa mem -Y -R $READGROUP -t {threads} -K 100000000 {input.referenceGenome} {input.read1} {input.read2} | samtools view --threads {threads} -bS -o {output}
 
