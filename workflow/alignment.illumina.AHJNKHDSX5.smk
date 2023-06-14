@@ -74,7 +74,7 @@ rule samtools_sort:
         "bwa"
     threads: 12
     resources:
-        mem_gb = lambda wildcards, attempts: 26 + ((attempt -1) * 24),
+        mem_gb = lambda wildcards, attempt: 26 + ((attempt -1) * 24),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
         partition = "large,milan"
     shell:
