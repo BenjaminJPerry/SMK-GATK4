@@ -28,7 +28,7 @@ SAMPLES, = glob_wildcards("fastq/BHJNVTDSX5/{samples}_R1.fastq.gz")
 
 rule all:
     input:
-        expand("results/01_mapping/{samples}.bam", samples = SAMPLES),
+        expand("results/01_mapping/{samples}.sorted.bam", samples = SAMPLES),
 
 
 rule bwa_mem:
@@ -37,7 +37,8 @@ rule bwa_mem:
         read2 = "fastq/BHJNVTDSX5/{samples}_R2.fastq.gz",
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
     output: 
-        "results/01_mapping/{samples}.bam"
+        bam = temp("results/01_mapping/{samples}.bam"),
+        bai = temp("results/01_mapping/{samples}.bam.bai")
     log:
         "logs/bwa_mem.{samples}.log"
     benchmark:
@@ -57,6 +58,32 @@ rule bwa_mem:
         READGROUP="@RG\\tID:$ANIMAL\\tPU:$RUN.$LANE\\tSM:$ANIMAL\\tPL:ILLUMINA\\tLB:ILLUMINA"
 
         bwa mem -Y -R $READGROUP -t {threads} -K 10000000 {input.referenceGenome} {input.read1} {input.read2} | samtools view --threads {threads} -bS -o {output}
+
+        """
+
+
+rule samtools_sort:
+    input:
+        bam = "results/01_mapping/{samples}.bam",
+        bai = "results/01_mapping/{samples}.bam.bai"
+    output:
+        sortedbam = "results/01_mapping/{samples}.sorted.bam",
+        sortedbai = "results/01_mapping/{samples}.sorted.bam.bai"
+    log:
+        "logs/samtools_sort_bwa.{samples}.log"
+    benchmark:
+        "benchmarks/samtools_sort_bwa.{samples}.tsv"
+    conda:
+        "bwa"
+    threads: 12
+    resources:
+        mem_gb = lambda wildcards, attempts: 26 + ((attempt -1) * 24),
+        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 60),
+        partition = "large,milan"
+    shell:
+        """
+
+        samtools sort -l 8 -m 2G --threads {threads} {input.bam} > {output.bam} && samtools index {output.bam}
 
         """
 
