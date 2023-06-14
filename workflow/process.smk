@@ -23,7 +23,7 @@ onstart:
     os.system('echo "  CONDA VERSION: $(conda --version)"')
 
 
-SAMPLES, = glob_wildcards("fastq/AHJNKHDSX5{samples}_R1.fastq.gz")
+SAMPLES, = glob_wildcards("results/01_mapping/{samples}.bam")
 
 
 rule all:
@@ -31,7 +31,32 @@ rule all:
         "",
 
 
-rule merge_bams:
+rule samtools_merge:
+    input:
+        bam = "fastq/MGI/{samples}_R1.fastq.gz",
+    output: 
+        "results/01_mapping/{samples}.merged.bam"
+    log:
+        "logs/samtools_merge.{samples}.log"
+    benchmark:
+        "benchmarks/samtools_merge.{samples}.tsv"
+    conda:
+        "bwa"
+    threads:24
+    resources:
+        mem_gb = lambda wildcards, attempt: 24 + ((attempt - 1) * 24),
+        time = lambda wildcards, attempt: 360 + ((attempt - 1) * 60),
+        partition="large,milan",
+    shell:
+        """
+        ANIMAL="$(echo {wildcards.samples} | cut -d "_" -f 1)"
+        RUN="$(echo {wildcards.samples} | cut -d "_" -f 2)"
+        LANE="$(echo {wildcards.samples} | cut -d "_" -f 3)"
+        READGROUP="@RG\\tID:$ANIMAL\\tPU:$RUN.$LANE\\tSM:$ANIMAL\\tPL:DNBSEQ\\tLB:DNBSEQ"
+
+        bwa mem -Y -R $READGROUP -t {threads} -K 100000000 {input.referenceGenome} {input.read1} {input.read2} | samtools view --threads {threads} -bS -o {output}
+
+        """
 
 
 rule samtools_sort: #TODO Make snakemake pipe

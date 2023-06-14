@@ -47,7 +47,7 @@ rule bwa_mem:
     threads:24
     resources:
         mem_gb = lambda wildcards, attempt: 24 + ((attempt - 1) * 24),
-        time = lambda wildcards, attempt: 360 + ((attempt - 1) * 60),
+        time = lambda wildcards, attempt: 360 + ((attempt - 1) * 240),
         partition="large,milan",
     shell:
         """
