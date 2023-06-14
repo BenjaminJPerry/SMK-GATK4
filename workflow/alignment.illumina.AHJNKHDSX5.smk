@@ -80,7 +80,7 @@ rule samtools_sort:
     shell:
         """
 
-        samtools sort -l 8 -m 2G --threads {threads} {input.bam} > {output.bam} && samtools index {output.bam}
+        samtools sort -l 8 -m 2G --threads {threads} {input.bam} > {output.sortedbam} && samtools index {output.sortedbam}
 
         """
 
