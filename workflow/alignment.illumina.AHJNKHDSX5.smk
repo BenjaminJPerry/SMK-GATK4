@@ -64,10 +64,8 @@ rule bwa_mem:
 rule samtools_sort:
     input:
         bam = "results/01_mapping/{samples}.bam",
-        bai = "results/01_mapping/{samples}.bam.bai"
     output:
         sortedbam = "results/01_mapping/{samples}.sorted.bam",
-        sortedbai = "results/01_mapping/{samples}.sorted.bam.bai"
     log:
         "logs/samtools_sort_bwa.{samples}.log"
     benchmark:
