@@ -22,20 +22,18 @@ onstart:
     os.system('echo "  PYTHON VERSION: $(python --version)"')
     os.system('echo "  CONDA VERSION: $(conda --version)"')
 
-
-SAMPLES, = glob_wildcards("results/01_mapping/{samples}.bam")
+#TODO: Write a clever input_function to return the basenames for samples; platform level information is in the readgroup information
+SAMPLES, = "120001,2201,2202,2203,2204,2205,2206,2207,2209,2212,2213,2214,2215,2216,2217,2218,2219,2220,2221,2222,2223,2224,2225,2226,2227,849,864,Blank,Debonair,NEGATIVE,PDGY-16-16,PDGY-17-104,PDGY-18-17"
 
 
 rule all:
     input:
-        "",
+        expand("results/02_snvs/{samples}.raw.snvs.gvcf.gz", samples = SAMPLES),
 
 
 rule samtools_merge:
-    input:
-        bam = "fastq/MGI/{samples}_R1.fastq.gz",
     output: 
-        "results/01_mapping/{samples}.merged.bam"
+        temp("results/01_mapping/{samples}.merged.bam")
     log:
         "logs/samtools_merge.{samples}.log"
     benchmark:
@@ -44,67 +42,70 @@ rule samtools_merge:
         "bwa"
     threads:24
     resources:
-        mem_gb = lambda wildcards, attempt: 24 + ((attempt - 1) * 24),
-        time = lambda wildcards, attempt: 360 + ((attempt - 1) * 60),
+        mem_gb = lambda wildcards, attempt: 32 + ((attempt - 1) * 24),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
         partition="large,milan",
     shell:
         """
-        ANIMAL="$(echo {wildcards.samples} | cut -d "_" -f 1)"
-        RUN="$(echo {wildcards.samples} | cut -d "_" -f 2)"
-        LANE="$(echo {wildcards.samples} | cut -d "_" -f 3)"
-        READGROUP="@RG\\tID:$ANIMAL\\tPU:$RUN.$LANE\\tSM:$ANIMAL\\tPL:DNBSEQ\\tLB:DNBSEQ"
 
-        bwa mem -Y -R $READGROUP -t {threads} -K 100000000 {input.referenceGenome} {input.read1} {input.read2} | samtools view --threads {threads} -bS -o {output}
+        samtools merge - results/01_mapping/{wildcards.samples}*.sorted.bam | samtools sort -l 8 -m 2G --threads {threads} > {output} && rm results/01_mapping/{wildcards.sample}*.sorted.bam
+        
+        rm results/01_mapping/{wildcards.sample}*.sorted.bam.bai
+        
+        samtools index {output}
 
         """
-
-
-rule samtools_sort: #TODO Make snakemake pipe
-    input:
-        "",
-    output:
-        sorted_bam = "results/01_mapping/{samples}.sorted.bam",
-    log:
-        "logs/samtools_sort.{samples}.log"
-    conda:
-        "samtools"
-    threads: 8
-    resources:
-    shell:
-        "gatk SortSam "
-        "--java-options '-Xmx{resources.mem_gb}G' "
-        "< {input.bam} "
-        "-O {output.sorted_bam} "
-        "2> {log}"
 
 
 rule gatk_MarkDuplicates:
     input:
-        "results/mapped/{sample}_sorted.bam"
+        "results/01_mapping/{samples}.merged.bam"
     output:
-        bam = temp("results/mapped/{sample}_sorted_mkdups.bam"),
-        metrics = "results/mapped/{sample}_sorted_mkdups_metrics.txt"
-    params:
-        tdir = config["TEMPDIR"]
+        bam = "results/01_mapping/{sample}.merged.sorted.mkdups.bam",
+        metrics = "results/01_mapping/{sample}_sorted_mkdups_metrics.txt"
     log:
-        "logs/gatk_MarkDuplicates.{sample}.log"
+        "logs/gatk_MarkDuplicates.{samples}.log"
     benchmark:
-        "benchmarks/gatk_MarkDuplicates/{sample}.tsv"
+        "benchmarks/gatk_MarkDuplicates.{sample}.tsv"
     singularity:
-        "docker://broadinstitute/gatk:4.2.6.1"
+        "docker://broadinstitute/gatk:4.4.0.0"
+    threads:2
+    resources:
+        mem_gb = lambda wildcards, attempt: 32 + ((attempt - 1) * 32),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        partition="large,milan",
+    shell:
+        'gatk --java-options "-Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
+        'MarkDuplicates '
+        '-I {input} '
+        '-O {output.bam} '
+        '-M {output.metrics} '
+        '&> {log} '
+
+
+rule gatk_HaplotypeCaller:
+    input:
+        bam = "results/01_mapping/{sample}.merged.sorted.mkdups.bam",
+        referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
+    output:
+        gvcf = "results/02_snvs/{samples}.raw.snvs.gvcf.gz",
+    log:
+        "logs/gatk_HaplotypeCaller_cohort.{samples}.log"
+    benchmark:
+        "benchmarks/gatk_HaplotypeCaller_cohort/{samples}.tsv"
+    singularity:
+        "docker://broadinstitute/gatk:4.4.0.0"
     threads: 2
     resources:
-        mem_gb = 8,
-        # partition = config["PARTITION"]["CPU"]
-    message:
-        "Locating and tagging duplicate reads in {input}"
+        mem_gb = lambda wildcards, attempt: 32 + ((attempt - 1) * 32),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        partition="large,milan",
     shell:
-        "gatk MarkDuplicates "
-        "--java-options '-Xmx{resources.mem_gb}G' "
-        "-I {input} "
-        "-O {output.bam} "
-        "-M {output.metrics} "
-        "--TMP_DIR {params.tdir} "
-        "&> {log}"
-
+        'gatk --java-options "--Xms{resources.mem_gb}G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
+        'HaplotypeCaller '
+        '-I {input.bam} '
+        '-R {input.referenceGenome} '
+        '-O {output.vcf} '
+        '-ERC GVCF '
+        '&> {log} '
 
