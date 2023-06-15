@@ -45,6 +45,7 @@ rule samtools_merge:
         mem_gb = lambda wildcards, attempt: 32 + ((attempt - 1) * 24),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
         partition="large,milan",
+        tmpdir="temp"
     shell:
         """
 
@@ -73,6 +74,7 @@ rule gatk_MarkDuplicates:
         mem_gb = lambda wildcards, attempt: 32 + ((attempt - 1) * 32),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
         partition="large,milan",
+        tmpdir="temp"
     shell:
         'gatk --java-options "-Xms{resources.mem_gb}G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
         'MarkDuplicates '
@@ -99,6 +101,7 @@ rule gatk_HaplotypeCaller:
         mem_gb = lambda wildcards, attempt: 32 + ((attempt - 1) * 32),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
         partition="large,milan",
+        tmpdir="temp"
     shell:
         'gatk --java-options "-Xms{resources.mem_gb}G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
         'HaplotypeCaller '
