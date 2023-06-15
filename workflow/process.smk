@@ -40,16 +40,16 @@ rule samtools_merge:
         "benchmarks/samtools_merge.{samples}.tsv"
     conda:
         "bwa"
-    threads:8
+    threads: 24
     resources:
-        mem_gb = lambda wildcards, attempt: 32 + ((attempt - 1) * 24),
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 24),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
         partition="large,milan",
         tmpdir="temp"
     shell:
         """
 
-        samtools merge - results/01_mapping/{wildcards.samples}*.sorted.bam 2> {log} | samtools sort -l 8 -m 2G --threads {threads} > {output} && rm results/01_mapping/{wildcards.samples}*.sorted.bam
+        samtools merge -f --threads {threads} - results/01_mapping/{wildcards.samples}*.sorted.bam 2> {log} | samtools sort -l 8 -m 2G --threads {threads} > {output} && rm results/01_mapping/{wildcards.samples}*.sorted.bam
         
         rm results/01_mapping/{wildcards.samples}*.sorted.bam.bai
         
