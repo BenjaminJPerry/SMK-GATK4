@@ -104,7 +104,7 @@ rule gatk_HaplotypeCaller:
         'HaplotypeCaller '
         '-I {input.bam} '
         '-R {input.referenceGenome} '
-        '-O {output.vcf} '
+        '-O {output.gvcf} '
         '-ERC GVCF '
         '&> {log} '
 
