@@ -48,9 +48,9 @@ rule samtools_merge:
     shell:
         """
 
-        samtools merge - results/01_mapping/{wildcards.samples}*.sorted.bam | samtools sort -l 8 -m 2G --threads {threads} > {output} && rm results/01_mapping/{wildcards.sample}*.sorted.bam
+        samtools merge - results/01_mapping/{wildcards.samples}*.sorted.bam | samtools sort -l 8 -m 2G --threads {threads} > {output} && rm results/01_mapping/{wildcards.samples}*.sorted.bam
         
-        rm results/01_mapping/{wildcards.sample}*.sorted.bam.bai
+        rm results/01_mapping/{wildcards.samples}*.sorted.bam.bai
         
         samtools index {output}
 
