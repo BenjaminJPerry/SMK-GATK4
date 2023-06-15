@@ -5,3 +5,4 @@ logs
 fastq
 test
 benchmarks
+samtools*
