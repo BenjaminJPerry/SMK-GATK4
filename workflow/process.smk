@@ -23,12 +23,12 @@ onstart:
     os.system('echo "  CONDA VERSION: $(conda --version)"')
 
 #TODO: Write a clever input_function to return the basenames for samples; platform level information is in the readgroup information
-SAMPLES, = "120001,2201,2202,2203,2204,2205,2206,2207,2209,2212,2213,2214,2215,2216,2217,2218,2219,2220,2221,2222,2223,2224,2225,2226,2227,849,864,Blank,Debonair,NEGATIVE,PDGY-16-16,PDGY-17-104,PDGY-18-17"
+SAMPLES = "120001,2201,2202,2203,2204,2205,2206,2207,2209,2212,2213,2214,2215,2216,2217,2218,2219,2220,2221,2222,2223,2224,2225,2226,2227,849,864,Blank,Debonair,NEGATIVE,PDGY-16-16,PDGY-17-104,PDGY-18-17"
 
 
 rule all:
     input:
-        expand("results/02_snvs/{samples}.raw.snvs.gvcf.gz", samples = SAMPLES),
+        expand("results/02_snvs/{samples}.raw.snvs.gvcf.gz", samples = SAMPLES.split(",")),
 
 
 rule samtools_merge:
