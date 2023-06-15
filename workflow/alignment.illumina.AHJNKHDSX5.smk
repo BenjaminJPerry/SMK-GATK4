@@ -37,7 +37,7 @@ rule bwa_mem:
         read2 = "fastq/AHJNKHDSX5/{samples}_R2.fastq.gz",
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
     output: 
-        "results/01_mapping/{samples}.bam"
+        temp("results/01_mapping/{samples}.bam")
     log:
         "logs/bwa_mem.{samples}.log"
     benchmark:
@@ -81,6 +81,6 @@ rule samtools_sort:
         """
 
         samtools sort -l 8 -m 2G --threads {threads} {input.bam} > {output.sortedbam} && samtools index {output.sortedbam}
-
+        
         """
 

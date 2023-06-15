@@ -28,12 +28,13 @@ SAMPLES = "120001,2201,2202,2203,2204,2205,2206,2207,2209,2212,2213,2214,2215,22
 
 rule all:
     input:
-        expand("results/02_snvs/{samples}.raw.snvs.gvcf.gz", samples = SAMPLES.split(",")),
+        expand("results/01_mapping/{samples}.merged.bam", samples = SAMPLES.split(","))
+#        expand("results/02_snvs/{samples}.raw.snvs.gvcf.gz", samples = SAMPLES.split(",")),
 
 
 rule samtools_merge:
     output: 
-        temp("results/01_mapping/{samples}.merged.bam")
+        "results/01_mapping/{samples}.merged.bam"
     log:
         "logs/samtools_merge.{samples}.log"
     benchmark:
@@ -69,7 +70,7 @@ rule gatk_MarkDuplicates:
         "benchmarks/gatk_MarkDuplicates.{samples}.tsv"
     threads:2
     resources:
-        mem_gb = lambda wildcards, attempt: 32 + ((attempt - 1) * 32),
+        mem_gb = lambda wildcards, attempt: 128 + ((attempt - 1) * 128),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
         partition="large,milan",
         tmpdir="temp"
