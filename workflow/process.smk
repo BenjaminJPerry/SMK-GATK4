@@ -74,7 +74,7 @@ rule gatk_MarkDuplicates:
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
         partition="large,milan",
     shell:
-        'gatk --java-options "-Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
+        'gatk --java-options "-Xms{resources.mem_gb}G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
         'MarkDuplicates '
         '-I {input} '
         '-O {output.bam} '
@@ -94,13 +94,13 @@ rule gatk_HaplotypeCaller:
         "benchmarks/gatk_HaplotypeCaller_cohort/{samples}.tsv"
     singularity:
         "docker://broadinstitute/gatk:4.4.0.0"
-    threads: 2
+    threads:2
     resources:
         mem_gb = lambda wildcards, attempt: 32 + ((attempt - 1) * 32),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
         partition="large,milan",
     shell:
-        'gatk --java-options "--Xms{resources.mem_gb}G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
+        'gatk --java-options "-Xms{resources.mem_gb}G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
         'HaplotypeCaller '
         '-I {input.bam} '
         '-R {input.referenceGenome} '
