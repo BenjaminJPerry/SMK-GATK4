@@ -43,16 +43,16 @@ rule samtools_merge:
         "bwa"
     threads: 24
     resources:
-        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 24),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 128 + ((attempt - 1) * 32),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 360),
         partition="large,milan",
         tmpdir="temp"
     shell:
         """
 
-        samtools merge -f --threads {threads} - results/01_mapping/{wildcards.samples}*.sorted.bam 2> {log} | samtools sort -l 8 -m 2G --threads {threads} > {output} && rm results/01_mapping/{wildcards.samples}*.sorted.bam
+        samtools merge -f --threads {threads} - results/01_mapping/{wildcards.samples}*.sorted.bam 2> {log} | samtools sort -l 8 -m 2G --threads {threads} > {output} && for file in $(ls results/01_mapping/{wildcards.samples}*.sorted.bam); do rm results/01_mapping/$file; done;
         
-        rm results/01_mapping/{wildcards.samples}*.sorted.bam.bai
+        for file in $(ls results/01_mapping/{wildcards.samples}*.sorted.bam.bai); do rm results/01_mapping/$file; done;
         
         samtools index {output}
 
