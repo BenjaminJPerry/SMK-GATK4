@@ -56,17 +56,16 @@ rule samtools_merge:
 
         """
 
-
 rule gatk_MarkDuplicates:
     input:
         "results/01_mapping/{samples}.merged.bam"
     output:
-        bam = "results/01_mapping/{sample}.merged.sorted.mkdups.bam",
-        metrics = "results/01_mapping/{sample}_sorted_mkdups_metrics.txt"
+        bam = "results/01_mapping/{samples}.merged.sorted.mkdups.bam",
+        metrics = "results/01_mapping/{samples}_sorted_mkdups_metrics.txt"
     log:
         "logs/gatk_MarkDuplicates.{samples}.log"
     benchmark:
-        "benchmarks/gatk_MarkDuplicates.{sample}.tsv"
+        "benchmarks/gatk_MarkDuplicates.{samples}.tsv"
     singularity:
         "docker://broadinstitute/gatk:4.4.0.0"
     threads:2
@@ -85,7 +84,7 @@ rule gatk_MarkDuplicates:
 
 rule gatk_HaplotypeCaller:
     input:
-        bam = "results/01_mapping/{sample}.merged.sorted.mkdups.bam",
+        bam = "results/01_mapping/{samples}.merged.sorted.mkdups.bam",
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
     output:
         gvcf = "results/02_snvs/{samples}.raw.snvs.gvcf.gz",
