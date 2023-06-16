@@ -74,8 +74,8 @@ rule gatk_MarkDuplicates:
     resources:
         mem_gb = lambda wildcards, attempt: 128 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition="large,milan",
-        DTMP="/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
         'module load GATK/4.3.0.0-gimkl-2022a; '
@@ -85,7 +85,7 @@ rule gatk_MarkDuplicates:
         '-O {output.bam} '
         '-M {output.metrics} '
         '--TMP_DIR {resources.DTMP} '
-        '2>&1 {log}.attempt.{resources.attempt} '
+        '&> {log}.attempt.{resources.attempt} '
 
 
 rule gatk_HaplotypeCaller:
@@ -102,8 +102,8 @@ rule gatk_HaplotypeCaller:
     resources:
         mem_gb = lambda wildcards, attempt: 128 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition="large,milan",
-        DTMP="/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
         'module load GATK/4.3.0.0-gimkl-2022a ; '
@@ -114,5 +114,5 @@ rule gatk_HaplotypeCaller:
         '-O {output.gvcf} '
         '-ERC GVCF '
         '--tmp-dir {resources.DTMP} '
-        '2>&1 {log}.attempt.{resources.attempt} '
+        '&> {log}.attempt.{resources.attempt} '
 
