@@ -34,8 +34,9 @@ rule all:
 
 
 rule samtools_merge:
+    priority: 100
     output: 
-        "results/01_mapping/{samples}.merged.bam"
+        temp("results/01_mapping/{samples}.merged.bam")
     log:
         "logs/samtools_merge.{samples}.log"
     benchmark:
@@ -71,12 +72,12 @@ rule gatk_MarkDuplicates:
         "benchmarks/gatk_MarkDuplicates.{samples}.tsv"
     threads:2
     resources:
-        mem_gb = lambda wildcards, attempt: 128 + ((attempt - 1) * 128),
+        mem_gb = lambda wildcards, attempt: 128 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
         partition="large,milan",
         tmpdir="temp"
     shell:
-        'module load GATK/4.3.0.0-gimkl-2022a; '
+        'module load GATK/4.3.0.0-gimkl-2022a && '
         'gatk --java-options "-Xms{resources.mem_gb}G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
         'MarkDuplicates '
         '-I {input} '
@@ -97,12 +98,12 @@ rule gatk_HaplotypeCaller:
         "benchmarks/gatk_HaplotypeCaller_cohort/{samples}.tsv"
     threads:2
     resources:
-        mem_gb = lambda wildcards, attempt: 32 + ((attempt - 1) * 32),
+        mem_gb = lambda wildcards, attempt: 128 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
         partition="large,milan",
         tmpdir="temp"
     shell:
-        'module load GATK/4.3.0.0-gimkl-2022a; '
+        'module load GATK/4.3.0.0-gimkl-2022a && '
         'gatk --java-options "-Xms{resources.mem_gb}G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
         'HaplotypeCaller '
         '-I {input.bam} '
