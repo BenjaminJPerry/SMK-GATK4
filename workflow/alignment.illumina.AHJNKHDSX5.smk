@@ -65,7 +65,7 @@ rule samtools_sort:
     input:
         bam = "results/01_mapping/{samples}.bam",
     output:
-        sortedbam = "results/01_mapping/{samples}.sorted.bam",
+        sortedbam = temp("results/01_mapping/{samples}.sorted.bam"),
     log:
         "logs/samtools_sort_bwa.{samples}.log"
     benchmark:
@@ -84,3 +84,31 @@ rule samtools_sort:
         
         """
 
+
+rule gatk_MarkDuplicates:
+    input:
+        "results/01_mapping/{samples}.sorted.bam"
+    output:
+        bam = "results/01_mapping/{samples}.sorted.mkdups.bam",
+        metrics = "results/01_mapping/{samples}_mkdups_metrics.txt"
+    log:
+        "logs/gatk_MarkDuplicates.{samples}.log"
+    benchmark:
+        "benchmarks/gatk_MarkDuplicates.{samples}.tsv"
+    threads:2
+    resources:
+        mem_gb = lambda wildcards, attempt: 128 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        'module load GATK/4.3.0.0-gimkl-2022a; '
+        'gatk --java-options "-Xms2G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
+        'MarkDuplicates '
+        '-I {input} '
+        '-O {output.bam} '
+        '-M {output.metrics} '
+        '--TMP_DIR {resources.DTMP} '
+        '--COMPRESSION_LEVEL 8 '
+        '&> {log}.attempt.{resources.attempt} '
