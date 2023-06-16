@@ -97,7 +97,7 @@ rule gatk_HaplotypeCaller:
     log:
         "logs/gatk_HaplotypeCaller_cohort.{samples}.log"
     benchmark:
-        "benchmarks/gatk_HaplotypeCaller_cohort/{samples}.tsv"
+        "benchmarks/gatk_HaplotypeCaller.{samples}.tsv"
     threads:2
     resources:
         mem_gb = lambda wildcards, attempt: 128 + ((attempt - 1) * 64),
