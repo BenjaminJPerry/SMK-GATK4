@@ -28,7 +28,7 @@ SAMPLES, = glob_wildcards("fastq/BHJNVTDSX5/{samples}_R1.fastq.gz")
 
 rule all:
     input:
-        expand("results/01_mapping/{samples}.sorted.bam", samples = SAMPLES),
+        expand("results/01_mapping/{samples}.sorted.mkdups.bam", samples = SAMPLES),
 
 
 rule bwa_mem:
