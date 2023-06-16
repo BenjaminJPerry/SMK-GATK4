@@ -79,7 +79,7 @@ rule gatk_MarkDuplicates:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         'module load GATK/4.3.0.0-gimkl-2022a; '
-        'gatk --java-options "-Xms{resources.mem_gb}G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
+        'gatk --java-options "-Xms2G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
         'MarkDuplicates '
         '-I {input} '
         '-O {output.bam} '
@@ -107,7 +107,7 @@ rule gatk_HaplotypeCaller:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         'module load GATK/4.3.0.0-gimkl-2022a ; '
-        'gatk --java-options "-Xms{resources.mem_gb}G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
+        'gatk --java-options "-Xms2G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
         'HaplotypeCaller '
         '-I {input.bam} '
         '-R {input.referenceGenome} '
