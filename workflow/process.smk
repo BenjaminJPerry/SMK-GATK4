@@ -65,7 +65,7 @@ rule gatk_HaplotypeCaller:
     output:
         gvcf = "results/02_snvs/{samples}.raw.snvs.gvcf.gz",
     log:
-        "logs/gatk_HaplotypeCaller_cohort.{samples}.log"
+        "logs/gatk_HaplotypeCaller.{samples}.log"
     benchmark:
         "benchmarks/gatk_HaplotypeCaller.{samples}.tsv"
     threads:2
