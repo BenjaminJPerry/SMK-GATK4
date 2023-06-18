@@ -68,9 +68,9 @@ rule gatk_HaplotypeCaller:
         "logs/gatk_HaplotypeCaller.{samples}.log"
     benchmark:
         "benchmarks/gatk_HaplotypeCaller.{samples}.tsv"
-    threads: 4
+    threads: 2
     resources:
-        mem_gb = lambda wildcards, attempt: 128 + ((attempt - 1) * 64),
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
