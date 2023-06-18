@@ -68,7 +68,7 @@ rule gatk_HaplotypeCaller:
         "logs/gatk_HaplotypeCaller.{samples}.log"
     benchmark:
         "benchmarks/gatk_HaplotypeCaller.{samples}.tsv"
-    threads:2
+    threads: 4
     resources:
         mem_gb = lambda wildcards, attempt: 128 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
