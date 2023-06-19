@@ -28,8 +28,8 @@ SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam
 
 rule all:
     input:
-        "results/02_snvs/cohort.rawsnvs.bcftools.vcf.gz",
-        "results/02_snvs/cohort.rawsnvs.freebayes.vcf.gz"
+        "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz",
+        "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz"
 
 
 
