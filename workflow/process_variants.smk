@@ -39,7 +39,7 @@ rule bgzip_freebayes_vcf:
         vcf = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf",
     output:
         vcfgz = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz",
-        csi = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz.csi",
+        csi = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi",
     benchmark:
         "benchmarks/bgzip_freebayes_vcf.{samples}.tsv"
     threads: 8
