@@ -52,10 +52,10 @@ rule gatk_HaplotypeCaller_gvcf:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        'module load GATK/4.3.0.0-gimkl-2022a ; '
-        'gatk --java-options "-Xms2G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
+        'module load GATK/4.4.0.0-gimkl-2022a ; '
+        'gatk --java-options "-Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
         'HaplotypeCaller '
-        '--min-base-quality-score 30 '
+        '--create-output-variant-index '
         '-I {input.bam} '
         '-R {input.referenceGenome} '
         '-O {output.gvcf} '
@@ -83,10 +83,10 @@ rule gatk_HaplotypeCaller_vcf:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        'module load GATK/4.3.0.0-gimkl-2022a ; '
-        'gatk --java-options "-Xms2G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
+        'module load GATK/4.4.0.0-gimkl-2022a ; '
+        'gatk --java-options "-Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
         'HaplotypeCaller '
-        '--min-base-quality-score 30 '
+        '--create-output-variant-index '
         '-I {input.bam} '
         '-R {input.referenceGenome} '
         '-O {output.gvcf} '
