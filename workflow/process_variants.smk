@@ -132,6 +132,6 @@ rule merge_freebayes_vcf: #TODO
     shell:
         """
         
-        bcftools merge --write-index --threads {threads} {input.vcfgz} -Oz8 -o {output.merge}
+        bcftools merge --write-index --threads {threads} {input.vcfgz} -Oz8 -o {output.merged}
 
         """
