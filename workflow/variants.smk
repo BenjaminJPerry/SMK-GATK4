@@ -28,7 +28,7 @@ SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam
 
 rule all:
     input:
-        "results/02_snvs/cohort.rawsnvs.bcftools.vcf.gz",
+        expand("results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz", samples = SAMPLES),
         expand("results/02_snvs/{samples}.rawsnvs.freebayes.vcf", samples = SAMPLES),
         expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz", samples = SAMPLES),
         expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.gvcf.gz", samples = SAMPLES),
@@ -97,14 +97,14 @@ rule gatk_HaplotypeCaller_vcf:
 rule bcftools_vcf:
     priority: 100
     input:
-        bams = expand("results/01_mapping/{samples}.sorted.mkdups.merged.bam", samples = SAMPLES),
+        bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam"
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
     output:
-        vcf = "results/02_snvs/cohort.rawsnvs.bcftools.vcf.gz",
+        vcf = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz",
     log:
-        "logs/bcftools_vcf.log"
+        "logs/bcftools_vcf.{samples}.log"
     benchmark:
-        "benchmarks/bcftools_vcf.tsv"
+        "benchmarks/bcftools_vcf.{samples}.tsv"
     threads: 24
     conda:
         "bcftools"
@@ -116,7 +116,7 @@ rule bcftools_vcf:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        bcftools mpileup --seed 1953 --threads {threads} --max-depth 500 -q 30 -Q 20 -m 10 -O u -f {input.referenceGenome} {input.bams} | bcftools call --threads {threads} -v -m -O z8 > {output.vcf}
+        bcftools mpileup --seed 1953 --threads {threads} --max-depth 500 -q 30 -Q 20 -m 10 -O u -f {input.referenceGenome} {input.bam} | bcftools call --threads {threads} -v -m -O z8 > {output.vcf}
 
         """
 
