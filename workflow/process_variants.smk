@@ -40,7 +40,7 @@ rule bgzip_freebayes_vcf:
     output:
         vcfgz = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz",
     benchmark:
-        "benchmarks/bgzip_freebayes_vcf.tsv"
+        "benchmarks/bgzip_freebayes_vcf.{samples}.tsv"
     threads: 8
     conda:
         "bcftools"
@@ -65,7 +65,7 @@ rule index_bcftools_vcf:
     output:
         csi = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz.csi",
     benchmark:
-        "benchmarks/index_bcftools_vcf.tsv"
+        "benchmarks/index_bcftools_vcf.{samples}.tsv"
     threads: 8
     conda:
         "bcftools"
