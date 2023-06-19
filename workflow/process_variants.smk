@@ -39,6 +39,7 @@ rule bgzip_freebayes_vcf:
         vcf = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf",
     output:
         vcfgz = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz",
+        csi = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz.csi",
     benchmark:
         "benchmarks/bgzip_freebayes_vcf.{samples}.tsv"
     threads: 8
@@ -90,7 +91,7 @@ rule merge_bcftools_vcf: #TODO
         vcfgz = expand("results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz", samples = SAMPLES),
         csi = expand("results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz.csi", samples = SAMPLES),
     output:
-        merged = "results/02_snvs/cohort.rawsnvs.bcftools.vcf.gz"
+        merged = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz"
     benchmark:
         "benchmarks/merge_bcftools_vcf.tsv"
     threads: 16
@@ -116,7 +117,7 @@ rule merge_freebayes_vcf: #TODO
         vcfgz = expand("results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz", samples = SAMPLES),
         csi = expand("results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi", samples = SAMPLES),
     output:
-        merged = "results/02_snvs/cohort.rawsnvs.freebayes.vcf.gz"
+        merged = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz"
     benchmark:
         "benchmarks/merge_freebayes_vcf.tsv"
     threads: 16
