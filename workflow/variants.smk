@@ -23,107 +23,127 @@ onstart:
     os.system('echo "  CONDA VERSION: $(conda --version)"')
 
 
-SAMPLES, = glob_wildcards("fastq/AHJNKHDSX5{samples}_R1.fastq.gz")
+SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam")
 
 
 rule all:
     input:
-        "",
+        "results/02_snvs/cohort.rawsnvs.bcftools.vcf.gz",
+        expand("results/02_snvs/{samples}.rawsnvs.freebayes.vcf", samples = SAMPLES),
+        expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz", samples = SAMPLES),
+        expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.gvcf.gz", samples = SAMPLES),
 
-rule gatk_HaplotypeCaller_first_pass:
+
+rule gatk_HaplotypeCaller_gvcf:
     input:
-        bams = "results/mapped/{sample}_recalibrated.bam",
-        refgenome = expand("{refgenome}", refgenome = config["REFGENOME"]),
+        bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
+        referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
     output:
-        protected("results/called/{sample}_raw_snps_indels.vcf")
-    params:
-        tdir = config["TEMPDIR"],
-        padding = get_wes_padding_command,
-        intervals = get_wes_intervals_command
+        gvcf = "results/02_snvs/{samples}.rawsnvs.haplotypeCaller.gvcf.gz",
     log:
-        "logs/gatk_HaplotypeCaller_single/{sample}.log"
+        "logs/gatk_HaplotypeCaller.gvcf.{samples}.log"
     benchmark:
-        "benchmarks/gatk_HaplotypeCaller_single/{sample}.tsv"
-    singularity:
-        "docker://broadinstitute/gatk:4.2.6.1"
+        "benchmarks/gatk_HaplotypeCaller.gvcf.{samples}.tsv"
     threads: 2
     resources:
-        mem_gb = 8,
-        # partition = config["PARTITION"]["CPU"]
-    message:
-        "Calling germline SNPs and indels via local re-assembly of haplotypes for {input.bams}"
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 7200 + ((attempt - 1) * 1440),
+        partition = "milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
     shell:
-        "gatk HaplotypeCaller "
-        "--java-options '-Xmx{resources.mem_gb}G' "
-        "-I {input.bams} "
-        "-R {input.refgenome} "
-        # "-D {input.dbsnp} "
-        "-O {output} "
-        "--tmp-dir {params.tdir} {params.padding} {params.intervals} "
-        "&> {log}"
+        'module load GATK/4.3.0.0-gimkl-2022a ; '
+        'gatk --java-options "-Xms2G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
+        'HaplotypeCaller '
+        '--min-base-quality-score 30 '
+        '-I {input.bam} '
+        '-R {input.referenceGenome} '
+        '-O {output.gvcf} '
+        '-ERC GVCF '
+        '--tmp-dir {resources.DTMP} '
+        '&> {log}.attempt.{resources.attempt} '
 
 
-rule gatk_BaseRecalibrator:
+rule gatk_HaplotypeCaller_vcf:
+    priority: 100
     input:
-        bams = "results/mapped/{sample}_sorted_mkdups.bam",
-        refgenome = expand("{refgenome}", refgenome = config["REFGENOME"])
+        bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
+        referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
     output:
-        report("results/mapped/{sample}_recalibration_report.grp", caption = "report/recalibration.rst", category = "Base recalibration")
-    params:
-        tdir = config["TEMPDIR"],
-        padding = get_wes_padding_command,
-        intervals = get_wes_intervals_command,
-        recalibration_resources = get_recal_resources_command
+        gvcf = "results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz",
     log:
-        "logs/gatk_BaseRecalibrator.{sample}.log"
+        "logs/gatk_HaplotypeCaller_vcf.{samples}.log"
     benchmark:
-        "benchmarks/gatk_BaseRecalibrator/{sample}.tsv"
-    singularity:
-        "docker://broadinstitute/gatk:4.2.6.1"
+        "benchmarks/gatk_HaplotypeCaller_vcf.{samples}.tsv"
     threads: 2
     resources:
-        mem_gb = 8,
-        # partition = config["PARTITION"]["CPU"]
-    message:
-        "Generating a recalibration table for {input.bams}"
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 2880 + ((attempt - 1) * 1440),
+        partition = "milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
     shell:
-        "gatk BaseRecalibrator "
-        "--java-options '-Xmx{resources.mem_gb}G' "
-        "-I {input.bams} "
-        "-R {input.refgenome} "
-        "-O {output} "
-        "--tmp-dir {params.tdir} {params.padding} {params.intervals} {params.recalibration_resources} "
-        "&> {log}"
+        'module load GATK/4.3.0.0-gimkl-2022a ; '
+        'gatk --java-options "-Xms2G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
+        'HaplotypeCaller '
+        '--min-base-quality-score 30 '
+        '-I {input.bam} '
+        '-R {input.referenceGenome} '
+        '-O {output.gvcf} '
+        '--tmp-dir {resources.DTMP} '
+        '&> {log}.attempt.{resources.attempt} '
 
 
-rule gatk_ApplyBQSR:
+rule bcftools_vcf:
+    priority: 100
     input:
-        bam = "results/mapped/{sample}_sorted_mkdups.bam",
-        recal = "results/mapped/{sample}_recalibration_report.grp",
-        refgenome = expand("{refgenome}", refgenome = config["REFGENOME"])
+        bams = expand("results/01_mapping/{samples}.sorted.mkdups.merged.bam", samples = SAMPLES),
+        referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
     output:
-        bam = protected("results/mapped/{sample}_recalibrated.bam")
-    params:
-        padding = get_wes_padding_command,
-        intervals = get_wes_intervals_command
+        vcf = "results/02_snvs/cohort.rawsnvs.bcftools.vcf.gz",
     log:
-        "logs/gatk_ApplyBQSR.{sample}.log"
+        "logs/bcftools_vcf.log"
     benchmark:
-        "benchmarks/gatk_ApplyBQSR/{sample}.tsv"
-    singularity:
-        "docker://broadinstitute/gatk:4.2.6.1"
-    threads: 2
+        "benchmarks/bcftools_vcf.tsv"
+    threads: 24
+    conda:
+        "bcftools"
     resources:
-        mem_gb = 8,
-        # partition = config["PARTITION"]["CPU"]
-    message:
-        "Applying base quality score recalibration and producing a recalibrated BAM file for {input.bam}"
+        mem_gb = lambda wildcards, attempt: 128 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 7200 + ((attempt - 1) * 1440),
+        partition = "milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
     shell:
-        "gatk ApplyBQSR "
-        "--java-options '-Xmx{resources.mem_gb}G' "
-        "-I {input.bam} "
-        "-bqsr {input.recal} "
-        "-R {input.refgenome} "
-        "-O {output} {params.padding} {params.intervals}"
+        """
+        bcftools mpileup --seed 1953 --threads {threads} --max-depth 500 -q 30 -Q 20 -m 10 -O u -f {input.referenceGenome} {input.bams} | bcftools call --threads {threads} -v -m -O z8 > {output.vcf}
+
+        """
 
 
+rule freebayes_vcf:
+    priority: 100
+    input:
+        bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
+        referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
+    output:
+        vcf = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf",
+    log:
+        "logs/freebayes_vcf.{samples}.log"
+    benchmark:
+        "benchmarks/freebayes_vcf.{samples}.tsv"
+    threads: 2
+    conda:
+        "freebayes"
+    resources:
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 2880 + ((attempt - 1) * 1440),
+        partition = "milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """
+        
+        freebayes --standard-filters --trim-complex-tail --min-coverage 30 -C 10 -F 0.1 -f {input.referenceGenome} {input.bam} > {output.vcf} 
+
+        """
