@@ -35,7 +35,7 @@ rule all:
 rule samtools_merge:
     priority: 100
     output: 
-        temp("results/01_mapping/{samples}.sorted.mkdups.merged.bam")
+        "results/01_mapping/{samples}.sorted.mkdups.merged.bam"
     log:
         "logs/samtools_merge.{samples}.log"
     benchmark:
@@ -52,38 +52,14 @@ rule samtools_merge:
         """
 
         samtools merge -f --threads {threads} - results/01_mapping/{wildcards.samples}*.sorted.mkdups.bam 2> {log} | samtools sort -l 8 -m 2G --threads {threads} > {output} && for file in $(ls results/01_mapping/{wildcards.samples}*.sorted.mkdups.bam); do rm $file; done;
-               
+
+        for file in $(ls results/01_mapping/{wildcards.samples}*.sorted.mkdups.bam.bai); do rm $file; done;
+
         samtools index {output}
 
         """
 
 
-rule gatk_HaplotypeCaller:
-    input:
-        bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
-        referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
-    output:
-        gvcf = "results/02_snvs/{samples}.raw.snvs.gvcf.gz",
-    log:
-        "logs/gatk_HaplotypeCaller.{samples}.log"
-    benchmark:
-        "benchmarks/gatk_HaplotypeCaller.{samples}.tsv"
-    threads: 2
-    resources:
-        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        'module load GATK/4.3.0.0-gimkl-2022a ; '
-        'gatk --java-options "-Xms2G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
-        'HaplotypeCaller '
-        '-I {input.bam} '
-        '-R {input.referenceGenome} '
-        '-O {output.gvcf} '
-        '-ERC GVCF '
-        '--tmp-dir {resources.DTMP} '
-        '&> {log}.attempt.{resources.attempt} '
+
 
 
