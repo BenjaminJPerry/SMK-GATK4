@@ -106,7 +106,7 @@ rule merge_bcftools_vcf: #TODO
     shell:
         """
         
-        bcftools merge --write-index --threads {threads} {input.vcfgz} -Oz8 -o {output.csi}
+        bcftools merge --write-index --threads {threads} {input.vcfgz} -Oz8 -o {output.merged}
 
         """
 
@@ -132,6 +132,6 @@ rule merge_freebayes_vcf: #TODO
     shell:
         """
         
-        bcftools merge --write-index --threads {threads} {input.vcfgz} -Oz8 -o {output.csi}
+        bcftools merge --write-index --threads {threads} {input.vcfgz} -Oz8 -o {output.merge}
 
         """
