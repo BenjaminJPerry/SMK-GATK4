@@ -38,7 +38,7 @@ rule freebayes_vcf: #ADDED TEMPORARILY TODO REMOVE AGAIN
         bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
     output:
-        vcf = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf",
+        vcf = temp("results/02_snvs/{samples}.rawsnvs.freebayes.vcf"),
     log:
         "logs/freebayes_vcf.{samples}.log"
     benchmark:
@@ -91,7 +91,7 @@ rule index_freebayes_vcf:
     input:
         vcfgz = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz",
     output:
-        csi = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi",
+        csi = temp("results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi"),
     benchmark:
         "benchmarks/index_freebayes_vcf.{samples}.tsv"
     threads: 8
@@ -116,7 +116,7 @@ rule index_bcftools_vcf:
     input:
         vcfgz = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz",
     output:
-        csi = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz.csi",
+        csi = temp("results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz.csi"),
     benchmark:
         "benchmarks/index_bcftools_vcf.{samples}.tsv"
     threads: 8
