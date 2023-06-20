@@ -115,11 +115,20 @@ rule bcftools_vcf:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        """
-        bcftools mpileup --seed 1953 --threads {threads} --max-depth 500 -q 30 -Q 20 -m 10 -O u -f {input.referenceGenome} {input.bam} | bcftools call --threads {threads} -v -m -O z8 > {output.vcf}
-
-        """
-
+        "bcftools mpileup "
+        "--seed 1953 "
+        "--threads {threads} "
+        "--max-depth 500 "
+        "-q 30 "
+        "-Q 20 "
+        "-m 10 "
+        "-Ou "
+        "-f {input.referenceGenome} {input.bam} "
+        "| bcftools call "
+        "--threads {threads} "
+        "-v "
+        "-m "
+        "-Oz8 > {output.vcf}"
 
 rule freebayes_vcf:
     priority: 100
@@ -142,8 +151,9 @@ rule freebayes_vcf:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        """
-        
-        freebayes --standard-filters --trim-complex-tail --min-coverage 30 -C 10 -F 0.1 -f {input.referenceGenome} {input.bam} > {output.vcf} 
-
-        """
+        "freebayes "
+        "--standard-filters "
+        "--pooled-continuous "
+        "--trim-complex-tail "
+        "-F 0.01 "
+        "-f {input.referenceGenome} {input.bam} > {output.vcf}"
