@@ -49,7 +49,7 @@ rule freebayes_vcf: #ADDED TEMPORARILY TODO REMOVE AGAIN
     resources:
         mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 2880 + ((attempt - 1) * 1440),
-        partition = "milan",
+        partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
@@ -75,7 +75,7 @@ rule bgzip_freebayes_vcf:
     resources:
         mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
-        partition = "milan",
+        partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
@@ -100,7 +100,7 @@ rule index_freebayes_vcf:
     resources:
         mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
-        partition = "milan",
+        partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
@@ -125,7 +125,7 @@ rule index_bcftools_vcf:
     resources:
         mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
-        partition = "milan",
+        partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
@@ -151,7 +151,7 @@ rule merge_freebayes_vcf: #TODO
     resources:
         mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition = "milan",
+        partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
@@ -177,7 +177,7 @@ rule merge_bcftools_vcf: #TODO
     resources:
         mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition = "milan",
+        partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
@@ -202,7 +202,7 @@ rule index_freebayes_merged:
     resources:
         mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition = "milan",
+        partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
@@ -223,7 +223,7 @@ rule index_bcftools_merged:
     resources:
         mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition = "milan",
+        partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
@@ -245,7 +245,7 @@ rule filter_freebayes_vcf:
     resources:
         mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition = "milan",
+        partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
@@ -267,7 +267,7 @@ rule filter_bcftools_vcf:
     resources:
         mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition = "milan",
+        partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
