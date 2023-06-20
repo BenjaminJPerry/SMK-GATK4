@@ -39,7 +39,6 @@ rule bgzip_freebayes_vcf:
         vcf = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf",
     output:
         vcfgz = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz",
-        csi = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi",
     benchmark:
         "benchmarks/bgzip_freebayes_vcf.{samples}.tsv"
     threads: 8
@@ -54,7 +53,32 @@ rule bgzip_freebayes_vcf:
     shell:
         """
         
-        bgzip -c -i -l 8 --threads {threads} {input.vcf} > {output.vcfgz}
+        bgzip -c -l 8 --threads {threads} {input.vcf} > {output.vcfgz}
+
+        """
+
+
+rule index_freebayes_vcf:
+    priority:100
+    input:
+        vcfgz = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz",
+    output:
+        csi = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi",
+    benchmark:
+        "benchmarks/index_freebayes_vcf.{samples}.tsv"
+    threads: 8
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
+        partition = "milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """
+        
+        bcftools index --threads {threads} {input.vcfgz} -o {output.csi}
 
         """
 
@@ -106,7 +130,7 @@ rule merge_bcftools_vcf: #TODO
     shell:
         """
         
-        bcftools merge --write-index --threads {threads} {input.vcfgz} -Oz8 -o {output.merged}
+        bcftools merge --threads {threads} {input.vcfgz} -Oz8 -o {output.merged}
 
         """
 
@@ -132,6 +156,6 @@ rule merge_freebayes_vcf: #TODO
     shell:
         """
         
-        bcftools merge --write-index --threads {threads} {input.vcfgz} -Oz8 -o {output.merged}
+        bcftools merge --threads {threads} {input.vcfgz} -Oz8 -o {output.merged}
 
         """
