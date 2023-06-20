@@ -241,7 +241,7 @@ rule filter_freebayes_vcf:
         "benchmarks/filter_freebayes_vcf.tsv"
     threads: 16
     conda:
-        "bcftools"
+        "freebayes"
     resources:
         mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
@@ -263,7 +263,7 @@ rule filter_bcftools_vcf:
         "benchmarks/filter_bcftools_vcf.tsv"
     threads: 16
     conda:
-        "bcftools"
+        "freebayes"
     resources:
         mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
