@@ -31,13 +31,13 @@ MGI, = glob_wildcards("fastq/MGI/{samples}_R1.fastq.gz")
 
 rule all:
     input:
+        "results/00_stats/seqkit.fastq.stats.txt",
         expand("results/00_stats/fastqc/{samples}_R2_fastqc.zip", samples = AHJNKHDSX5),
         expand("results/00_stats/fastqc/{samples}_R2_fastqc.zip", samples = BHJNVTDSX5),
         expand("results/00_stats/fastqc/{samples}_R2_fastqc.zip", samples = MGI),
         expand("results/00_stats/fastqc/{samples}_R1_fastqc.zip", samples = AHJNKHDSX5),
         expand("results/00_stats/fastqc/{samples}_R1_fastqc.zip", samples = BHJNVTDSX5),
         expand("results/00_stats/fastqc/{samples}_R1_fastqc.zip", samples = MGI),
-
         expand("results/00_stats/{samples}.sorted.mkdups.merged.bam.samtools_stats.txt", samples = SAMPLES),
         expand("results/00_stats/{samples}.mosdepth.summary.txt", samples = SAMPLES),
 
@@ -45,79 +45,102 @@ rule all:
 rule fastqc_AHJNKHDSX5:
     priority: 100
     input:
-        fastq1 = 'fastq/AHJNKHDSX5/{samples}_R1.fastq.gz',
-        fastq2 = 'fastq/AHJNKHDSX5/{samples}_R2.fastq.gz',
+        fastq1 = "fastq/AHJNKHDSX5/{samples}_R1.fastq.gz",
+        fastq2 = "fastq/AHJNKHDSX5/{samples}_R2.fastq.gz",
     output:
-        zip1 = 'results/00_stats/fastqc/{samples}_R1_fastqc.zip',
-        zip2 = 'results/00_stats/fastqc/{samples}_R2_fastqc.zip'
+        zip1 = "results/00_stats/fastqc/{samples}_R1_fastqc.zip",
+        zip2 = "results/00_stats/fastqc/{samples}_R2_fastqc.zip"
     conda:
-        'fastqc'
-        # 'docker://biocontainers/fastqc:v0.11.9_cv8'
-    threads: 8
+        "fastqc"
+    threads: 12
     resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,    
     shell:
-        'fastqc '
-        '-o results/00_stats/fastqc/ '
-        '-q '
-        '-t {threads} '
-        '{input.fastq1} {input.fastq2}'
+        "fastqc "
+        "-o results/00_stats/fastqc/ "
+        "-q "
+        "-t {threads} "
+        "{input.fastq1} {input.fastq2}"
 
 
 rule fastqc_BHJNVTDSX5:
     priority: 100
     input:
-        fastq1 = 'fastq/BHJNVTDSX5/{samples}_R1.fastq.gz',
-        fastq2 = 'fastq/BHJNVTDSX5/{samples}_R2.fastq.gz',
+        fastq1 = "fastq/BHJNVTDSX5/{samples}_R1.fastq.gz",
+        fastq2 = "fastq/BHJNVTDSX5/{samples}_R2.fastq.gz",
     output:
-        zip1 = 'results/00_stats/fastqc/{samples}_R1_fastqc.zip',
-        zip2 = 'results/00_stats/fastqc/{samples}_R2_fastqc.zip'
+        zip1 = "results/00_stats/fastqc/{samples}_R1_fastqc.zip",
+        zip2 = "results/00_stats/fastqc/{samples}_R2_fastqc.zip"
     conda:
-        'fastqc'
-        # 'docker://biocontainers/fastqc:v0.11.9_cv8'
-    threads: 8
+        "fastqc"
+    threads: 12
     resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,    
     shell:
-        'fastqc '
-        '-o results/00_stats/fastqc/ '
-        '-q '
-        '-t {threads} '
-        '{input.fastq1} {input.fastq2}'
+        "fastqc "
+        "-o results/00_stats/fastqc/ "
+        "-q "
+        "-t {threads} "
+        "{input.fastq1} {input.fastq2}"
 
 
 rule fastqc_MGI:
     priority: 100
     input:
-        fastq1 = 'fastq/MGI/{samples}_R1.fastq.gz',
-        fastq2 = 'fastq/MGI/{samples}_R2.fastq.gz',
+        fastq1 = "fastq/MGI/{samples}_R1.fastq.gz",
+        fastq2 = "fastq/MGI/{samples}_R2.fastq.gz",
     output:
-        zip1 = 'results/00_stats/fastqc/{samples}_R1_fastqc.zip',
-        zip2 = 'results/00_stats/fastqc/{samples}_R2_fastqc.zip'
+        zip1 = "results/00_stats/fastqc/{samples}_R1_fastqc.zip",
+        zip2 = "results/00_stats/fastqc/{samples}_R2_fastqc.zip"
     conda:
-        'fastqc'
-        # 'docker://biocontainers/fastqc:v0.11.9_cv8'
-    threads: 8
+        "fastqc"
+    threads: 12
     resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,    
     shell:
-        'fastqc '
-        '-o results/00_stats/fastqc/ '
-        '-q '
-        '-t {threads} '
-        '{input.fastq1} {input.fastq2}'
+        "fastqc "
+        "-o results/00_stats/fastqc/ "
+        "-q "
+        "-t {threads} "
+        "{input.fastq1} {input.fastq2}"
+
+
+
+rule seqkit_stats:
+    priority: 1000
+    input:
+        fastqA1 = expand("fastq/AHJNKHDSX5/{samples}_R1.fastq.gz", samples = AHJNKHDSX5),
+        fastqA2 = expand("fastq/AHJNKHDSX5/{samples}_R2.fastq.gz", samples = AHJNKHDSX5),
+        fastqB1 = expand("fastq/BHJNVTDSX5/{samples}_R1.fastq.gz", samples = BHJNVTDSX5),
+        fastqB2 = expand("fastq/BHJNVTDSX5/{samples}_R2.fastq.gz", samples = BHJNVTDSX5),
+        fastqM1 = expand("fastq/MGI/{samples}_R1.fastq.gz", samples = MGI),
+        fastqM2 = expand("fastq/MGI/{samples}_R2.fastq.gz", samples = MGI),
+    output:
+        "results/00_stats/seqkit.fastq.stats.txt"
+    benchmark:
+        "benchmarks/seqkit_stats.txt"
+    conda:
+        "seqkit"
+    threads: 32
+    resources:
+        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 4),
+        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 600),
+        partition="large,milan",
+    shell:
+        "seqkit stats -j {threads} -a {input.fastqA1} {input.fastqA2} {input.fastqB1} {input.fastqB2} {input.fastqM1} {input.fastqM2} > {output} "
+
 
 
 rule samtools_stats_merged:
