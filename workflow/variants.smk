@@ -145,7 +145,7 @@ rule freebayes_vcf:
     conda:
         "freebayes"
     resources:
-        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
+        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 2880 + ((attempt - 1) * 1440),
         partition = "milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",

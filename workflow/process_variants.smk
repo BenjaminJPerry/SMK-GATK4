@@ -28,37 +28,8 @@ SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam
 
 rule all:
     input:
-        "results/02_snvs/merged.filteredsnvs.MQM60.freebayes.vcf.gz",
-        "results/02_snvs/merged.filteredsnvs.MQM60.bcftools.vcf.gz",
-
-
-rule freebayes_vcf: #ADDED TEMPORARILY TODO REMOVE AGAIN
-    priority: 1000 #ADDED TEMPORARILY TODO REMOVE AGAIN
-    input: #ADDED TEMPORARILY TODO REMOVE AGAIN
-        bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam", #ADDED TEMPORARILY TODO REMOVE AGAIN
-        referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa", #ADDED TEMPORARILY TODO REMOVE AGAIN
-    output: #ADDED TEMPORARILY TODO REMOVE AGAIN
-        vcf = temp("results/02_snvs/{samples}.rawsnvs.freebayes.vcf"), #ADDED TEMPORARILY TODO REMOVE AGAIN
-    log: #ADDED TEMPORARILY TODO REMOVE AGAIN
-        "logs/freebayes_vcf.{samples}.log" #ADDED TEMPORARILY TODO REMOVE AGAIN
-    benchmark: #ADDED TEMPORARILY TODO REMOVE AGAIN
-        "benchmarks/freebayes_vcf.{samples}.tsv" #ADDED TEMPORARILY TODO REMOVE AGAIN
-    threads: 2 #ADDED TEMPORARILY TODO REMOVE AGAIN
-    conda: #ADDED TEMPORARILY TODO REMOVE AGAIN
-        "freebayes" #ADDED TEMPORARILY TODO REMOVE AGAIN
-    resources: #ADDED TEMPORARILY TODO REMOVE AGAIN
-        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64), #ADDED TEMPORARILY TODO REMOVE AGAIN
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440), #ADDED TEMPORARILY TODO REMOVE AGAIN
-        partition = "large,milan", #ADDED TEMPORARILY TODO REMOVE AGAIN
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp", #ADDED TEMPORARILY TODO REMOVE AGAIN
-        attempt = lambda wildcards, attempt: attempt, #ADDED TEMPORARILY TODO REMOVE AGAIN
-    shell: #ADDED TEMPORARILY TODO REMOVE AGAIN
-        "freebayes " #ADDED TEMPORARILY TODO REMOVE AGAIN
-        "--standard-filters " #ADDED TEMPORARILY TODO REMOVE AGAIN
-        "--pooled-continuous " #ADDED TEMPORARILY TODO REMOVE AGAIN
-        "--trim-complex-tail " #ADDED TEMPORARILY TODO REMOVE AGAIN
-        "-F 0.01 " #ADDED TEMPORARILY TODO REMOVE AGAIN
-        "-f {input.referenceGenome} {input.bam} > {output.vcf}" #ADDED TEMPORARILY TODO REMOVE AGAIN
+        "results/03_filtered/merged.filteredsnvs.QUAL20.freebayes.vcf.gz",
+        "results/03_filtered/merged.filteredsnvs.QUAL20.bcftools.vcf.gz",
 
 
 rule bgzip_freebayes_vcf:
@@ -236,7 +207,7 @@ rule filter_freebayes_vcf:
         merged = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz",
         index = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz.tbi"
     output:
-        filtered = "results/02_snvs/merged.filteredsnvs.QUAL20.freebayes.vcf.gz"
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL20.freebayes.vcf.gz"
     benchmark:
         "benchmarks/filter_freebayes_vcf.tsv"
     threads: 16
@@ -258,7 +229,7 @@ rule filter_bcftools_vcf:
         merged = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz",
         index = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz.tbi"
     output:
-        filtered = "results/02_snvs/merged.filteredsnvs.QUAL20.bcftools.vcf.gz"
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL20.bcftools.vcf.gz"
     benchmark:
         "benchmarks/filter_bcftools_vcf.tsv"
     threads: 16
