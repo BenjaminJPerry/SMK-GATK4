@@ -34,6 +34,10 @@ rule all:
         expand("results/00_stats/fastqc/{samples}_R2_fastqc.zip", samples = AHJNKHDSX5),
         expand("results/00_stats/fastqc/{samples}_R2_fastqc.zip", samples = BHJNVTDSX5),
         expand("results/00_stats/fastqc/{samples}_R2_fastqc.zip", samples = MGI),
+        expand("results/00_stats/fastqc/{samples}_R1_fastqc.zip", samples = AHJNKHDSX5),
+        expand("results/00_stats/fastqc/{samples}_R1_fastqc.zip", samples = BHJNVTDSX5),
+        expand("results/00_stats/fastqc/{samples}_R1_fastqc.zip", samples = MGI),
+
         expand("results/00_stats/{samples}.sorted.mkdups.merged.bam.samtools_stats.txt", samples = SAMPLES),
         expand("results/00_stats/{samples}.mosdepth.summary.txt", samples = SAMPLES),
 
@@ -44,8 +48,8 @@ rule fastqc_AHJNKHDSX5:
         fastq1 = 'fastq/AHJNKHDSX5/{samples}_R1.fastq.gz',
         fastq2 = 'fastq/AHJNKHDSX5/{samples}_R2.fastq.gz',
     output:
-        zip1 = 'results/00_stats/fastqc/{sample}_R1_fastqc.zip',
-        zip2 = 'results/00_stats/fastqc/{sample}_R2_fastqc.zip'
+        zip1 = 'results/00_stats/fastqc/{samples}_R1_fastqc.zip',
+        zip2 = 'results/00_stats/fastqc/{samples}_R2_fastqc.zip'
     conda:
         'fastqc'
         # 'docker://biocontainers/fastqc:v0.11.9_cv8'
@@ -70,8 +74,8 @@ rule fastqc_BHJNVTDSX5:
         fastq1 = 'fastq/BHJNVTDSX5/{samples}_R1.fastq.gz',
         fastq2 = 'fastq/BHJNVTDSX5/{samples}_R2.fastq.gz',
     output:
-        zip1 = 'results/00_stats/fastqc/{sample}_R1_fastqc.zip',
-        zip2 = 'results/00_stats/fastqc/{sample}_R2_fastqc.zip'
+        zip1 = 'results/00_stats/fastqc/{samples}_R1_fastqc.zip',
+        zip2 = 'results/00_stats/fastqc/{samples}_R2_fastqc.zip'
     conda:
         'fastqc'
         # 'docker://biocontainers/fastqc:v0.11.9_cv8'
@@ -96,8 +100,8 @@ rule fastqc_MGI:
         fastq1 = 'fastq/MGI/{samples}_R1.fastq.gz',
         fastq2 = 'fastq/MGI/{samples}_R2.fastq.gz',
     output:
-        zip1 = 'results/00_stats/fastqc/{sample}_R1_fastqc.zip',
-        zip2 = 'results/00_stats/fastqc/{sample}_R2_fastqc.zip'
+        zip1 = 'results/00_stats/fastqc/{samples}_R1_fastqc.zip',
+        zip2 = 'results/00_stats/fastqc/{samples}_R2_fastqc.zip'
     conda:
         'fastqc'
         # 'docker://biocontainers/fastqc:v0.11.9_cv8'
