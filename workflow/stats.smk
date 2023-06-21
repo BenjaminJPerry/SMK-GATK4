@@ -130,7 +130,7 @@ rule samtools_stats_merged:
     conda:
         "bwa"
     threads: 12
-        resources:
+    resources:
         mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 60),
         partition = "large,milan",
