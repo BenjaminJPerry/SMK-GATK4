@@ -33,32 +33,32 @@ rule all:
 
 
 rule freebayes_vcf: #ADDED TEMPORARILY TODO REMOVE AGAIN
-    priority: 1000
-    input:
-        bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
-        referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
-    output:
-        vcf = temp("results/02_snvs/{samples}.rawsnvs.freebayes.vcf"),
-    log:
-        "logs/freebayes_vcf.{samples}.log"
-    benchmark:
-        "benchmarks/freebayes_vcf.{samples}.tsv"
-    threads: 2
-    conda:
-        "freebayes"
-    resources:
-        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        "freebayes "
-        "--standard-filters "
-        "--pooled-continuous "
-        "--trim-complex-tail "
-        "-F 0.01 "
-        "-f {input.referenceGenome} {input.bam} > {output.vcf}"
+    priority: 1000 #ADDED TEMPORARILY TODO REMOVE AGAIN
+    input: #ADDED TEMPORARILY TODO REMOVE AGAIN
+        bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam", #ADDED TEMPORARILY TODO REMOVE AGAIN
+        referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa", #ADDED TEMPORARILY TODO REMOVE AGAIN
+    output: #ADDED TEMPORARILY TODO REMOVE AGAIN
+        vcf = temp("results/02_snvs/{samples}.rawsnvs.freebayes.vcf"), #ADDED TEMPORARILY TODO REMOVE AGAIN
+    log: #ADDED TEMPORARILY TODO REMOVE AGAIN
+        "logs/freebayes_vcf.{samples}.log" #ADDED TEMPORARILY TODO REMOVE AGAIN
+    benchmark: #ADDED TEMPORARILY TODO REMOVE AGAIN
+        "benchmarks/freebayes_vcf.{samples}.tsv" #ADDED TEMPORARILY TODO REMOVE AGAIN
+    threads: 2 #ADDED TEMPORARILY TODO REMOVE AGAIN
+    conda: #ADDED TEMPORARILY TODO REMOVE AGAIN
+        "freebayes" #ADDED TEMPORARILY TODO REMOVE AGAIN
+    resources: #ADDED TEMPORARILY TODO REMOVE AGAIN
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64), #ADDED TEMPORARILY TODO REMOVE AGAIN
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440), #ADDED TEMPORARILY TODO REMOVE AGAIN
+        partition = "large,milan", #ADDED TEMPORARILY TODO REMOVE AGAIN
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp", #ADDED TEMPORARILY TODO REMOVE AGAIN
+        attempt = lambda wildcards, attempt: attempt, #ADDED TEMPORARILY TODO REMOVE AGAIN
+    shell: #ADDED TEMPORARILY TODO REMOVE AGAIN
+        "freebayes " #ADDED TEMPORARILY TODO REMOVE AGAIN
+        "--standard-filters " #ADDED TEMPORARILY TODO REMOVE AGAIN
+        "--pooled-continuous " #ADDED TEMPORARILY TODO REMOVE AGAIN
+        "--trim-complex-tail " #ADDED TEMPORARILY TODO REMOVE AGAIN
+        "-F 0.01 " #ADDED TEMPORARILY TODO REMOVE AGAIN
+        "-f {input.referenceGenome} {input.bam} > {output.vcf}" #ADDED TEMPORARILY TODO REMOVE AGAIN
 
 
 rule bgzip_freebayes_vcf:
@@ -249,7 +249,7 @@ rule filter_freebayes_vcf:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        "vcffilter -f 'MQM = 60' {input.merged} > {output.filtered} "
+        "vcffilter -f 'QUAL > 20' {input.merged} > {output.filtered} " #TODO COMPRESS OUTPUT
 
 
 rule filter_bcftools_vcf:
@@ -271,5 +271,34 @@ rule filter_bcftools_vcf:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        "vcffilter -f 'MQM = 60' {input.merged} > {output.filtered} "
+        "vcffilter -f 'QUAL > 20' {input.merged} > {output.filtered} " #TODO COMPRESS OUTPUT
 
+
+rule bcftools_view_freebayes_fvcf:
+    priority:100
+    input:
+        filtered = "results/02_snvs/merged.filteredsnvs.MQM60.bcftools.vcf.gz",
+        regions = "resources/regions.txt"
+    output:
+        regionSNVs = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz"
+    benchmark:
+        "benchmarks/bcftools_view_freebayes_fvcf.tsv"
+    threads: 16
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        " bcftools view --threads {threads} -R <regions.txt> {input.vcfgz} -Oz8 -o {output.merged} "
+
+rule bcftools_view_bcftools_fvcf:
+
+
+rule intersect_freebayes_fvcf:
+
+
+rule intersect_bcftools_fvcf:
