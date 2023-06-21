@@ -133,10 +133,10 @@ rule seqkit_stats:
         "benchmarks/seqkit_stats.txt"
     conda:
         "seqkit"
-    threads: 32
+    threads: 64
     resources:
-        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 4),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 600),
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 4),
+        time = lambda wildcards, attempt: 360 + ((attempt - 1) * 600),
         partition="large,milan",
     shell:
         "seqkit stats -j {threads} -a {input.fastqA1} {input.fastqA2} {input.fastqB1} {input.fastqB2} {input.fastqM1} {input.fastqM2} > {output} "
