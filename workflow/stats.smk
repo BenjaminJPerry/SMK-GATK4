@@ -44,7 +44,7 @@ rule fastqc_AHJNKHDSX5:
         fastq1 = 'fastq/AHJNKHDSX5/{samples}_R1.fastq.gz',
         fastq2 = 'fastq/AHJNKHDSX5/{samples}_R2.fastq.gz',
     output:
-        zip1 = 'results/00_stats/fastqc/{sample}_R1_fastqc.zip'
+        zip1 = 'results/00_stats/fastqc/{sample}_R1_fastqc.zip',
         zip2 = 'results/00_stats/fastqc/{sample}_R2_fastqc.zip'
     conda:
         'fastqc'
@@ -70,7 +70,7 @@ rule fastqc_BHJNVTDSX5:
         fastq1 = 'fastq/BHJNVTDSX5/{samples}_R1.fastq.gz',
         fastq2 = 'fastq/BHJNVTDSX5/{samples}_R2.fastq.gz',
     output:
-        zip1 = 'results/00_stats/fastqc/{sample}_R1_fastqc.zip'
+        zip1 = 'results/00_stats/fastqc/{sample}_R1_fastqc.zip',
         zip2 = 'results/00_stats/fastqc/{sample}_R2_fastqc.zip'
     conda:
         'fastqc'
@@ -96,7 +96,7 @@ rule fastqc_MGI:
         fastq1 = 'fastq/MGI/{samples}_R1.fastq.gz',
         fastq2 = 'fastq/MGI/{samples}_R2.fastq.gz',
     output:
-        zip1 = 'results/00_stats/fastqc/{sample}_R1_fastqc.zip'
+        zip1 = 'results/00_stats/fastqc/{sample}_R1_fastqc.zip',
         zip2 = 'results/00_stats/fastqc/{sample}_R2_fastqc.zip'
     conda:
         'fastqc'
