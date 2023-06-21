@@ -236,7 +236,7 @@ rule filter_freebayes_vcf:
         merged = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz",
         index = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz.tbi"
     output:
-        filtered = "results/02_snvs/merged.filteredsnvs.MQM60.freebayes.vcf.gz"
+        filtered = "results/02_snvs/merged.filteredsnvs.QUAL20.freebayes.vcf.gz"
     benchmark:
         "benchmarks/filter_freebayes_vcf.tsv"
     threads: 16
@@ -258,7 +258,7 @@ rule filter_bcftools_vcf:
         merged = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz",
         index = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz.tbi"
     output:
-        filtered = "results/02_snvs/merged.filteredsnvs.MQM60.bcftools.vcf.gz"
+        filtered = "results/02_snvs/merged.filteredsnvs.QUAL20.bcftools.vcf.gz"
     benchmark:
         "benchmarks/filter_bcftools_vcf.tsv"
     threads: 16
