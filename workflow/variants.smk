@@ -118,16 +118,16 @@ rule bcftools_vcf:
         "bcftools mpileup "
         "--seed 1953 "
         "--threads {threads} "
-        "--max-depth 500 "
-        "-q 30 "
-        "-Q 20 "
-        "-m 10 "
+        "--max-depth 500 " # Max raw per-file depth; avoids excessive memory usage [250]
+        "-q 30 " # skip alignment with mapQ less than
+        "-Q 20 " # Skip bases with baseQ/BAQ less than
+        "-m 10 " # Minimum number gapped reads for indel candidates
         "-Ou "
         "-f {input.referenceGenome} {input.bam} "
         "| bcftools call "
         "--threads {threads} "
-        "-v "
-        "-m "
+        "-v " # Output variant sites only
+        "-m " # Alternative model for multiallelic and rare-variant calling
         "-Oz8 > {output.vcf}"
 
 rule freebayes_vcf:
@@ -152,8 +152,8 @@ rule freebayes_vcf:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         "freebayes "
-        "--standard-filters "
-        "--pooled-continuous "
-        "--trim-complex-tail "
-        "-F 0.01 "
+        "--standard-filters " # Use stringent input base and mapping quality filters. Equivalent to -m 30 -q 20 -R 0 -S 0
+        "--pooled-continuous " # Output all alleles which pass input filters, regardles of genotyping outcome or model.
+        "--trim-complex-tail " # Trim complex tails.
+        "-F 0.01 " # minimum fraction of observations supporting alternate allele within one individual [0.05]
         "-f {input.referenceGenome} {input.bam} > {output.vcf}"
