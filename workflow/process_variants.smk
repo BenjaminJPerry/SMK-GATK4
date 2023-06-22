@@ -259,7 +259,7 @@ rule filter_freebayes_vcf_QUAL30:
         merged = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz",
         index = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz.tbi"
     output:
-        filtered = "results/03_filtered/merged.filteredsnvs.QUAL30.freebayes.vcf.gz"
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL30.freebayes.vcf"
     benchmark:
         "benchmarks/filter_freebayes_vcf.tsv"
     threads: 16
