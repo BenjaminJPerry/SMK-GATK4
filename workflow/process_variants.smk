@@ -38,6 +38,8 @@ rule all:
         "results/03_filtered/merged.filteredsnvs.QUAL50.bcftools.vcf",
         "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf",
         "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf",
+        "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf.gz",
+        "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz"
 
 
 rule bgzip_freebayes_vcf:
@@ -429,7 +431,7 @@ rule filter_bcftools_vcf_QUAL60:
         "vcffilter -f 'QUAL > 60' {input.merged} > {output.filtered} " #TODO COMPRESS OUTPUT
 
 
-rule bcftools_view_freebayes_fvcf:
+rule bcftools_view_freebayes_fvcf: #TODO
     priority:100
     input:
         filtered = "results/02_snvs/merged.filteredsnvs.MQM60.bcftools.vcf.gz",
@@ -448,12 +450,65 @@ rule bcftools_view_freebayes_fvcf:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        " bcftools view --threads {threads} -R <regions.txt> {input.vcfgz} -Oz8 -o {output.merged} "
+        " bcftools view "
+        "--threads {threads} "
+        "-R <regions.txt> "
+        "--with-header "
+        "{input.vcfgz} "
+        "-Oz8 -o {output.merged} "
 
-rule bcftools_view_bcftools_fvcf:
+
+rule bcftools_view_bcf_freebayes:
+    priority:100
+    input:
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf",
+    output:
+        bcf = "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf.gz"
+    threads: 32
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        " bcftools view "
+        "--threads {threads} "
+        "{input.filtered} "
+        "-Oz8 -o {output.bcf} && "
+        "bcftools index {output.bcf} "
 
 
-rule intersect_freebayes_fvcf:
+rule bcftools_view_bcf_bcftools:
+    priority:100
+    input:
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf",
+    output:
+        bcf = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz"
+    threads: 32
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        " bcftools view "
+        "--threads {threads} "
+        "{input.filtered} "
+        "-Oz8 -o {output.bcf} && "
+        "bcftools index {output.bcf} "
 
 
-rule intersect_bcftools_fvcf:
+rule bcftools_view_bcftools_fvcf: #TODO
+
+
+rule intersect_freebayes_fvcf: #TODO
+
+
+rule intersect_bcftools_fvcf: #TODO
+
