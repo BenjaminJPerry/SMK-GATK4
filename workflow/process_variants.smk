@@ -478,7 +478,7 @@ rule bcftools_view_bcf_freebayes:
         "--threads {threads} "
         "{input.filtered} "
         "-Oz8 -o {output.bcf} && "
-        "bcftools index {output.bcf} "
+        "bcftools index --threads {threads} {output.bcf} "
 
 
 rule bcftools_view_bcf_bcftools:
@@ -501,7 +501,7 @@ rule bcftools_view_bcf_bcftools:
         "--threads {threads} "
         "{input.filtered} "
         "-Oz8 -o {output.bcf} && "
-        "bcftools index {output.bcf} "
+        "bcftools index --threads {threads} {output.bcf} "
 
 
 rule bcftools_view_bcftools_fvcf: #TODO
