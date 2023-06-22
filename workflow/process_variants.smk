@@ -28,8 +28,16 @@ SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam
 
 rule all:
     input:
-        "results/03_filtered/merged.filteredsnvs.QUAL20.freebayes.vcf.gz",
-        "results/03_filtered/merged.filteredsnvs.QUAL20.bcftools.vcf.gz",
+        "results/03_filtered/merged.filteredsnvs.QUAL20.freebayes.vcf",
+        "results/03_filtered/merged.filteredsnvs.QUAL20.bcftools.vcf",
+        "results/03_filtered/merged.filteredsnvs.QUAL30.freebayes.vcf",
+        "results/03_filtered/merged.filteredsnvs.QUAL30.bcftools.vcf",
+        "results/03_filtered/merged.filteredsnvs.QUAL40.freebayes.vcf",
+        "results/03_filtered/merged.filteredsnvs.QUAL40.bcftools.vcf",
+        "results/03_filtered/merged.filteredsnvs.QUAL50.freebayes.vcf",
+        "results/03_filtered/merged.filteredsnvs.QUAL50.bcftools.vcf",
+        "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf",
+        "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf",
 
 
 rule bgzip_freebayes_vcf:
@@ -201,7 +209,7 @@ rule index_bcftools_merged:
         "tabix -f {input.merged} "
 
 
-rule filter_freebayes_vcf:
+rule filter_freebayes_vcf_QUAL20:
     priority:100
     input:
         merged = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz",
@@ -223,13 +231,13 @@ rule filter_freebayes_vcf:
         "vcffilter -f 'QUAL > 20' {input.merged} > {output.filtered} " #TODO COMPRESS OUTPUT
 
 
-rule filter_bcftools_vcf:
+rule filter_bcftools_vcf_QUAL20:
     priority:100
     input:
         merged = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz",
         index = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz.tbi"
     output:
-        filtered = "results/03_filtered/merged.filteredsnvs.QUAL20.bcftools.vcf.gz"
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL20.bcftools.vcf"
     benchmark:
         "benchmarks/filter_bcftools_vcf.tsv"
     threads: 16
@@ -245,13 +253,189 @@ rule filter_bcftools_vcf:
         "vcffilter -f 'QUAL > 20' {input.merged} > {output.filtered} " #TODO COMPRESS OUTPUT
 
 
+rule filter_freebayes_vcf_QUAL30:
+    priority:100
+    input:
+        merged = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz",
+        index = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz.tbi"
+    output:
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL30.freebayes.vcf.gz"
+    benchmark:
+        "benchmarks/filter_freebayes_vcf.tsv"
+    threads: 16
+    conda:
+        "freebayes"
+    resources:
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        "vcffilter -f 'QUAL > 30' {input.merged} > {output.filtered} " #TODO COMPRESS OUTPUT
+
+
+rule filter_bcftools_vcf_QUAL30:
+    priority:100
+    input:
+        merged = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz",
+        index = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz.tbi"
+    output:
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL30.bcftools.vcf"
+    benchmark:
+        "benchmarks/filter_bcftools_vcf.tsv"
+    threads: 16
+    conda:
+        "freebayes"
+    resources:
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        "vcffilter -f 'QUAL > 30' {input.merged} > {output.filtered} " #TODO COMPRESS OUTPUT
+
+
+rule filter_freebayes_vcf_QUAL40:
+    priority:100
+    input:
+        merged = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz",
+        index = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz.tbi"
+    output:
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL40.freebayes.vcf"
+    benchmark:
+        "benchmarks/filter_freebayes_vcf.tsv"
+    threads: 16
+    conda:
+        "freebayes"
+    resources:
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        "vcffilter -f 'QUAL > 40' {input.merged} > {output.filtered} " #TODO COMPRESS OUTPUT
+
+
+rule filter_bcftools_vcf_QUAL40:
+    priority:100
+    input:
+        merged = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz",
+        index = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz.tbi"
+    output:
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL40.bcftools.vcf"
+    benchmark:
+        "benchmarks/filter_bcftools_vcf.tsv"
+    threads: 16
+    conda:
+        "freebayes"
+    resources:
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        "vcffilter -f 'QUAL > 40' {input.merged} > {output.filtered} " #TODO COMPRESS OUTPUT
+
+
+rule filter_freebayes_vcf_QUAL50:
+    priority:100
+    input:
+        merged = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz",
+        index = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz.tbi"
+    output:
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL50.freebayes.vcf"
+    benchmark:
+        "benchmarks/filter_freebayes_vcf.tsv"
+    threads: 16
+    conda:
+        "freebayes"
+    resources:
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        "vcffilter -f 'QUAL > 50' {input.merged} > {output.filtered} " #TODO COMPRESS OUTPUT
+
+
+rule filter_bcftools_vcf_QUAL50:
+    priority:100
+    input:
+        merged = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz",
+        index = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz.tbi"
+    output:
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL50.bcftools.vcf"
+    benchmark:
+        "benchmarks/filter_bcftools_vcf.tsv"
+    threads: 16
+    conda:
+        "freebayes"
+    resources:
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        "vcffilter -f 'QUAL > 50' {input.merged} > {output.filtered} " #TODO COMPRESS OUTPUT
+
+
+rule filter_freebayes_vcf_QUAL60:
+    priority:100
+    input:
+        merged = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz",
+        index = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz.tbi"
+    output:
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf"
+    benchmark:
+        "benchmarks/filter_freebayes_vcf.tsv"
+    threads: 16
+    conda:
+        "freebayes"
+    resources:
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        "vcffilter -f 'QUAL > 60' {input.merged} > {output.filtered} " #TODO COMPRESS OUTPUT
+
+
+rule filter_bcftools_vcf_QUAL60:
+    priority:100
+    input:
+        merged = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz",
+        index = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz.tbi"
+    output:
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf"
+    benchmark:
+        "benchmarks/filter_bcftools_vcf.tsv"
+    threads: 16
+    conda:
+        "freebayes"
+    resources:
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        "vcffilter -f 'QUAL > 60' {input.merged} > {output.filtered} " #TODO COMPRESS OUTPUT
+
+
 rule bcftools_view_freebayes_fvcf:
     priority:100
     input:
         filtered = "results/02_snvs/merged.filteredsnvs.MQM60.bcftools.vcf.gz",
         regions = "resources/regions.txt"
     output:
-        regionSNVs = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz"
+        regionSNVs = "results/02_snvs/merged.rawsnvs.bcftools.vcf"
     benchmark:
         "benchmarks/bcftools_view_freebayes_fvcf.tsv"
     threads: 16
