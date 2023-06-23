@@ -510,7 +510,7 @@ rule bcftools_view_bcftools_regions:
     priority:100
     input:
         filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz",
-        regions = 'resources/snp_targets.txt'
+        regions = "resources/snp_targets.txt"
     output:
         filtered_snps = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz.pigmentSNPs.vcf"
     threads: 2
@@ -533,10 +533,10 @@ rule bcftools_view_bcftools_regions:
 rule bcftools_view_freebayes_regions:
     priority:100
     input:
-        filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz",
-        regions = 'resources/snp_targets.txt'
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf.gz",
+        regions = "resources/snp_targets.txt"
     output:
-        filtered_snps = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz.pigmentSNPs.vcf"
+        filtered_snps = "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf.gz.pigmentSNPs.vcf"
     threads: 2
     conda:
         "bcftools"
