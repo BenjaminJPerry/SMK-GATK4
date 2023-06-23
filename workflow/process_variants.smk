@@ -39,7 +39,9 @@ rule all:
         "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf",
         "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf",
         "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf.gz",
-        "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz"
+        "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz",
+        "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf.gz.pigmentSNPs.vcf",
+        "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz.pigmentSNPs.vcf"
 
 
 rule bgzip_freebayes_vcf:
@@ -504,11 +506,56 @@ rule bcftools_view_bcf_bcftools:
         "bcftools index --threads {threads} {output.bcf} "
 
 
-rule bcftools_view_bcftools_fvcf: #TODO
+rule bcftools_view_bcftools_regions: #TODO
+    priority:100
+    input:
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz",
+    output:
+        filtered_snps = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz.pigmentSNPs.vcf"
+    threads: 2
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 4 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 6 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        " bcftools view "
+        "-R resources/snp_targets.txt "
+        "--threads {threads} "
+        "{input.filtered} "
+        "> {output.filtered_snps} "
 
 
-rule intersect_freebayes_fvcf: #TODO
+rule bcftools_view_freebayes_regions: #TODO
+    priority:100
+    input:
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz",
+    output:
+        filtered_snps = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz.pigmentSNPs.vcf"
+    threads: 2
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 4 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 6 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        " bcftools view "
+        "-R resources/snp_targets.txt "
+        "--threads {threads} "
+        "{input.filtered} "
+        "> {output.filtered_snps} "
 
 
-rule intersect_bcftools_fvcf: #TODO
+rule vcftools_vcfstats_bcftools_fvcf: #TODO
 
+
+rule rtg_vcfstats__bcftools_fvcf: #TODO
+
+
+rule bcftools_stats_bcftools_fvcf: #TODO
