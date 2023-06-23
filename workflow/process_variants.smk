@@ -510,6 +510,7 @@ rule bcftools_view_bcftools_regions: #TODO
     priority:100
     input:
         filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz",
+        regions = 'resources/snp_targets.txt'
     output:
         filtered_snps = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz.pigmentSNPs.vcf"
     threads: 2
@@ -523,7 +524,7 @@ rule bcftools_view_bcftools_regions: #TODO
         attempt = lambda wildcards, attempt: attempt,
     shell:
         " bcftools view "
-        "-R resources/snp_targets.txt "
+        "-R {input.regions} "
         "--threads {threads} "
         "{input.filtered} "
         "> {output.filtered_snps} "
@@ -533,6 +534,7 @@ rule bcftools_view_freebayes_regions: #TODO
     priority:100
     input:
         filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz",
+        regions = 'resources/snp_targets.txt'
     output:
         filtered_snps = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz.pigmentSNPs.vcf"
     threads: 2
@@ -546,7 +548,7 @@ rule bcftools_view_freebayes_regions: #TODO
         attempt = lambda wildcards, attempt: attempt,
     shell:
         " bcftools view "
-        "-R resources/snp_targets.txt "
+        "-R {input.regions} "
         "--threads {threads} "
         "{input.filtered} "
         "> {output.filtered_snps} "
