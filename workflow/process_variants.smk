@@ -506,7 +506,7 @@ rule bcftools_view_bcf_bcftools:
         "bcftools index --threads {threads} {output.bcf} "
 
 
-rule bcftools_view_bcftools_regions: #TODO
+rule bcftools_view_bcftools_regions:
     priority:100
     input:
         filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz",
@@ -530,7 +530,7 @@ rule bcftools_view_bcftools_regions: #TODO
         "> {output.filtered_snps} "
 
 
-rule bcftools_view_freebayes_regions: #TODO
+rule bcftools_view_freebayes_regions:
     priority:100
     input:
         filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz",
