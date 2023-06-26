@@ -556,6 +556,53 @@ rule bcftools_view_freebayes_regions:
         "> {output.filtered_snps} "
 
 
+rule bcftools_view_bcf_freebayes_QUAL20:
+    priority:100
+    input:
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL20.freebayes.vcf",
+    output:
+        bcf = "results/03_filtered/merged.filteredsnvs.QUAL20.freebayes.vcf.gz"
+    threads: 32
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        " bcftools view "
+        "--threads {threads} "
+        "{input.filtered} "
+        "-Oz8 -o {output.bcf} && "
+        "bcftools index --threads {threads} {output.bcf} "
+
+
+rule bcftools_view_bcf_bcftools_QUAL20:
+    priority:100
+    input:
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL20.bcftools.vcf",
+    output:
+        bcf = "results/03_filtered/merged.filteredsnvs.QUAL20.bcftools.vcf.gz"
+    threads: 32
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        " bcftools view "
+        "--threads {threads} "
+        "{input.filtered} "
+        "-Oz8 -o {output.bcf} && "
+        "bcftools index --threads {threads} {output.bcf} "
+
+
+
 rule bcftools_view_bcftools_regions_QUAL20:
     priority:100
     input:
