@@ -41,7 +41,9 @@ rule all:
         "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf.gz",
         "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz",
         "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf.gz.pigmentSNPs.vcf",
-        "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz.pigmentSNPs.vcf"
+        "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz.pigmentSNPs.vcf",
+        "results/03_filtered/merged.filteredsnvs.QUAL20.freebayes.vcf.gz.pigmentSNPs.vcf",
+        "results/03_filtered/merged.filteredsnvs.QUAL20.bcftools.vcf.gz.pigmentSNPs.vcf"
 
 
 rule bgzip_freebayes_vcf:
