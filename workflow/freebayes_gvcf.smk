@@ -117,9 +117,9 @@ rule merge_freebayes_gvcf: #TODO
     priority:100
     input:
         gvcfgz = expand("results/02_snvs/{samples}.QUAL20.freebayes.gvcf.gz", samples = SAMPLES),
-        csi = expand("results/02_snvs/{samples}.rawsnvs.freebayes.gvcf.gz.csi", samples = SAMPLES),
+        csi = expand("results/02_snvs/{samples}.QUAL20.freebayes.gvcf.gz.csi", samples = SAMPLES),
     output:
-        merged = "results/02_snvs/merged.rawsnvs.freebayes.gvcf.gz"
+        merged = "results/02_snvs/merged.rawsnvs.QUAL20.gvcf.gz"
     benchmark:
         "benchmarks/merge_freebayes_gvcf.tsv"
     threads: 16
