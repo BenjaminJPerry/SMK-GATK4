@@ -159,5 +159,5 @@ rule bcftools_view_freebayes_regions:
         " bcftools view "
         "-R {input.regions} "
         "--threads {threads} "
-        "{input.filtered} "
+        "{input.gvcf} "
         "> {output.filtered_snps} "
