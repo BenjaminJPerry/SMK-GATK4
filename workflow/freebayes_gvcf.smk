@@ -93,7 +93,7 @@ rule index_freebayes_gvcf:
     input:
         gvcfgz = "results/02_snvs/{samples}.QUAL20.freebayes.gvcf.gz",
     output:
-        csi = temp("results/02_snvs/{samples}.QUAL20.freebayes.gvcf.gz.csi"),
+        csi = "results/02_snvs/{samples}.QUAL20.freebayes.gvcf.gz.csi",
     benchmark:
         "benchmarks/index_freebayes_gvcf.{samples}.tsv"
     threads: 8
@@ -119,7 +119,7 @@ rule merge_freebayes_gvcf: #TODO
         gvcfgz = expand("results/02_snvs/{samples}.QUAL20.freebayes.gvcf.gz", samples = SAMPLES),
         csi = expand("results/02_snvs/{samples}.QUAL20.freebayes.gvcf.gz.csi", samples = SAMPLES),
     output:
-        merged = "results/02_snvs/merged.rawsnvs.QUAL20.gvcf.gz"
+        merged = "results/02_snvs/merged.QUAL20.freebayes.gvcf.gz"
     benchmark:
         "benchmarks/merge_freebayes_gvcf.tsv"
     threads: 16
