@@ -28,10 +28,10 @@ SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam
 
 rule all:
     input:
-        "results/02_snvs/merged.rawsnvs.freebayes.gvcf.gz.pigmentSNPs.vcf",
+        "results/02_snvs/merged.QUAL20.freebayes.gvcf.gz.pigmentSNPs.vcf",
 
 
-rule freebayes_vcf:
+rule freebayes_gvcf:
     priority: 100
     input:
         bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
@@ -63,7 +63,7 @@ rule freebayes_vcf:
         "> {output.gvcf}  "
 
 
-rule bgzip_freebayes_vcf:
+rule bgzip_freebayes_gvcf:
     priority:100
     input:
         gvcf = "results/02_snvs/{samples}.QUAL20.freebayes.gvcf",
@@ -88,7 +88,7 @@ rule bgzip_freebayes_vcf:
         """
 
 
-rule index_freebayes_vcf:
+rule index_freebayes_gvcf:
     priority:100
     input:
         gvcfgz = "results/02_snvs/{samples}.QUAL20.freebayes.gvcf.gz",
@@ -113,10 +113,10 @@ rule index_freebayes_vcf:
         """
 
 
-rule merge_freebayes_vcf: #TODO
+rule merge_freebayes_gvcf: #TODO
     priority:100
     input:
-        gvcfgz = expand("results/02_snvs/{samples}.QUAL20.freebayes.gvcf.gz.gz", samples = SAMPLES),
+        gvcfgz = expand("results/02_snvs/{samples}.QUAL20.freebayes.gvcf.gz", samples = SAMPLES),
         csi = expand("results/02_snvs/{samples}.rawsnvs.freebayes.gvcf.gz.csi", samples = SAMPLES),
     output:
         merged = "results/02_snvs/merged.rawsnvs.freebayes.gvcf.gz"
@@ -142,10 +142,10 @@ rule merge_freebayes_vcf: #TODO
 rule bcftools_view_freebayes_regions:
     priority:100
     input:
-        gvcf = "results/02_snvs/merged.rawsnvs.freebayes.gvcf.gz",
+        gvcf = "results/02_snvs/merged.QUAL20.freebayes.gvcf.gz",
         regions = "resources/snp_targets.txt"
     output:
-        filtered_snps = "results/02_snvs/merged.rawsnvs.freebayes.gvcf.gz.pigmentSNPs.vcf"
+        filtered_snps = "results/02_snvs/merged.QUAL20.freebayes.gvcf.gz.pigmentSNPs.vcf"
     threads: 2
     conda:
         "bcftools"
