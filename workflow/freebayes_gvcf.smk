@@ -108,7 +108,7 @@ rule index_freebayes_gvcf:
     shell:
         """
         
-        bcftools index --threads {threads} {input.vcfgz} -o {output.csi}
+        bcftools index --threads {threads} {input.gvcfgz} -o {output.csi}
 
         """
 
