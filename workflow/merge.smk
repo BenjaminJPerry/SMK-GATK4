@@ -28,8 +28,7 @@ SAMPLES = "NEGATIVE,Blank,120001,2201,2202,2203,2204,2205,2206,2207,2209,2212,22
 
 rule all:
     input:
-#        expand("results/01_mapping/{samples}.merged.bam", samples = SAMPLES.split(","))
-        expand("results/02_snvs/{samples}.raw.snvs.gvcf.gz", samples = SAMPLES.split(",")),
+        expand("results/01_mapping/{samples}.merged.bam", samples = SAMPLES.split(","))
 
 
 rule samtools_merge:
@@ -58,8 +57,4 @@ rule samtools_merge:
         samtools index {output}
 
         """
-
-
-
-
 
