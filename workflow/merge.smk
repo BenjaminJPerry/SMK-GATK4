@@ -28,7 +28,7 @@ SAMPLES = "NEGATIVE,Blank,120001,2201,2202,2203,2204,2205,2206,2207,2209,2212,22
 
 rule all:
     input:
-        expand("results/01_mapping/{samples}.merged.bam", samples = SAMPLES.split(","))
+        expand("results/01_mapping/{samples}.sorted.mkdups.merged.bam", samples = SAMPLES.split(","))
 
 
 rule samtools_merge:
