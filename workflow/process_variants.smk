@@ -46,31 +46,6 @@ rule all:
         "results/03_filtered/merged.filteredsnvs.QUAL20.bcftools.vcf.gz.pigmentSNPs.vcf"
 
 
-rule bgzip_freebayes_vcf:
-    priority:100
-    input:
-        vcf = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf",
-    output:
-        vcfgz = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz",
-    benchmark:
-        "benchmarks/bgzip_freebayes_vcf.{samples}.tsv"
-    threads: 8
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        """
-        
-        bgzip -c -l 8 --threads {threads} {input.vcf} > {output.vcfgz}
-
-        """
-
-
 rule index_freebayes_vcf:
     priority:100
     input:

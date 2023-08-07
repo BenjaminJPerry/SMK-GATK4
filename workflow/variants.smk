@@ -29,7 +29,7 @@ SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam
 rule all:
     input:
         expand("results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz", samples = SAMPLES),
-        expand("results/02_snvs/{samples}.rawsnvs.freebayes.vcf", samples = SAMPLES),
+        expand("results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz", samples = SAMPLES),
         expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz", samples = SAMPLES),
         expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.gvcf.gz", samples = SAMPLES),
 
@@ -157,3 +157,30 @@ rule freebayes_vcf:
         "--trim-complex-tail " # Trim complex tails.
         "-F 0.01 " # minimum fraction of observations supporting alternate allele within one individual [0.05]
         "-f {input.referenceGenome} {input.bam} > {output.vcf}"
+
+
+rule bgzip_freebayes_vcf:
+    priority:100
+    input:
+        vcf = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf",
+    output:
+        vcfgz = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz",
+    benchmark:
+        "benchmarks/bgzip_freebayes_vcf.{samples}.tsv"
+    threads: 8
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """
+        
+        bgzip -c -l 8 --threads {threads} {input.vcf} > {output.vcfgz}
+
+        """
+
+
