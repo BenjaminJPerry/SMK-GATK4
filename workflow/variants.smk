@@ -136,7 +136,7 @@ rule freebayes_vcf:
         bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
     output:
-        vcf = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf",
+        vcf = temp("results/02_snvs/{samples}.rawsnvs.freebayes.vcf"),
     log:
         "logs/freebayes_vcf.{samples}.log"
     benchmark:
