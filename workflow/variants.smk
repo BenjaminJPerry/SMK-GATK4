@@ -119,7 +119,7 @@ rule bcftools_vcf:
         "bcftools mpileup "
         "--seed 1953 "
         "--threads {threads} "
-        "--max-depth 100 " # Max raw per-file depth; avoids excessive memory usage [250]
+        "--max-depth 250 " # Max raw per-file depth; avoids excessive memory usage [250]
         "-q 30 " # skip alignment with mapQ less than
         "-Q 20 " # Skip bases with baseQ/BAQ less than
         "-m 10 " # Minimum number gapped reads for indel candidates
@@ -206,14 +206,11 @@ rule varscan2_vcf:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        "bcftools mpileup "
-        "--seed 1953 "
+        "samtools mpileup "
         "--threads {threads} "
-        "--max-depth 100 " # Max raw per-file depth; avoids excessive memory usage [250]
+        "--max-depth 250 " # Max raw per-file depth; avoids excessive memory usage [250]
         "-q 30 " # skip alignment with mapQ less than
         "-Q 20 " # Skip bases with baseQ/BAQ less than
-        "-m 10 " # Minimum number gapped reads for indel candidates
-        "-O u "
         "-f {input.referenceGenome} {input.bam} "
         "| varscan  mpileup2snp "
         "--min-coverage 10 "
