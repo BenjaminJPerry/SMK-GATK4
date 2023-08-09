@@ -30,33 +30,9 @@ rule all:
     input:
         "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf.gz",
         "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz",
+        "results/03_filtered/merged.filteredsnvs.QUAL60.varscan2.vcf.gz",
         "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf.gz.pigmentSNPs.vcf",
         "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz.pigmentSNPs.vcf",
-
-
-rule index_freebayes_vcf:
-    priority:100
-    input:
-        vcfgz = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz",
-    output:
-        csi = temp("results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi"),
-    benchmark:
-        "benchmarks/index_freebayes_vcf.{samples}.tsv"
-    threads: 8
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        """
-        
-        bcftools index --threads {threads} {input.vcfgz} -o {output.csi}
-
-        """
 
 
 rule index_bcftools_vcf:
@@ -105,32 +81,6 @@ rule index_varscan2_vcf:
         """
         
         bcftools index --threads {threads} {input.vcfgz} -o {output.csi}
-
-        """
-
-
-rule merge_freebayes_vcf: #TODO
-    priority:100
-    input:
-        vcfgz = temp(expand("results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz", samples = SAMPLES)),
-        csi = temp(expand("results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi", samples = SAMPLES)),
-    output:
-        merged = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz"
-    benchmark:
-        "benchmarks/merge_freebayes_vcf.tsv"
-    threads: 16
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        """
-        
-        bcftools merge --threads {threads} {input.vcfgz} -Oz8 -o {output.merged}
 
         """
 

@@ -78,7 +78,7 @@ rule bcftools_vcf:
 rule varscan2_vcf:
     priority: 100
     input:
-        bams = expand("results/01_mapping/{samples}.sorted.mkdups.merged.bam", samples = SAMPLES)
+        bams = expand("results/01_mapping/{samples}.sorted.mkdups.merged.bam", samples = SAMPLES),
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
     output:
         vcf = temp("results/02_snvs/merged.rawsnvs.varscan2.vcf"),
