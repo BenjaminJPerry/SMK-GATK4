@@ -31,7 +31,7 @@ rule all:
         expand("results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz", samples = SAMPLES),
         expand("results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz", samples = SAMPLES),
         expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz", samples = SAMPLES),
-        expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.gvcf.gz", samples = SAMPLES),
+        expand("results/02_snvs/{samples}.rawsnvs.varscan2.vcf.gz", samples = SAMPLES),
 
 
 rule gatk_HaplotypeCaller_gvcf:
@@ -47,15 +47,16 @@ rule gatk_HaplotypeCaller_gvcf:
     threads: 4
     resources:
         mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 7200 + ((attempt - 1) * 1440),
+        time = lambda wildcards, attempt: 10080 + ((attempt - 1) * 1440),
         partition = "milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        'module load GATK/4.4.0.0-gimkl-2022a ; '
+        'module load GATK/4.3.0.0-gimkl-2022a ; '
         'gatk --java-options "-Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
         'HaplotypeCaller '
         '--create-output-variant-index '
+        '--base-quality-score-threshold 20 ' 
         '-I {input.bam} '
         '-R {input.referenceGenome} '
         '-O {output.gvcf} '
@@ -78,15 +79,15 @@ rule gatk_HaplotypeCaller_vcf:
     threads: 4
     resources:
         mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 4320 + ((attempt - 1) * 1440),
+        time = lambda wildcards, attempt: 10080 + ((attempt - 1) * 1440),
         partition = "milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        'module load GATK/4.4.0.0-gimkl-2022a ; '
+        'module load GATK/4.3.0.0-gimkl-2022a ; '
         'gatk --java-options "-Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
         'HaplotypeCaller '
-        '--create-output-variant-index '
+        '--base-quality-score-threshold 20 ' 
         '-I {input.bam} '
         '-R {input.referenceGenome} '
         '-O {output.gvcf} '
@@ -118,7 +119,7 @@ rule bcftools_vcf:
         "bcftools mpileup "
         "--seed 1953 "
         "--threads {threads} "
-        "--max-depth 500 " # Max raw per-file depth; avoids excessive memory usage [250]
+        "--max-depth 100 " # Max raw per-file depth; avoids excessive memory usage [250]
         "-q 30 " # skip alignment with mapQ less than
         "-Q 20 " # Skip bases with baseQ/BAQ less than
         "-m 10 " # Minimum number gapped reads for indel candidates
@@ -153,9 +154,9 @@ rule freebayes_vcf:
     shell:
         "freebayes "
         "--standard-filters " # Use stringent input base and mapping quality filters. Equivalent to -m 30 -q 20 -R 0 -S 0
-        "--pooled-continuous " # Output all alleles which pass input filters, regardles of genotyping outcome or model.
-        "--trim-complex-tail " # Trim complex tails.
-        "-F 0.01 " # minimum fraction of observations supporting alternate allele within one individual [0.05]
+        #"--pooled-continuous " # Output all alleles which pass input filters, regardles of genotyping outcome or model.
+        #"--trim-complex-tail " # Trim complex tails.
+        #"-F 0.01 " # minimum fraction of observations supporting alternate allele within one individual [0.05]
         "-f {input.referenceGenome} {input.bam} > {output.vcf}"
 
 
@@ -184,3 +185,58 @@ rule bgzip_freebayes_vcf:
         """
 
 
+rule varscan2_vcf:
+    priority: 100
+    input:
+        bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
+        referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
+    output:
+        vcf = temp("results/02_snvs/{samples}.rawsnvs.varscan2.vcf.gz"),
+    log:
+        "logs/varscan2_vcf.{samples}.log"
+    benchmark:
+        "benchmarks/varscan2_vcf.{samples}.tsv"
+    threads: 24
+    conda:
+        "varscan2"
+    resources:
+        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 2880 + ((attempt - 1) * 1440),
+        partition = "milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        "bcftools mpileup "
+        "--seed 1953 "
+        "--threads {threads} "
+        "--max-depth 100 " # Max raw per-file depth; avoids excessive memory usage [250]
+        "-q 30 " # skip alignment with mapQ less than
+        "-Q 20 " # Skip bases with baseQ/BAQ less than
+        "-m 10 " # Minimum number gapped reads for indel candidates
+        "| varscan  mpileup2snp "
+        "--output-file {output.vcf} "
+
+
+rule bgzip_varscan2_vcf:
+    priority:100
+    input:
+        vcf = "results/02_snvs/{samples}.rawsnvs.varscan2.vcf.gz",
+    output:
+        vcfgz = "results/02_snvs/{samples}.rawsnvs.varscan2.vcf.gz",
+    benchmark:
+        "benchmarks/bgzip_varscan2_vcf.{samples}.tsv"
+    threads: 8
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """
+        
+        bgzip -c -l 8 --threads {threads} {input.vcf} > {output.vcfgz}
+
+        """
