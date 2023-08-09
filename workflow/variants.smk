@@ -154,6 +154,7 @@ rule freebayes_vcf:
     shell:
         "freebayes "
         "--standard-filters " # Use stringent input base and mapping quality filters. Equivalent to -m 30 -q 20 -R 0 -S 0
+        "--limit-coverage 250 " # Match the other variant callers
         #"--pooled-continuous " # Output all alleles which pass input filters, regardles of genotyping outcome or model.
         #"--trim-complex-tail " # Trim complex tails.
         #"-F 0.01 " # minimum fraction of observations supporting alternate allele within one individual [0.05]
