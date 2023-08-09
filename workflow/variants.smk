@@ -196,7 +196,7 @@ rule varscan2_vcf:
         "logs/varscan2_vcf.{samples}.log"
     benchmark:
         "benchmarks/varscan2_vcf.{samples}.tsv"
-    threads: 24
+    threads: 2
     conda:
         "varscan2"
     resources:
@@ -207,7 +207,6 @@ rule varscan2_vcf:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         "samtools mpileup "
-        "--threads {threads} "
         "--max-depth 250 " # Max raw per-file depth; avoids excessive memory usage [250]
         "-q 30 " # skip alignment with mapQ less than
         "-Q 20 " # Skip bases with baseQ/BAQ less than
