@@ -96,6 +96,31 @@ rule index_bcftools_vcf:
         """
 
 
+rule index_varscan2_vcf:
+    priority:100
+    input:
+        vcfgz = "results/02_snvs/{samples}.rawsnvs.varscan2.vcf.gz",
+    output:
+        csi = temp("results/02_snvs/{samples}.rawsnvs.varscan2.vcf.gz.csi"),
+    benchmark:
+        "benchmarks/index_varscan2_vcf.{samples}.tsv"
+    threads: 8
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """
+        
+        bcftools index --threads {threads} {input.vcfgz} -o {output.csi}
+
+        """
+
+
 rule merge_freebayes_vcf: #TODO
     priority:100
     input:

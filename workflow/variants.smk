@@ -66,7 +66,7 @@ rule gatk_HaplotypeCaller_gvcf:
 
 
 rule gatk_HaplotypeCaller_vcf:
-    priority: 100
+    priority: 1
     input:
         bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
@@ -161,7 +161,7 @@ rule freebayes_vcf:
 
 
 rule bgzip_freebayes_vcf:
-    priority:100
+    priority:1000
     input:
         vcf = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf",
     output:
@@ -191,7 +191,7 @@ rule varscan2_vcf:
         bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
     output:
-        vcf = temp("results/02_snvs/{samples}.rawsnvs.varscan2.vcf.gz"),
+        vcf = temp("results/02_snvs/{samples}.rawsnvs.varscan2.vcf"),
     log:
         "logs/varscan2_vcf.{samples}.log"
     benchmark:
@@ -217,13 +217,13 @@ rule varscan2_vcf:
         "--min-coverage 10 "
         "--min-avg-qual 20 "
         "--output-vcf "
-        "--output-file {output.vcf} "
+        "> {output.vcf} "
 
 
 rule bgzip_varscan2_vcf:
-    priority:100
+    priority:1000
     input:
-        vcf = "results/02_snvs/{samples}.rawsnvs.varscan2.vcf.gz",
+        vcf = "results/02_snvs/{samples}.rawsnvs.varscan2.vcf",
     output:
         vcfgz = "results/02_snvs/{samples}.rawsnvs.varscan2.vcf.gz",
     benchmark:
