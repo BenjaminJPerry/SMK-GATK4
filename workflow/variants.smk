@@ -213,6 +213,8 @@ rule varscan2_vcf:
         "-q 30 " # skip alignment with mapQ less than
         "-Q 20 " # Skip bases with baseQ/BAQ less than
         "-m 10 " # Minimum number gapped reads for indel candidates
+        "-O u "
+        "-f {input.referenceGenome} {input.bam} "
         "| varscan  mpileup2snp "
         "--min-coverage 10 "
         "--min-avg-qual 20 "
