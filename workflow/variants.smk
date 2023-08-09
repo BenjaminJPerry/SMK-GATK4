@@ -214,6 +214,9 @@ rule varscan2_vcf:
         "-Q 20 " # Skip bases with baseQ/BAQ less than
         "-m 10 " # Minimum number gapped reads for indel candidates
         "| varscan  mpileup2snp "
+        "--min-coverage 10 "
+        "--min-avg-qual 20 "
+        "--output-vcf "
         "--output-file {output.vcf} "
 
 
