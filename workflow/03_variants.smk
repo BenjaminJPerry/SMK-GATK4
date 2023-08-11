@@ -47,7 +47,7 @@ rule bcftools_vcf:
         bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
     output:
-        vcf = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz",
+        vcf = temp("results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz"),
     log:
         "logs/bcftools_vcf.{samples}.log"
     benchmark:
