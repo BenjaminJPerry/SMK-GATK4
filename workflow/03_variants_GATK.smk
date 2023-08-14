@@ -29,7 +29,8 @@ CHROM = ('chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9',
 
 rule all:
     input:
-        "results/02_snvs/merged.rawsnvs.haplotypeCaller.vcf.gz",
+        expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz", samples = SAMPLES),
+        # "results/02_snvs/merged.rawsnvs.haplotypeCaller.vcf.gz",
 
 
 
@@ -143,53 +144,53 @@ rule merge_replicons_vcf: #TODO
 
 
 
-rule index_animals_vcf:
-    priority:100
-    input:
-        vcfgz = "results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz",
-    output:
-        csi = temp("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi"),
-    benchmark:
-        "benchmarks/index_varscan2_vcf.{samples}.tsv"
-    threads: 8
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        """
+# rule index_animals_vcf:
+#     priority:100
+#     input:
+#         vcfgz = "results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz",
+#     output:
+#         csi = temp("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi"),
+#     benchmark:
+#         "benchmarks/index_varscan2_vcf.{samples}.tsv"
+#     threads: 8
+#     conda:
+#         "bcftools"
+#     resources:
+#         mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
+#         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
+#         partition = "large,milan",
+#         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+#         attempt = lambda wildcards, attempt: attempt,
+#     shell:
+#         """
         
-        bcftools index --threads {threads} {input.vcfgz} -o {output.csi}
+#         bcftools index --threads {threads} {input.vcfgz} -o {output.csi}
 
-        """
+#         """
 
 
-rule merge_animals_vcf: #TODO
-    priority:100
-    input:
-        vcfgz = expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz", samples = SAMPLES),
-        csi = expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi", samples = SAMPLES),
-    output:
-        merged = "results/02_snvs/merged.rawsnvs.haplotypeCaller.vcf.gz"
-    benchmark:
-        "benchmarks/merge_varscan2_vcf.tsv"
-    threads: 16
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        """
+# rule merge_animals_vcf: #TODO
+#     priority:100
+#     input:
+#         vcfgz = expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz", samples = SAMPLES),
+#         csi = expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi", samples = SAMPLES),
+#     output:
+#         merged = "results/02_snvs/merged.rawsnvs.haplotypeCaller.vcf.gz"
+#     benchmark:
+#         "benchmarks/merge_varscan2_vcf.tsv"
+#     threads: 16
+#     conda:
+#         "bcftools"
+#     resources:
+#         mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
+#         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+#         partition = "large,milan",
+#         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+#         attempt = lambda wildcards, attempt: attempt,
+#     shell:
+#         """
         
-        bcftools merge --threads {threads} {input.vcfgz} -Oz8 -o {output.merged}
+#         bcftools merge --threads {threads} {input.vcfgz} -Oz8 -o {output.merged}
 
-        """
+#         """
 
