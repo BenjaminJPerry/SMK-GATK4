@@ -28,7 +28,8 @@ CHROM = ['chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9',
 
 
 wildcard_constraints:
-   chromosome = '\w+'
+   chromosome = '\w+',
+   samples = '\w+'
 
 
 rule all:
