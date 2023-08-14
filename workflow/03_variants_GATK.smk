@@ -29,7 +29,7 @@ CHROM = ('chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9',
 
 rule all:
     input:
-        "results/02_snvs/merged.rawsnvs.gatk.vcf.gz",
+        "results/02_snvs/merged.rawsnvs.haplotypeCaller.vcf.gz",
 
 
 
