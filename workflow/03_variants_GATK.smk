@@ -48,7 +48,7 @@ rule gatk_HaplotypeCaller_vcf:
     output:
         vcf_chrom = temp("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz"),
     params:
-        chromosome = '{chromosome}''
+        chromosome = '{chromosome}'
     log:
         "logs/gatk_HaplotypeCaller_vcf.{samples}.{chromosome}.log"
     benchmark:
