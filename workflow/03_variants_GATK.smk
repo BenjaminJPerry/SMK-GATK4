@@ -120,12 +120,12 @@ rule index_replicons_vcf:
 rule merge_replicons_vcf: #TODO
     priority:100
     input:
-        vcfgz = expand("results/02_snvs/{{samples}}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz", chromosome = CHROM),
-        csi = expand("results/02_snvs/{{samples}}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz.csi", chromosome = CHROM),
+        vcfgz = expand("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz", chromosome = CHROM),
+        csi = expand("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz.csi", chromosome = CHROM),
     output:
-        merged = temp("results/02_snvs/{{samples}}.rawsnvs.haplotypeCaller.vcf.gz")
+        merged = temp("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz")
     benchmark:
-        "benchmarks/{{samples}}_merge_bcftools_vcf.tsv"
+        "benchmarks/{samples}_merge_bcftools_vcf.tsv"
     threads: 16
     conda:
         "bcftools"
