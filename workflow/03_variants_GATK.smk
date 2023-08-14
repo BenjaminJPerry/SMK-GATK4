@@ -47,6 +47,8 @@ rule gatk_HaplotypeCaller_vcf:
         #chromosome = '{chromosome}'
     output:
         vcf_chrom = temp("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz"),
+    params:
+        chromosomes = expand({chromsome}, chromosome = )
     log:
         "logs/gatk_HaplotypeCaller_vcf.{samples}.{chromosome}.log"
     benchmark:
@@ -125,8 +127,8 @@ rule index_replicons_vcf:
 rule merge_replicons_vcf: #TODO
     priority:100
     input:
-        vcfgz = expand("results/02_snvs/{{samples}}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz", chromosome = CHROM, allow_missing=True),
-        csi = expand("results/02_snvs/{{samples}}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz.csi", chromosome = CHROM, allow_missing=True),
+        vcfgz = expand("results/02_snvs/{{samples}}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz", chromosome = CHROM),
+        csi = expand("results/02_snvs/{{samples}}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz.csi", chromosome = CHROM),
     output:
         merged = temp("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz")
     benchmark:
