@@ -34,7 +34,8 @@ wildcard_constraints:
 
 rule all:
     input:
-        "results/02_snvs/merged.rawsnvs.haplotypeCaller.vcf.gz",
+        expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi", samples = SAMPLES),
+        #"results/02_snvs/merged.rawsnvs.haplotypeCaller.vcf.gz",
 
 
 
