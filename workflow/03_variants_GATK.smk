@@ -96,7 +96,7 @@ rule index_replicons_vcf:
     input:
         vcfgz = "results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz",
     output:
-        csi = temp("results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz.csi"),
+        csi = temp("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.csi"),
     benchmark:
         "benchmarks/index_bcftools_vcf.{samples}.{chromosome}.tsv"
     threads: 8
