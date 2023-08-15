@@ -128,7 +128,7 @@ rule merge_bcftools_vcf: #TODO
         
         bcftools merge --threads {threads} {input.vcfgz} -Oz8 -o {output.merged} &&
 
-        echo "Total Raw SNPs in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l) | tee -a snps.counts.summary.txt
+        echo "Total snps in {output.filtered_vcf}: $(cat {output.filtered_vcf} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
 
 
         """
@@ -243,7 +243,7 @@ rule merge_varscan2_vcf: #TODO
         
         bcftools merge --threads {threads} {input.vcfgz} -Oz8 -o {output.merged} &&
 
-        echo "Total Raw SNPs in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l) | tee -a snps.counts.summary.txt
+        echo "Total snps in {output.filtered_vcf}: $(cat {output.filtered_vcf} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
 
 
         """
@@ -354,7 +354,7 @@ rule merge_freebayes_vcf:
         
         bcftools merge --threads {threads} {input.vcfgz} -Oz8 -o {output.merged} &&
 
-        echo "Total Raw SNPs in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l) | tee -a snps.counts.summary.txt
+        echo "Total snps in {output.filtered_vcf}: $(cat {output.filtered_vcf} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
 
         """
 
@@ -386,7 +386,7 @@ rule view_bcftools_chroms:
 
         bcftools index --threads {threads} {output.filtered_vcf} -o {output.filtered_vcf_csi} &&
 
-        echo "Total Raw SNPs in {output.filtered_vcf}: $(cat {output.filtered_vcf} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt
+        echo "Total snps in {output.filtered_vcf}: $(cat {output.filtered_vcf} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
         
         """
 
@@ -418,7 +418,7 @@ rule view_freebayes_chroms:
 
         bcftools index --threads {threads} {output.filtered_vcf} -o {output.filtered_vcf_csi} && 
 
-        echo "Total Raw SNPs in {output.filtered_vcf}: $(cat {output.filtered_vcf} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt
+        echo "Total snps in {output.filtered_vcf}: $(cat {output.filtered_vcf} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
         
         """
 
