@@ -384,7 +384,7 @@ rule view_bcftools_chroms:
 
         bcftools view {input.merged_vcf} -Oz8 -o {output.filtered_vcf} --regions {params.chromosomes} &&
 
-        bcftools index --threads {threads} {output.filtered_vcf} -o {output.csi} &&
+        bcftools index --threads {threads} {output.filtered_vcf} -o {output.filtered_vcf_csi} &&
 
         echo "Total Raw SNPs in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l) | tee -a snps.counts.summary.txt
         
@@ -416,7 +416,7 @@ rule view_freebayes_chroms:
 
         bcftools view {input.merged_vcf} -Oz8 -o {output.filtered_vcf} --regions {params.chromosomes} &&
 
-        bcftools index --threads {threads} {output.filtered_vcf} -o {output.csi} && 
+        bcftools index --threads {threads} {output.filtered_vcf} -o {output.filtered_vcf_csi} && 
 
         echo "Total Raw SNPs in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l) | tee -a snps.counts.summary.txt
         
