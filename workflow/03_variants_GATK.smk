@@ -34,7 +34,7 @@ CHROM = ('chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9',
 
 rule all:
     input:
-        "results/02_snvs/merged.rawsnvs.haplotypeCaller.vcf.gz",
+        "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz",
         "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz.csi"
 
 
@@ -47,7 +47,6 @@ rule gatk_HaplotypeCaller_vcf:
         #chromosome = '{chromosome}'
     output:
         vcf_chrom = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz"),
-        vcf_chrom_index = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz.tbi")
     params:
         chromosome = '{chromosome}'
     log:
@@ -73,14 +72,14 @@ rule gatk_HaplotypeCaller_vcf:
         '-L {params.chromosome} '
         '-O {output.vcf_chrom} '
         '--tmp-dir {resources.DTMP} '
-        '&> {log}.attempt.{resources.attempt} '
+        '&> {log}.attempt.{resources.attempt} && '
+        'rm results/02_snvs/{wildcards.samples}.rawsnvs.{wildcards.chromosome}.haplotypeCaller.vcf.gz.tbi '
 
 
 rule index_replicons_vcf:
     priority:100
     input:
         vcfgz = "results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz",
-        vcf_chrom_index = "results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz.tbi"
     output:
         csi = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz.csi"),
     benchmark:
