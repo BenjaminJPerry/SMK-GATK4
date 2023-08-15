@@ -46,7 +46,7 @@ rule gatk_HaplotypeCaller_vcf:
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
         #chromosome = '{chromosome}'
     output:
-        vcf_chrom = temp("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz"),
+        vcf_chrom = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz"),
     params:
         chromosome = '{chromosome}'
     log:
@@ -104,9 +104,9 @@ rule gatk_HaplotypeCaller_vcf:
 rule index_replicons_vcf:
     priority:100
     input:
-        vcfgz = "results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz",
+        vcfgz = "results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz",
     output:
-        csi = temp("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz.csi"),
+        csi = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz.csi"),
     benchmark:
         "benchmarks/index_bcftools_vcf.{samples}.{chromosome}.tsv"
     threads: 8
@@ -129,8 +129,8 @@ rule index_replicons_vcf:
 rule merge_replicons_vcf: #TODO
     priority:100
     input:
-        vcfgz = expand("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz", chromosome = CHROM, allow_missing=True),
-        csi = expand("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz.csi", chromosome = CHROM, allow_missing=True),
+        vcfgz = expand("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz", chromosome = CHROM, allow_missing=True),
+        csi = expand("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz.csi", chromosome = CHROM, allow_missing=True),
     output:
         merged = temp("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz")
     benchmark:
