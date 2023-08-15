@@ -30,6 +30,8 @@ rule all:
     input:
         "results/02_snvs/merged.chroms.bcftools.vcf.gz",
         "results/02_snvs/merged.chroms.freebayes.vcf.gz",
+        "results/02_snvs/merged.chroms.bcftools.vcf.gz.csi",
+        "results/02_snvs/merged.chroms.freebayes.vcf.gz.csi"
         
         #"results/02_snvs/merged.rawsnvs.bcftools.vcf.gz",
         #"results/02_snvs/merged.rawsnvs.freebayes.vcf.gz",
@@ -133,76 +135,15 @@ rule merge_bcftools_vcf: #TODO
 
         """
 
-        
-### varscan2
 
-
-rule varscan2_vcf:
-    priority: 100
-    input:
-        bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
-        referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
-    output:
-        vcf = temp("results/02_snvs/{samples}.rawsnvs.varscan2.vcf"),
-    log:
-        "logs/varscan2_vcf.{samples}.log"
-    benchmark:
-        "benchmarks/varscan2_vcf.{samples}.tsv"
-    threads: 2
-    conda:
-        "varscan2"
-    resources:
-        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 2880 + ((attempt - 1) * 1440),
-        partition = "milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        "samtools mpileup "
-        "--max-depth 250 " # Max raw per-file depth; avoids excessive memory usage [250]
-        "-q 30 " # skip alignment with mapQ less than
-        "-Q 20 " # Skip bases with baseQ/BAQ less than
-        "-f {input.referenceGenome} {input.bam} "
-        "| varscan  mpileup2snp "
-        "--min-coverage 10 "
-        "--min-avg-qual 20 "
-        "--output-vcf "
-        "> {output.vcf} "
-
-
-rule bgzip_varscan2_vcf:
-    priority:1000
-    input:
-        vcf = "results/02_snvs/{samples}.rawsnvs.varscan2.vcf",
-    output:
-        vcfgz = temp("results/02_snvs/{samples}.rawsnvs.varscan2.vcf.gz"),
-    benchmark:
-        "benchmarks/bgzip_varscan2_vcf.{samples}.tsv"
-    threads: 8
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        """
-        
-        bgzip -c -l 8 --threads {threads} {input.vcf} > {output.vcfgz}
-
-        """
-
-
-rule index_varscan2_vcf:
+  rule index_merged_bcftools_vcf:
     priority:100
     input:
-        vcfgz = "results/02_snvs/{samples}.rawsnvs.varscan2.vcf.gz",
+        vcfgz = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz",
     output:
-        csi = temp("results/02_snvs/{samples}.rawsnvs.varscan2.vcf.gz.csi"),
+        csi = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz.csi",
     benchmark:
-        "benchmarks/index_varscan2_vcf.{samples}.tsv"
+        "benchmarks/index_merged_bcftools_vcf.tsv"
     threads: 8
     conda:
         "bcftools"
@@ -218,35 +159,7 @@ rule index_varscan2_vcf:
         bcftools index --threads {threads} {input.vcfgz} -o {output.csi}
 
         """
-
-
-rule merge_varscan2_vcf: #TODO
-    priority:100
-    input:
-        vcfgz = expand("results/02_snvs/{samples}.rawsnvs.varscan2.vcf.gz", samples = SAMPLES),
-        csi = expand("results/02_snvs/{samples}.rawsnvs.varscan2.vcf.gz.csi", samples = SAMPLES),
-    output:
-        merged = "results/02_snvs/merged.rawsnvs.varscan2.vcf.gz"
-    benchmark:
-        "benchmarks/merge_varscan2_vcf.tsv"
-    threads: 16
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        """
-        
-        bcftools merge --threads {threads} {input.vcfgz} -Oz8 -o {output.merged} &&
-
-        echo "Total snps in {output.filtered_vcf}: $(cat {output.filtered_vcf} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-
-
-        """
+      
 
 ### freebayes
 
@@ -359,10 +272,36 @@ rule merge_freebayes_vcf:
         """
 
 
+rule index_merged_freebayes_vcf:
+    priority:100
+    input:
+        vcfgz = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz",
+    output:
+        csi = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz.csi",
+    benchmark:
+        "benchmarks/index_merged_freebayes_vcf.tsv"
+    threads: 8
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """
+        
+        bcftools index --threads {threads} {input.vcfgz} -o {output.csi}
+
+        """
+
+
 rule view_bcftools_chroms:
     priority:100
     input:
         merged_vcf = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz",
+        csi = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz.csi",
     output:
         filtered_vcf = "results/02_snvs/merged.chroms.bcftools.vcf.gz",
         filtered_vcf_csi = "results/02_snvs/merged.chroms.bcftools.vcf.gz.csi"
@@ -395,6 +334,7 @@ rule view_freebayes_chroms:
     priority:100
     input:
         merged_vcf = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz",
+        csi = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz.csi",
     output:
         filtered_vcf = "results/02_snvs/merged.chroms.freebayes.vcf.gz",
         filtered_vcf_csi = "results/02_snvs/merged.chroms.freebayes.vcf.gz.csi"
