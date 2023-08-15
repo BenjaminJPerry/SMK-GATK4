@@ -34,8 +34,8 @@ CHROM = ('chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9',
 
 rule all:
     input:
-        #expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi", samples = SAMPLES),
         "results/02_snvs/merged.rawsnvs.haplotypeCaller.vcf.gz",
+        "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz.csi"
 
 
 
@@ -47,6 +47,7 @@ rule gatk_HaplotypeCaller_vcf:
         #chromosome = '{chromosome}'
     output:
         vcf_chrom = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz"),
+        vcf_chrom_index = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz.tbi")
     params:
         chromosome = '{chromosome}'
     log:
@@ -79,6 +80,7 @@ rule index_replicons_vcf:
     priority:100
     input:
         vcfgz = "results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz",
+        vcf_chrom_index = "results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz.tbi"
     output:
         csi = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz.csi"),
     benchmark:
@@ -158,7 +160,8 @@ rule merge_animals_vcf: #TODO
         vcfgz = expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz", samples = SAMPLES),
         csi = expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi", samples = SAMPLES),
     output:
-        merged = "results/02_snvs/merged.rawsnvs.haplotypeCaller.vcf.gz"
+        merged = "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz",
+        csi = "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz.csi",
     benchmark:
         "benchmarks/merge_varscan2_vcf.tsv"
     threads: 16
@@ -173,7 +176,12 @@ rule merge_animals_vcf: #TODO
     shell:
         """
         
-        bcftools merge --threads {threads} {input.vcfgz} -Oz8 -o {output.merged}
+        bcftools merge --threads {threads} {input.vcfgz} -Oz8 -o {output.merged} &&
+
+        bcftools index --threads {threads} {output.merged} -o {output.csi} &&
+
+        echo "Total snps in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+
 
         """
 
