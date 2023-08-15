@@ -46,7 +46,7 @@ rule gatk_HaplotypeCaller_vcf:
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
         #chromosome = '{chromosome}'
     output:
-        vcf_chrom = temp("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz"),
+        vcf_chrom = temp("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf"),
     params:
         chromosome = '{chromosome}'
     log:
