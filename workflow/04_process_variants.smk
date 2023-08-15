@@ -28,9 +28,6 @@ SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam
 
 rule all:
     input:
-
-# 
-
         "results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz",
         "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz",
         "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz",
