@@ -34,8 +34,8 @@ CHROM = ('chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9',
 
 rule all:
     input:
-        expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi", samples = SAMPLES),
-        #"results/02_snvs/merged.rawsnvs.haplotypeCaller.vcf.gz",
+        #expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi", samples = SAMPLES),
+        "results/02_snvs/merged.rawsnvs.haplotypeCaller.vcf.gz",
 
 
 
@@ -101,35 +101,36 @@ rule gatk_HaplotypeCaller_vcf:
 #         """
 
 
-# rule index_replicons_vcf:
-#     priority:100
-#     input:
-#         vcfgz = "results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz",
-#     output:
-#         csi = temp("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.csi"),
-#     benchmark:
-#         "benchmarks/index_bcftools_vcf.{samples}.{chromosome}.tsv"
-#     threads: 8
-#     conda:
-#         "bcftools"
-#     resources:
-#         mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
-#         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
-#         partition = "large,milan",
-#         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-#         attempt = lambda wildcards, attempt: attempt,
-#     shell:
-#         """
+rule index_replicons_vcf:
+    priority:100
+    input:
+        vcfgz = "results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz",
+    output:
+        csi = temp("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.csi"),
+    benchmark:
+        "benchmarks/index_bcftools_vcf.{samples}.{chromosome}.tsv"
+    threads: 8
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """
         
-#         bcftools index --threads {threads} {input.vcfgz} -o {output.csi}
+        bcftools index --threads {threads} {input.vcfgz} -o {output.csi}
 
-#         """
+        """
 
 
 rule merge_replicons_vcf: #TODO
     priority:100
     input:
         vcfgz = expand("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz", chromosome = CHROM, allow_missing=True),
+        csi = expand("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz.csi", chromosome = CHROM, allow_missing=True),
     output:
         merged = temp("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz")
     benchmark:
