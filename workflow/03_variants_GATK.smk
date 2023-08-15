@@ -55,7 +55,7 @@ rule gatk_HaplotypeCaller_vcf:
         "benchmarks/gatk_HaplotypeCaller_vcf.{samples}.{chromosome}.tsv"
     threads: 4
     resources:
-        mem_gb = lambda wildcards, attempt: 32 + ((attempt - 1) * 64),
+        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 720 + ((attempt - 1) * 1440),
         partition = "milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
@@ -83,13 +83,13 @@ rule index_replicons_vcf:
     output:
         csi = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz.csi"),
     benchmark:
-        "benchmarks/index_bcftools_vcf.{samples}.{chromosome}.tsv"
+        "benchmarks/index_replicons_vcf.{samples}.{chromosome}.tsv"
     threads: 8
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
+        mem_gb = lambda wildcards, attempt: 4 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 30 + ((attempt - 1) * 240),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -109,13 +109,13 @@ rule concatenate_replicons_vcf: #TODO
     output:
         merged = temp("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz")
     benchmark:
-        "benchmarks/{samples}_merge_bcftools_vcf.tsv"
+        "benchmarks/{samples}_concatenate_replicons_vcf.tsv"
     threads: 8
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 120),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -135,13 +135,13 @@ rule index_animals_vcf:
     output:
         csi = temp("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi"),
     benchmark:
-        "benchmarks/index_varscan2_vcf.{samples}.tsv"
+        "benchmarks/index_animals_vcf.{samples}.tsv"
     threads: 8
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
+        mem_gb = lambda wildcards, attempt: 4 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 30 + ((attempt - 1) * 240),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
