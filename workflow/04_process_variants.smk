@@ -28,92 +28,32 @@ SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam
 
 rule all:
     input:
-        "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf.gz",
-        "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz",
-        "results/03_filtered/merged.filteredsnvs.QUAL60.varscan2.vcf.gz",
 
-        "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf.gz.pigmentSNPs.vcf",
-        "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz.pigmentSNPs.vcf",
+# 
 
+        "results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz",
+        "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz",
+        "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz",
 
-rule index_freebayes_merged:
-    priority:100
-    input:
-        merged = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz"
-    output:
-        index = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz.tbi"
-    benchmark:
-        "benchmarks/filter_freebayes_vcf.tsv"
-    threads: 16
-    conda:
-        "freebayes"
-    resources:
-        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        "tabix -f results/02_snvs/merged.rawsnvs.freebayes.vcf.gz"
+        #"results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz.pigmentSNPs.vcf",
+        #"results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz.pigmentSNPs.vcf",
+        #"results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz.pigmentSNPs.vcf",
 
 
-rule index_bcftools_merged:
-    priority:100
-    input:
-        merged = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz"
-    output:
-        index = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz.tbi"
-    benchmark:
-        "benchmarks/index_bcftools_merged.tsv"
-    threads: 16
-    conda:
-        "freebayes"
-    resources:
-        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        "tabix -f {input.merged} "
-
-
-rule index_varscan2_merged:
-    priority:100
-    input:
-        merged = "results/02_snvs/merged.rawsnvs.varscan2.vcf.gz"
-    output:
-        index = "results/02_snvs/merged.rawsnvs.varscan2.vcf.gz.tbi"
-    benchmark:
-        "benchmarks/index_varscan2_merged.tsv"
-    threads: 16
-    conda:
-        "freebayes"
-    resources:
-        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        "tabix -f {input.merged} "
-
-
-#
 
 
 rule filter_freebayes_vcf_QUAL60:
     priority:100
     input:
-        merged = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz",
-        index = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz.tbi"
+        merged = "results/02_snvs/merged.chrom.freebayes.vcf.gz",
+        index = "results/02_snvs/merged.chrom.freebayes.vcf.gz.csi"
     output:
-        filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf"
+        filtered = "results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz"
     benchmark:
-        "benchmarks/filter_freebayes_vcf.tsv"
+        "benchmarks/filter_freebayes_vcf_QUAL60.tsv"
     threads: 16
     conda:
-        "freebayes"
+        "bcftools"
     resources:
         mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
@@ -121,21 +61,30 @@ rule filter_freebayes_vcf_QUAL60:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        "vcffilter -f 'QUAL > 60' {input.merged} > {output.filtered} " #TODO COMPRESS OUTPUT
+        '''
 
+        bcftools view --write-index -i 'QUAL>=60' {input.merged} -O z8 -o {output.filtered} &&
+
+        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads 6 -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads 6 -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads 6 -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads 6 -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads 6 -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+
+        '''
 
 rule filter_bcftools_vcf_QUAL60:
     priority:100
     input:
-        merged = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz",
-        index = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz.tbi"
+        merged = "results/02_snvs/merged.chrom.bcftools.vcf.gz",
+        index = "results/02_snvs/merged.chrom.bcftools.vcf.gz.csi"
     output:
-        filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf"
+        filtered = "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz"
     benchmark:
-        "benchmarks/filter_bcftools_vcf.tsv"
+        "benchmarks/filter_bcftools_vcf_QUAL60.tsv"
     threads: 16
     conda:
-        "freebayes"
+        "bcftools"
     resources:
         mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
@@ -143,21 +92,31 @@ rule filter_bcftools_vcf_QUAL60:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        "vcffilter -f 'QUAL > 60' {input.merged} > {output.filtered} " #TODO COMPRESS OUTPUT
+        '''
+
+        bcftools view --write-index -i 'QUAL>=60' {input.merged} -O z8 -o {output.filtered} &&
+
+        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads 6 -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads 6 -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads 6 -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads 6 -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads 6 -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+
+        '''
 
 
-rule filter_varscan2_vcf_QUAL60:
+rule filter_haplotypeCaller_vcf_QUAL60:
     priority:100
     input:
-        merged = "results/02_snvs/merged.rawsnvs.varscan2.vcf.gz",
-        index = "results/02_snvs/merged.rawsnvs.varscan2.vcf.gz.tbi"
+        merged = "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz",
+        index = "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz.csi"
     output:
-        filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.varscan2.vcf"
+        filtered = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz"
     benchmark:
-        "benchmarks/filter_varscan2_vcf.tsv"
+        "benchmarks/filter_haplotypeCaller_vcf_QUAL60.tsv"
     threads: 16
     conda:
-        "freebayes"
+        "bcftools"
     resources:
         mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
@@ -165,10 +124,17 @@ rule filter_varscan2_vcf_QUAL60:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        "vcffilter -f 'QUAL > 60' {input.merged} > {output.filtered} " #TODO COMPRESS OUTPUT
+        '''
 
+        bcftools view --write-index -i 'QUAL>=60' {input.merged} -O z8 -o {output.filtered} &&
 
-#
+        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads 6 -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads 6 -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads 6 -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads 6 -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads 6 -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+
+        '''
 
 
 rule bcftools_view_bcf_freebayes:
@@ -217,9 +183,6 @@ rule bcftools_view_bcf_bcftools:
         "bcftools index --threads {threads} {output.bcf} "
 
 
-#
-
-
 rule bcftools_view_bcftools_regions:
     priority:100
     input:
@@ -266,8 +229,4 @@ rule bcftools_view_freebayes_regions:
         "--threads {threads} "
         "{input.filtered} "
         "> {output.filtered_snps} "
-
-
-#
-
 
