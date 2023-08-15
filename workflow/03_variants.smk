@@ -136,7 +136,7 @@ rule merge_bcftools_vcf: #TODO
         """
 
 
-  rule index_merged_bcftools_vcf:
+rule index_merged_bcftools_vcf:
     priority:100
     input:
         vcfgz = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz",
