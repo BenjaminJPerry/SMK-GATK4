@@ -422,6 +422,3 @@ rule view_freebayes_chroms:
         
         """
 
-
-
-bcftools view input.vcf.gz --regions
