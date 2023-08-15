@@ -75,32 +75,6 @@ rule gatk_HaplotypeCaller_vcf:
         '&> {log}.attempt.{resources.attempt} '
 
 
-
-# rule bgzip_replicons_vcf:
-#     priority:1000
-#     input:
-#         vcf = "results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf",
-#     output:
-#         vcfgz = temp("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz"),
-#     benchmark:
-#         "benchmarks/bgzip_varscan2_vcf.{samples}.{chromosome}.tsv"
-#     threads: 8
-#     conda:
-#         "bcftools"
-#     resources:
-#         mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
-#         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
-#         partition = "large,milan",
-#         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-#         attempt = lambda wildcards, attempt: attempt,
-#     shell:
-#         """
-        
-#         bgzip -c -l 8 --threads {threads} {input.vcf} > {output.vcfgz}
-
-#         """
-
-
 rule index_replicons_vcf:
     priority:100
     input:
@@ -126,7 +100,7 @@ rule index_replicons_vcf:
         """
 
 
-rule merge_replicons_vcf: #TODO
+rule concatenate_replicons_vcf: #TODO
     priority:100
     input:
         vcfgz = expand("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz", chromosome = CHROM, allow_missing=True),
@@ -135,7 +109,7 @@ rule merge_replicons_vcf: #TODO
         merged = temp("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz")
     benchmark:
         "benchmarks/{samples}_merge_bcftools_vcf.tsv"
-    threads: 16
+    threads: 8
     conda:
         "bcftools"
     resources:
@@ -147,7 +121,7 @@ rule merge_replicons_vcf: #TODO
     shell:
         """
         
-        bcftools merge --threads {threads} {input.vcfgz} -Oz8 -o {output.merged}
+        bcftools concat --threads {threads} {input.vcfgz} | bcftools sort -Oz8 -o {output.merged} - 
 
         """
 
