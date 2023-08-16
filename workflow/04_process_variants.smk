@@ -37,6 +37,7 @@ rule all:
         #"results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz.pigmentSNPs.vcf",
 
 
+
 rule filter_freebayes_vcf_QUAL60:
     priority:100
     input:
@@ -47,7 +48,7 @@ rule filter_freebayes_vcf_QUAL60:
         csi = "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz.csi"
     benchmark:
         "benchmarks/filter_freebayes_vcf_QUAL60.tsv"
-    threads: 16
+    threads: 8
     conda:
         "bcftools"
     resources:
@@ -62,11 +63,11 @@ rule filter_freebayes_vcf_QUAL60:
         bcftools view -e 'QUAL<60' {input.merged} -O z8 -o {output.filtered} &&
         bcftools index --threads {threads} {output.filtered} -o {output.csi} 
 
-        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads 6 -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads 6 -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads 6 -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads 6 -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads 6 -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
+        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
 
         exit 0;
         '''
@@ -81,7 +82,7 @@ rule filter_bcftools_vcf_QUAL60:
         csi = "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz.csi"
     benchmark:
         "benchmarks/filter_bcftools_vcf_QUAL60.tsv"
-    threads: 16
+    threads: 8
     conda:
         "bcftools"
     resources:
@@ -96,11 +97,11 @@ rule filter_bcftools_vcf_QUAL60:
         bcftools view -e 'QUAL<60' {input.merged} -O z8 -o {output.filtered} &&
         bcftools index --threads {threads} {output.filtered} -o {output.csi} 
 
-        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads 6 -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads 6 -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads 6 -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads 6 -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads 6 -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
+        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
 
         exit 0;
 
@@ -117,7 +118,7 @@ rule filter_haplotypeCaller_vcf_QUAL60:
         csi = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz.csi"
     benchmark:
         "benchmarks/filter_haplotypeCaller_vcf_QUAL60.tsv"
-    threads: 16
+    threads: 8
     conda:
         "bcftools"
     resources:
@@ -132,64 +133,19 @@ rule filter_haplotypeCaller_vcf_QUAL60:
         bcftools view -e 'QUAL<60' {input.merged} -O z8 -o {output.filtered} &&
         bcftools index --threads {threads} {output.filtered} -o {output.csi} 
 
-        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads 6 -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
-        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads 6 -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads 6 -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
-        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads 6 -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
-        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads 6 -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
+        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
+        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
+        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
+        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
+        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
 
         exit 0;
 
         '''
 
 
-rule bcftools_view_bcf_freebayes:
-    priority:100
-    input:
-        filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf",
-    output:
-        bcf = "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf.gz"
-    threads: 32
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 1440),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        " bcftools view "
-        "--threads {threads} "
-        "{input.filtered} "
-        "-Oz8 -o {output.bcf} && "
-        "bcftools index --threads {threads} {output.bcf} "
 
-
-rule bcftools_view_bcf_bcftools:
-    priority:100
-    input:
-        filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf",
-    output:
-        bcf = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz"
-    threads: 32
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 1440),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        " bcftools view "
-        "--threads {threads} "
-        "{input.filtered} "
-        "-Oz8 -o {output.bcf} && "
-        "bcftools index --threads {threads} {output.bcf} "
-
-
-rule bcftools_view_bcftools_regions:
+rule view_bcftools_regions: #TODO Updated files
     priority:100
     input:
         filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz",
@@ -213,7 +169,7 @@ rule bcftools_view_bcftools_regions:
         "> {output.filtered_snps} "
 
 
-rule bcftools_view_freebayes_regions:
+rule view_freebayes_regions: #TODO Updated files
     priority:100
     input:
         filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf.gz",
@@ -235,4 +191,91 @@ rule bcftools_view_freebayes_regions:
         "--threads {threads} "
         "{input.filtered} "
         "> {output.filtered_snps} "
+
+
+rule view_haplotypeCaller_regions: #TODO Updated files
+    priority:100
+    input:
+        filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.haplotypeCaller.vcf.gz",
+        regions = "resources/snp_targets_100bp.txt"
+    output:
+        filtered_snps = "results/03_filtered/merged.filteredsnvs.QUAL60.haplotypeCaller.vcf.gz.pigmentSNPs.vcf"
+    threads: 2
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 4 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 6 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        " bcftools view "
+        "-R {input.regions} "
+        "--threads {threads} "
+        "{input.filtered} "
+        "> {output.filtered_snps} "
+
+
+
+rule isec_bcftools_LIC565:
+    priority:100
+    input:
+        filtered = "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz.csi",
+        snps_LIC = "resources/LIC_565.ch.frmt.sorted.vcf.gz",
+        snps_LIC_csi = "resources/LIC_565.ch.frmt.sorted.vcf.gz.csi",
+    output:
+        LICFiltered = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.vcf.gz"
+        csi = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.vcf.gz.csi"
+    threads: 8
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """
+        bcftools isec -O v -p results/03_filtered/isec_bcftools_LIC565 {input.snps_LIC} {input.filtered} &&
+
+        bcftools isec --threads {threads} -O z8 -p results/03_filtered/isec_bcftools_LIC565 {input.snps_LIC} {input.filtered} &&
+
+
+        rm -r results/03_filtered/isec_bcftools_LIC565 &&
+
+        bcftools index --threads {threads} {output.LICFiltered} -o {output.csi} && 
+
+        echo "Total snps in {output.LICFiltered}: $(bcftools view --threads 6 {output.LICFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
+
+        """
+
+rule isec_freebayes_LIC565:
+
+
+rule isec_haplotypeCaller_LIC565:
+
+
+
+rule isec_bcftools_TBulls:
+
+
+rule isec_freebayes_TBulls:
+
+
+rule isec_haplotypeCaller_TBulls:
+
+
+
+rule filter_DP_bcftools:
+
+
+rule filter_DP_freebayes:
+
+
+rule filter_DP_haplotypeCaller:
+
+
 
