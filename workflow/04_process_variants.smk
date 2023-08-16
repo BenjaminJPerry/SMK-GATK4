@@ -32,6 +32,10 @@ rule all:
         "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz",
         "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz",
 
+        "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.vcf.gz",
+        "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.vcf.gz",
+        "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.vcf.gz"
+
         #"results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz.pigmentSNPs.vcf",
         #"results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz.pigmentSNPs.vcf",
         #"results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz.pigmentSNPs.vcf",
@@ -241,21 +245,83 @@ rule isec_bcftools_LIC565:
         """
         bcftools isec -O v -p results/03_filtered/isec_bcftools_LIC565 {input.snps_LIC} {input.filtered} &&
 
-        #TODO view to vcf.gz
-
-        rm -r results/03_filtered/isec_bcftools_LIC565 &&
+        bcfttools view --threads {threads} -O z8 results/03_filtered/isec_bcftools_LIC565/0001.vcf -o {output.LICFiltered} &&
 
         bcftools index --threads {threads} {output.LICFiltered} -o {output.csi} && 
 
-        echo "Total snps in {output.LICFiltered}: $(bcftools view --threads 6 {output.LICFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
+        rm -r results/03_filtered/isec_bcftools_LIC565 &&
+
+        echo "Total snps in {output.LICFiltered}: $(bcftools view --threads {threads} {output.LICFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
 
         """
 
+
 rule isec_freebayes_LIC565:
+    priority:100
+    input:
+        filtered = "results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz.csi",
+        snps_LIC = "resources/LIC_565.ch.frmt.sorted.vcf.gz",
+        snps_LIC_csi = "resources/LIC_565.ch.frmt.sorted.vcf.gz.csi",
+    output:
+        LICFiltered = "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.vcf.gz.csi"
+    threads: 8
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """
+        bcftools isec -O v -p results/03_filtered/isec_freebayes_LIC565 {input.snps_LIC} {input.filtered} &&
+
+        bcfttools view --threads {threads} -O z8 results/03_filtered/isec_freebayes_LIC565/0001.vcf -o {output.LICFiltered} &&
+
+        bcftools index --threads {threads} {output.LICFiltered} -o {output.csi} && 
+
+        rm -r results/03_filtered/isec_freebayes_LIC565 &&
+
+        echo "Total snps in {output.LICFiltered}: $(bcftools view --threads {threads} {output.LICFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
+
+        """
 
 
 rule isec_haplotypeCaller_LIC565:
+    priority:100
+    input:
+        filtered = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz.csi",
+        snps_LIC = "resources/LIC_565.ch.frmt.sorted.vcf.gz",
+        snps_LIC_csi = "resources/LIC_565.ch.frmt.sorted.vcf.gz.csi",
+    output:
+        LICFiltered = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.vcf.gz.csi"
+    threads: 8
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 1440),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """
+        bcftools isec -O v -p results/03_filtered/isec_haplotypeCaller_LIC565 {input.snps_LIC} {input.filtered} &&
 
+        bcfttools view --threads {threads} -O z8 results/03_filtered/isec_haplotypeCaller_LIC565/0001.vcf -o {output.LICFiltered} &&
+
+        bcftools index --threads {threads} {output.LICFiltered} -o {output.csi} && 
+
+        rm -r results/03_filtered/isec_haplotypeCaller_LIC565 &&
+
+        echo "Total snps in {output.LICFiltered}: $(bcftools view --threads {threads} {output.LICFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
+
+        """
 
 
 rule isec_bcftools_TBulls:
