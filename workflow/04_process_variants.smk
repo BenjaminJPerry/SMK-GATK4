@@ -136,7 +136,7 @@ rule filter_haplotypeCaller_vcf_QUAL60:
         echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads 6 -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
         echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads 6 -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
         echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads 6 -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
-        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads 6 -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; &&
+        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads 6 -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
 
         exit 0;
 
