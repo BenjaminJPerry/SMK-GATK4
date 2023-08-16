@@ -245,7 +245,7 @@ rule isec_bcftools_LIC565:
         """
         bcftools isec -O v -p results/03_filtered/isec_bcftools_LIC565 {input.snps_LIC} {input.filtered} &&
 
-        bcfttools view --threads {threads} -O z8 results/03_filtered/isec_bcftools_LIC565/0001.vcf -o {output.LICFiltered} &&
+        bcftools view --threads {threads} -O z8 results/03_filtered/isec_bcftools_LIC565/0001.vcf -o {output.LICFiltered} &&
 
         bcftools index --threads {threads} {output.LICFiltered} -o {output.csi} && 
 
@@ -279,7 +279,7 @@ rule isec_freebayes_LIC565:
         """
         bcftools isec -O v -p results/03_filtered/isec_freebayes_LIC565 {input.snps_LIC} {input.filtered} &&
 
-        bcfttools view --threads {threads} -O z8 results/03_filtered/isec_freebayes_LIC565/0001.vcf -o {output.LICFiltered} &&
+        bcftools view --threads {threads} -O z8 results/03_filtered/isec_freebayes_LIC565/0001.vcf -o {output.LICFiltered} &&
 
         bcftools index --threads {threads} {output.LICFiltered} -o {output.csi} && 
 
@@ -313,7 +313,7 @@ rule isec_haplotypeCaller_LIC565:
         """
         bcftools isec -O v -p results/03_filtered/isec_haplotypeCaller_LIC565 {input.snps_LIC} {input.filtered} &&
 
-        bcfttools view --threads {threads} -O z8 results/03_filtered/isec_haplotypeCaller_LIC565/0001.vcf -o {output.LICFiltered} &&
+        bcftools view --threads {threads} -O z8 results/03_filtered/isec_haplotypeCaller_LIC565/0001.vcf -o {output.LICFiltered} &&
 
         bcftools index --threads {threads} {output.LICFiltered} -o {output.csi} && 
 
@@ -347,7 +347,7 @@ rule isec_bcftools_TBulls:
         """
         bcftools isec -O v -p results/03_filtered/isec_bcftools_TBulls {input.snps_TBulls} {input.LICFiltered} &&
 
-        bcfttools view --threads {threads} -O z8 results/03_filtered/isec_bcftools_TBulls/0001.vcf -o {output.TBullsFiltered} &&
+        bcftools view --threads {threads} -O z8 results/03_filtered/isec_bcftools_TBulls/0001.vcf -o {output.TBullsFiltered} &&
 
         bcftools index --threads {threads} {output.TBullsFiltered} -o {output.csi} && 
 
@@ -381,7 +381,7 @@ rule isec_freebayes_TBulls:
         """
         bcftools isec -O v -p results/03_filtered/isec_freebayes_TBulls {input.snps_TBulls} {input.LICFiltered} &&
 
-        bcfttools view --threads {threads} -O z8 results/03_filtered/isec_freebayes_TBulls/0001.vcf -o {output.TBullsFiltered} &&
+        bcftools view --threads {threads} -O z8 results/03_filtered/isec_freebayes_TBulls/0001.vcf -o {output.TBullsFiltered} &&
 
         bcftools index --threads {threads} {output.TBullsFiltered} -o {output.csi} && 
 
@@ -416,7 +416,7 @@ rule isec_haplotypeCaller_TBulls:
         """
         bcftools isec -O v -p results/03_filtered/isec_haplotypeCaller_TBulls {input.snps_TBulls} {input.LICFiltered} &&
 
-        bcfttools view --threads {threads} -O z8 results/03_filtered/isec_haplotypeCaller_TBulls/0001.vcf -o {output.TBullsFiltered} &&
+        bcftools view --threads {threads} -O z8 results/03_filtered/isec_haplotypeCaller_TBulls/0001.vcf -o {output.TBullsFiltered} &&
 
         bcftools index --threads {threads} {output.TBullsFiltered} -o {output.csi} && 
 
