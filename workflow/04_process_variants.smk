@@ -59,7 +59,7 @@ rule filter_freebayes_vcf_QUAL60:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         '''
-
+        sleep 5
         bcftools view --write-index -i 'QUAL>=60' {input.merged} -O z8 -o {output.filtered} &&
 
         echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads 6 -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
@@ -90,7 +90,7 @@ rule filter_bcftools_vcf_QUAL60:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         '''
-
+        sleep 5
         bcftools view --write-index -i 'QUAL>=60' {input.merged} -O z8 -o {output.filtered} &&
 
         echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads 6 -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
@@ -122,7 +122,7 @@ rule filter_haplotypeCaller_vcf_QUAL60:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         '''
-
+        sleep 5
         bcftools view --write-index -i 'QUAL>=60' {input.merged} -O z8 -o {output.filtered} &&
 
         echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads 6 -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
