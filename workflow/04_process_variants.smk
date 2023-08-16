@@ -45,7 +45,8 @@ rule filter_freebayes_vcf_QUAL60:
         merged = "results/02_snvs/merged.chrom.freebayes.vcf.gz",
         index = "results/02_snvs/merged.chrom.freebayes.vcf.gz.csi"
     output:
-        filtered = "results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz"
+        filtered = "results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz.csi"
     benchmark:
         "benchmarks/filter_freebayes_vcf_QUAL60.tsv"
     threads: 16
@@ -60,7 +61,8 @@ rule filter_freebayes_vcf_QUAL60:
     shell:
         '''
         sleep 5
-        bcftools view --write-index -i 'QUAL>=60' {input.merged} -O z8 -o {output.filtered} &&
+        bcftools view -i 'QUAL>=60' {input.merged} -O z8 -o {output.filtered} &&
+        bcftools index --threads {threads} {output.filtered} -o {output.csi} 
 
         echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads 6 -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
         echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads 6 -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
@@ -76,7 +78,8 @@ rule filter_bcftools_vcf_QUAL60:
         merged = "results/02_snvs/merged.chrom.bcftools.vcf.gz",
         index = "results/02_snvs/merged.chrom.bcftools.vcf.gz.csi"
     output:
-        filtered = "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz"
+        filtered = "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz.csi"
     benchmark:
         "benchmarks/filter_bcftools_vcf_QUAL60.tsv"
     threads: 16
@@ -91,7 +94,8 @@ rule filter_bcftools_vcf_QUAL60:
     shell:
         '''
         sleep 5
-        bcftools view --write-index -i 'QUAL>=60' {input.merged} -O z8 -o {output.filtered} &&
+        bcftools view -i 'QUAL>=60' {input.merged} -O z8 -o {output.filtered} &&
+        bcftools index --threads {threads} {output.filtered} -o {output.csi} 
 
         echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads 6 -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
         echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads 6 -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
@@ -108,7 +112,8 @@ rule filter_haplotypeCaller_vcf_QUAL60:
         merged = "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz",
         index = "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz.csi"
     output:
-        filtered = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz"
+        filtered = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz.csi"
     benchmark:
         "benchmarks/filter_haplotypeCaller_vcf_QUAL60.tsv"
     threads: 16
@@ -123,13 +128,14 @@ rule filter_haplotypeCaller_vcf_QUAL60:
     shell:
         '''
         sleep 5
-        bcftools view --write-index -i 'QUAL>=60' {input.merged} -O z8 -o {output.filtered} &&
+        bcftools view -i 'QUAL>=60' {input.merged} -O z8 -o {output.filtered} &&
+        bcftools index --threads {threads} {output.filtered} -o {output.csi} 
 
-        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads 6 -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads 6 -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads 6 -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads 6 -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads 6 -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads 6 -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
+        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads 6 -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
+        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads 6 -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
+        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads 6 -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
+        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads 6 -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
 
         '''
 
