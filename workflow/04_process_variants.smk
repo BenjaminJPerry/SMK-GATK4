@@ -226,7 +226,7 @@ rule isec_bcftools_LIC565:
         snps_LIC = "resources/LIC_565.ch.frmt.sorted.vcf.gz",
         snps_LIC_csi = "resources/LIC_565.ch.frmt.sorted.vcf.gz.csi",
     output:
-        LICFiltered = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.vcf.gz"
+        LICFiltered = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.vcf.gz",
         csi = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.vcf.gz.csi"
     threads: 8
     conda:
@@ -241,8 +241,7 @@ rule isec_bcftools_LIC565:
         """
         bcftools isec -O v -p results/03_filtered/isec_bcftools_LIC565 {input.snps_LIC} {input.filtered} &&
 
-        bcftools isec --threads {threads} -O z8 -p results/03_filtered/isec_bcftools_LIC565 {input.snps_LIC} {input.filtered} &&
-
+        #TODO view to vcf.gz
 
         rm -r results/03_filtered/isec_bcftools_LIC565 &&
 
