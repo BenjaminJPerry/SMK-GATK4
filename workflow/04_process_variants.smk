@@ -49,7 +49,7 @@ rule filter_freebayes_vcf_QUAL60:
         index = "results/02_snvs/merged.chrom.freebayes.vcf.gz.csi"
     output:
         filtered = "results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz",
-        csi = "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz.csi"
+        csi = "results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz.csi"
     benchmark:
         "benchmarks/filter_freebayes_vcf_QUAL60.tsv"
     threads: 8
