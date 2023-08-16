@@ -160,8 +160,8 @@ rule view_bcftools_regions: #TODO Updated files
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 4 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 6 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 4 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -184,8 +184,8 @@ rule view_freebayes_regions: #TODO Updated files
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 4 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 6 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 4 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -208,8 +208,8 @@ rule view_haplotypeCaller_regions: #TODO Updated files
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 4 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 6 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 4 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -236,8 +236,8 @@ rule isec_bcftools_LIC565:
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -270,8 +270,8 @@ rule isec_freebayes_LIC565:
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -304,8 +304,8 @@ rule isec_haplotypeCaller_LIC565:
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -338,8 +338,8 @@ rule isec_bcftools_TBulls:
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -372,8 +372,8 @@ rule isec_freebayes_TBulls:
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -407,8 +407,8 @@ rule isec_haplotypeCaller_TBulls:
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
