@@ -36,7 +36,9 @@ rule all:
         "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.vcf.gz",
         "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.vcf.gz",
 
-        "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.DP10.vcf.gz"
+        "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.DP10.vcf.gz",
+        "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz",
+        "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.DP10.vcf.gz",
 
         #"results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz.pigmentSNPs.vcf",
         #"results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz.pigmentSNPs.vcf",
@@ -430,9 +432,63 @@ rule isec_haplotypeCaller_TBulls:
 
 
 rule filter_DP10_bcftools:
+    priority:100
+    input:
+        TBullsFiltered = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.vcf.gz.csi"
+    output:
+        TBullsFiltered = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz.csi"
+    threads: 6
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """ 
+        sleep 5;
+
+        bcftools view -O z8 -e 'INFO/DP<10' --threads {threads} {input.TBullsFiltered} -o {output.TBullsFiltered} &&
+
+        bcftools index --threads {threads} {output.TBullsFiltered} -o {output.csi}
+
+        echo "Total snps in {output.TBullsFiltered}: $(bcftools view --threads {threads} {output.TBullsFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
+        
+        """
 
 
 rule filter_DP10_freebayes:
+    priority:100
+    input:
+        TBullsFiltered = "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.vcf.gz.csi"
+    output:
+        TBullsFiltered = "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.DP10.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.DP10.vcf.gz.csi"
+    threads: 6
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """ 
+        sleep 5;
+
+        bcftools view -O z8 -e 'INFO/DP<10' --threads {threads} {input.TBullsFiltered} -o {output.TBullsFiltered} &&
+
+        bcftools index --threads {threads} {output.TBullsFiltered} -o {output.csi}
+
+        echo "Total snps in {output.TBullsFiltered}: $(bcftools view --threads {threads} {output.TBullsFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
+        
+        """
 
 
 rule filter_DP10_haplotypeCaller:
