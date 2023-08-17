@@ -28,19 +28,21 @@ SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam
 
 rule all:
     input:
-        "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz",
-        "results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz",
-        "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz",
+        expand("results/04_animals/{samples}.bcftools.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.DP10.vcf.gz", samples = SAMPLES),
 
-        "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.vcf.gz",
-        "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.vcf.gz",
-        "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.vcf.gz",
+        # "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz",
+        # "results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz",
+        # "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz",
 
-        "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.DP10.vcf.gz",
-        "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz",
-        "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.DP10.vcf.gz",
+        # "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.vcf.gz",
+        # "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.vcf.gz",
+        # "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.vcf.gz",
 
-        #"results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz.pigmentSNPs.vcf",
+        # "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.DP10.vcf.gz",
+        # "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz",
+        # "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.DP10.vcf.gz",
+
+        # #"results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz.pigmentSNPs.vcf",
         #"results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz.pigmentSNPs.vcf",
         #"results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz.pigmentSNPs.vcf",
 
@@ -56,7 +58,7 @@ rule filter_freebayes_vcf_QUAL60:
         csi = "results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz.csi"
     benchmark:
         "benchmarks/filter_freebayes_vcf_QUAL60.tsv"
-    threads: 8
+    threads:8
     conda:
         "bcftools"
     resources:
@@ -90,7 +92,7 @@ rule filter_bcftools_vcf_QUAL60:
         csi = "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz.csi"
     benchmark:
         "benchmarks/filter_bcftools_vcf_QUAL60.tsv"
-    threads: 8
+    threads:8
     conda:
         "bcftools"
     resources:
@@ -126,7 +128,7 @@ rule filter_haplotypeCaller_vcf_QUAL60:
         csi = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz.csi"
     benchmark:
         "benchmarks/filter_haplotypeCaller_vcf_QUAL60.tsv"
-    threads: 8
+    threads:8
     conda:
         "bcftools"
     resources:
@@ -160,7 +162,7 @@ rule view_bcftools_regions: #TODO Updated files
         regions = "resources/snp_targets_100bp.txt"
     output:
         filtered_snps = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz.pigmentSNPs.vcf"
-    threads: 2
+    threads:2
     conda:
         "bcftools"
     resources:
@@ -184,7 +186,7 @@ rule view_freebayes_regions: #TODO Updated files
         regions = "resources/snp_targets_100bp.txt"
     output:
         filtered_snps = "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf.gz.pigmentSNPs.vcf"
-    threads: 2
+    threads:2
     conda:
         "bcftools"
     resources:
@@ -208,7 +210,7 @@ rule view_haplotypeCaller_regions: #TODO Updated files
         regions = "resources/snp_targets_100bp.txt"
     output:
         filtered_snps = "results/03_filtered/merged.filteredsnvs.QUAL60.haplotypeCaller.vcf.gz.pigmentSNPs.vcf"
-    threads: 2
+    threads:2
     conda:
         "bcftools"
     resources:
@@ -236,7 +238,7 @@ rule isec_bcftools_LIC565:
     output:
         LICFiltered = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.vcf.gz",
         csi = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.vcf.gz.csi"
-    threads: 8
+    threads:8
     conda:
         "bcftools"
     resources:
@@ -270,7 +272,7 @@ rule isec_freebayes_LIC565:
     output:
         LICFiltered = "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.vcf.gz",
         csi = "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.vcf.gz.csi"
-    threads: 8
+    threads:8
     conda:
         "bcftools"
     resources:
@@ -304,7 +306,7 @@ rule isec_haplotypeCaller_LIC565:
     output:
         LICFiltered = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.vcf.gz",
         csi = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.vcf.gz.csi"
-    threads: 8
+    threads:8
     conda:
         "bcftools"
     resources:
@@ -338,7 +340,7 @@ rule isec_bcftools_TBulls:
     output:
         TBullsFiltered = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.vcf.gz",
         csi = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.vcf.gz.csi"
-    threads: 8
+    threads:8
     conda:
         "bcftools"
     resources:
@@ -372,7 +374,7 @@ rule isec_freebayes_TBulls:
     output:
         TBullsFiltered = "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.vcf.gz",
         csi = "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.vcf.gz.csi"
-    threads: 8
+    threads:8
     conda:
         "bcftools"
     resources:
@@ -407,7 +409,7 @@ rule isec_haplotypeCaller_TBulls:
     output:
         TBullsFiltered = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.vcf.gz",
         csi = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.vcf.gz.csi"
-    threads: 8
+    threads:8
     conda:
         "bcftools"
     resources:
@@ -439,7 +441,7 @@ rule filter_DP10_bcftools:
     output:
         TBullsFiltered = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz",
         csi = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz.csi"
-    threads: 6
+    threads:6
     conda:
         "bcftools"
     resources:
@@ -471,7 +473,7 @@ rule filter_DP10_freebayes:
     output:
         TBullsFiltered = "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.DP10.vcf.gz",
         csi = "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.DP10.vcf.gz.csi"
-    threads: 6
+    threads:6
     conda:
         "bcftools"
     resources:
@@ -503,7 +505,7 @@ rule filter_DP10_haplotypeCaller:
     output:
         TBullsFiltered = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.DP10.vcf.gz",
         csi = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.DP10.vcf.gz.csi"
-    threads: 6
+    threads:6
     conda:
         "bcftools"
     resources:
@@ -529,6 +531,36 @@ rule filter_DP10_haplotypeCaller:
 
 
 rule bcftools_private_snps:
+    priority:100
+    input:
+        TBullsFiltered = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz.csi"
+    output:
+        private = "results/04_animals/{samples}.bcftools.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz",
+        csi = "results/04_animals/{samples}.bcftools.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz.csi",
+    threads:6
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """ 
+        sleep 5;
+
+        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.TBullsFiltered} -o {output.private} ;
+
+        bcftools index --threads {threads} {output.private} -o {output.csi}
+
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a results/04_animals/{wildcards.samples}.bcftools.snps.counts.summary.txt &&
+
+        exit 0;
+
+        """
+
 
 rule freebayes_private_snps:
 
