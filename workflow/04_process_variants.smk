@@ -429,7 +429,7 @@ rule isec_haplotypeCaller_TBulls:
         """
 
 
-rule filter_DP10_haplotypeCaller:
+rule filter_DP10_bcftools:
 
 
 rule filter_DP10_freebayes:
