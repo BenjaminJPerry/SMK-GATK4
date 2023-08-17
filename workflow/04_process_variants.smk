@@ -452,11 +452,13 @@ rule filter_DP10_bcftools:
         """ 
         sleep 5;
 
-        bcftools view -O z8 -e 'INFO/DP<10' --threads {threads} {input.TBullsFiltered} -o {output.TBullsFiltered} &&
+        bcftools view -O z8 -e 'INFO/DP<10' --threads {threads} {input.TBullsFiltered} -o {output.TBullsFiltered} ;
 
         bcftools index --threads {threads} {output.TBullsFiltered} -o {output.csi}
 
-        echo "Total snps in {output.TBullsFiltered}: $(bcftools view --threads {threads} {output.TBullsFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
+        echo "Total snps in {output.TBullsFiltered}: $(bcftools view --threads {threads} {output.TBullsFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
+
+        exit 0; 
         
         """
 
@@ -482,11 +484,13 @@ rule filter_DP10_freebayes:
         """ 
         sleep 5;
 
-        bcftools view -O z8 -e 'INFO/DP<10' --threads {threads} {input.TBullsFiltered} -o {output.TBullsFiltered} &&
+        bcftools view -O z8 -e 'INFO/DP<10' --threads {threads} {input.TBullsFiltered} -o {output.TBullsFiltered} ;
 
         bcftools index --threads {threads} {output.TBullsFiltered} -o {output.csi}
 
-        echo "Total snps in {output.TBullsFiltered}: $(bcftools view --threads {threads} {output.TBullsFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
+        echo "Total snps in {output.TBullsFiltered}: $(bcftools view --threads {threads} {output.TBullsFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
+
+        exit 0; 
         
         """
 
@@ -512,13 +516,21 @@ rule filter_DP10_haplotypeCaller:
         """ 
         sleep 5;
 
-        bcftools view -O z8 -e 'INFO/DP<10' --threads {threads} {input.TBullsFiltered} -o {output.TBullsFiltered} &&
+        bcftools view -O z8 -e 'INFO/DP<10' --threads {threads} {input.TBullsFiltered} -o {output.TBullsFiltered} ;
 
         bcftools index --threads {threads} {output.TBullsFiltered} -o {output.csi}
 
-        echo "Total snps in {output.TBullsFiltered}: $(bcftools view --threads {threads} {output.TBullsFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
-        
+        echo "Total snps in {output.TBullsFiltered}: $(bcftools view --threads {threads} {output.TBullsFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
+
+        exit 0;
+
         """
 
 
+
+rule bcftools_private_snps:
+
+rule freebayes_private_snps:
+
+rule haplotypeCaller_private_snps:
 
