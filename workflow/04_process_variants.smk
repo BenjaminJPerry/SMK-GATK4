@@ -28,7 +28,9 @@ SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam
 
 rule all:
     input:
-        expand("results/04_animals/{samples}.bcftools.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz", samples = SAMPLES),
+        expand("results/04_animals/{samples}.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz", samples = SAMPLES),
+        expand("results/04_animals/{samples}.chrom.freebayes.QUAL60.LIC565.TBulls.DP10.vcf.gz", samples = SAMPLES),
+        expand("results/04_animals/{samples}.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.DP10.vcf.gz", samples = SAMPLES),
 
         # "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz",
         # "results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz",
@@ -536,8 +538,8 @@ rule bcftools_private_snps:
         TBullsFiltered = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz",
         csi = "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz.csi"
     output:
-        private = "results/04_animals/{samples}.bcftools.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz",
-        csi = "results/04_animals/{samples}.bcftools.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz.csi",
+        private = "results/04_animals/{samples}.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz",
+        csi = "results/04_animals/{samples}.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz.csi",
     threads:6
     conda:
         "bcftools"
@@ -555,7 +557,7 @@ rule bcftools_private_snps:
 
         bcftools index --threads {threads} {output.private} -o {output.csi}
 
-        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a results/04_animals/{wildcards.samples}.bcftools.snps.counts.summary.txt &&
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a results/04_animals/bcftools.animals.private.snps.counts.summary.txt &&
 
         exit 0;
 
@@ -563,6 +565,65 @@ rule bcftools_private_snps:
 
 
 rule freebayes_private_snps:
+    priority:100
+    input:
+        TBullsFiltered = "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.DP10.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.DP10.vcf.gz.csi"
+    output:
+        private = "results/04_animals/{samples}.chrom.freebayes.QUAL60.LIC565.TBulls.DP10.vcf.gz",
+        csi = "results/04_animals/{samples}.chrom.freebayes.QUAL60.LIC565.TBulls.DP10.vcf.gz.csi",
+    threads:6
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """ 
+        sleep 5;
+
+        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.TBullsFiltered} -o {output.private} ;
+
+        bcftools index --threads {threads} {output.private} -o {output.csi}
+
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a results/04_animals/freebayes.animals.private.snps.counts.summary.txt &&
+
+        exit 0;
+
+        """
+
 
 rule haplotypeCaller_private_snps:
+    priority:100
+    input:
+        TBullsFiltered = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.DP10.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.DP10.vcf.gz.csi"
+    output:
+        private = "results/04_animals/{samples}.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.DP10.vcf.gz",
+        csi = "results/04_animals/{samples}.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.DP10.vcf.gz.csi",
+    threads:6
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """ 
+        sleep 5;
+
+        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.TBullsFiltered} -o {output.private} ;
+
+        bcftools index --threads {threads} {output.private} -o {output.csi}
+
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a results/04_animals/haplotypeCaller.animals.private.snps.counts.summary.txt &&
+
+        exit 0;
+
+        """
 
