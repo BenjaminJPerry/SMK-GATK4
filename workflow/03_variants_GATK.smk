@@ -159,8 +159,8 @@ rule merge_animals_vcf: #TODO
         vcfgz = expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz", samples = SAMPLES),
         csi = expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi", samples = SAMPLES),
     output:
-        merged = "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz",
-        csi = "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz.csi",
+        merged = "results/02_snvs/merged.rawsnps.haplotypeCaller.vcf.gz",
+        csi = "results/02_snvs/merged.rawsnps.haplotypeCaller.vcf.gz.csi",
     benchmark:
         "benchmarks/merge_varscan2_vcf.tsv"
     threads: 16
@@ -182,5 +182,38 @@ rule merge_animals_vcf: #TODO
         echo "Total snps in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
 
 
+        """
+
+
+rule view_haplotype_chrom:
+    priority:100
+    input:
+        merged_vcf = "results/02_snvs/merged.rawsnps.haplotypeCaller.vcf.gz",
+        csi = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz.csi",
+    output:
+        filtered_vcf = "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz",
+        filtered_vcf_csi = "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz.csi"
+    params:
+        chromosomes = "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chr23,chr24,chr25,chr26,chr27,chr28,chr29,chrX,chrY" #TODO move to config; Also, removed ChrM
+    benchmark:
+        "benchmarks/view_haplotypeCaller_chrom.tsv"
+    threads: 8
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 720 + ((attempt - 1) * 720),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """
+
+        bcftools view {input.merged_vcf} -Oz8 -o {output.filtered_vcf} --regions {params.chromosomes} &&
+
+        bcftools index --threads {threads} {output.filtered_vcf} -o {output.filtered_vcf_csi} && 
+
+        echo "Total snps in {output.filtered_vcf}: $(cat {output.filtered_vcf} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        
         """
 
