@@ -429,7 +429,13 @@ rule isec_haplotypeCaller_TBulls:
         """
 
 
-rule filter_DP10_bcftools:
+rule filter_DP10_haplotypeCaller:
+
+
+rule filter_DP10_freebayes:
+
+
+rule filter_DP10_haplotypeCaller:
     priority:100
     input:
         TBullsFiltered = "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.vcf.gz",
@@ -457,11 +463,6 @@ rule filter_DP10_bcftools:
         echo "Total snps in {output.TBullsFiltered}: $(bcftools view --threads {threads} {output.TBullsFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
         
         """
-
-rule filter_DP10_freebayes:
-
-
-rule filter_DP10_haplotypeCaller:
 
 
 
