@@ -61,7 +61,7 @@ rule gatk_HaplotypeCaller_vcf:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        'module load GATK/4.4.0.0-gimkl-2022a '
+        'module load GATK/4.4.0.0-gimkl-2022a; '
         'gatk --java-options "-Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}"  '
         'HaplotypeCaller '
         '--base-quality-score-threshold 20 ' 
