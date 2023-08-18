@@ -34,8 +34,8 @@ CHROM = ('chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9',
 
 rule all:
     input:
-        "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz",
-        "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz.csi"
+        "results/02_snvs/merged.chrom.DPFilt.haplotypeCaller.vcf.gz",
+        "results/02_snvs/merged.chrom.DPFilt.haplotypeCaller.vcf.gz.csi"
 
 
 
@@ -44,7 +44,6 @@ rule gatk_HaplotypeCaller_vcf:
     input:
         bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
-        #chromosome = '{chromosome}'
     output:
         vcf_chrom = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz"),
     params:
@@ -76,12 +75,14 @@ rule gatk_HaplotypeCaller_vcf:
         'rm results/02_snvs/{wildcards.samples}.rawsnvs.{wildcards.chromosome}.haplotypeCaller.vcf.gz.tbi '
 
 
-rule index_replicons_vcf:
+
+rule DPFilt_replicons_vcf: #TODO
     priority:100
     input:
         vcfgz = "results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz",
     output:
-        csi = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz.csi"),
+        filt = temp("results/02_snvs/{samples}.rawsnvs.DPFilt.{chromosome}.haplotypeCaller.vcf.gz"),
+        csi = temp("results/02_snvs/{samples}.rawsnvs.DPFilt.{chromosome}.haplotypeCaller.vcf.gz.csi"),
     benchmark:
         "benchmarks/index_replicons_vcf.{samples}.{chromosome}.tsv"
     threads: 8
@@ -96,7 +97,9 @@ rule index_replicons_vcf:
     shell:
         """
         
-        bcftools index --threads {threads} {input.vcfgz} -o {output.csi}
+        bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>500' -o {output.filt} {input.vcfgz};
+
+        bcftools index --threads {threads} {output.filt} -o {output.csi}
 
         """
 
@@ -104,10 +107,11 @@ rule index_replicons_vcf:
 rule concatenate_replicons_vcf: #TODO
     priority:100
     input:
-        vcfgz = expand("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz", chromosome = CHROM, allow_missing=True),
-        csi = expand("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz.csi", chromosome = CHROM, allow_missing=True),
+        vcfgz = expand("results/02_snvs/{samples}.rawsnvs.DPFilt.{chromosome}.haplotypeCaller.vcf.gz", chromosome = CHROM, allow_missing=True),
+        csi = expand("results/02_snvs/{samples}.rawsnvs.DPFilt.{chromosome}.haplotypeCaller.vcf.gz.csi", chromosome = CHROM, allow_missing=True),
     output:
-        merged = temp("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz")
+        merged = temp("results/02_snvs/{samples}.rawsnvs.DPFilt.haplotypeCaller.vcf.gz"),
+        csi = temp("results/02_snvs/{samples}.rawsnvs.DPFilt.haplotypeCaller.vcf.gz.csi"),
     benchmark:
         "benchmarks/{samples}_concatenate_replicons_vcf.tsv"
     threads: 8
@@ -122,33 +126,9 @@ rule concatenate_replicons_vcf: #TODO
     shell:
         """
         
-        bcftools concat --threads {threads} {input.vcfgz} | bcftools sort -Oz8 -o {output.merged} - 
+        bcftools concat --threads {threads} {input.vcfgz} | bcftools sort -O z8 -o {output.merged} - ;
 
-        """
-
-
-
-rule index_animals_vcf:
-    priority:100
-    input:
-        vcfgz = "results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz",
-    output:
-        csi = temp("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi"),
-    benchmark:
-        "benchmarks/index_animals_vcf.{samples}.tsv"
-    threads: 8
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 4 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 30 + ((attempt - 1) * 240),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        """
-        
-        bcftools index --threads {threads} {input.vcfgz} -o {output.csi}
+        bcftools index --threads {threads} {output.merged} -o {output.csi}
 
         """
 
@@ -156,11 +136,11 @@ rule index_animals_vcf:
 rule merge_animals_vcf: #TODO
     priority:100
     input:
-        vcfgz = expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz", samples = SAMPLES),
-        csi = expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi", samples = SAMPLES),
+        vcfgz = expand("results/02_snvs/{samples}.rawsnvs.DPFilt.haplotypeCaller.vcf.gz", samples = SAMPLES),
+        csi = expand("results/02_snvs/{samples}.rawsnvs.DPFilt.haplotypeCaller.vcf.gz.csi", samples = SAMPLES),
     output:
-        merged = "results/02_snvs/merged.rawsnps.haplotypeCaller.vcf.gz",
-        csi = "results/02_snvs/merged.rawsnps.haplotypeCaller.vcf.gz.csi",
+        merged = "results/02_snvs/merged.rawsnvs.DPFilt.haplotypeCaller.vcf.gz",
+        csi = "results/02_snvs/merged.rawsnvs.DPFilt.haplotypeCaller.vcf.gz.csi",
     benchmark:
         "benchmarks/merge_varscan2_vcf.tsv"
     threads: 16
@@ -175,9 +155,9 @@ rule merge_animals_vcf: #TODO
     shell:
         """
         
-        bcftools merge --threads {threads} {input.vcfgz} -Oz8 -o {output.merged} &&
+        bcftools merge --threads {threads} {input.vcfgz} -Oz8 -o {output.merged};
 
-        bcftools index --threads {threads} {output.merged} -o {output.csi} &&
+        bcftools index --threads {threads} {output.merged} -o {output.csi};
 
         echo "Total snps in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
 
@@ -188,11 +168,11 @@ rule merge_animals_vcf: #TODO
 rule view_haplotype_chrom:
     priority:100
     input:
-        merged_vcf = "results/02_snvs/merged.rawsnps.haplotypeCaller.vcf.gz",
-        csi = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz.csi",
+        merged_vcf = "results/02_snvs/merged.rawsnvs.DPFilt.haplotypeCaller.vcf.gz",
+        csi = "results/02_snvs/merged.rawsnvs.DPFilt.freebayes.vcf.gz.csi",
     output:
-        filtered_vcf = "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz",
-        filtered_vcf_csi = "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz.csi"
+        filtered_vcf = "results/02_snvs/merged.chrom.DPFilt.haplotypeCaller.vcf.gz",
+        filtered_vcf_csi = "results/02_snvs/merged.chrom.DPFilt.haplotypeCaller.vcf.gz.csi"
     params:
         chromosomes = "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chr23,chr24,chr25,chr26,chr27,chr28,chr29,chrX,chrY" #TODO move to config; Also, removed ChrM
     benchmark:
@@ -209,9 +189,9 @@ rule view_haplotype_chrom:
     shell:
         """
 
-        bcftools view {input.merged_vcf} -Oz8 -o {output.filtered_vcf} --regions {params.chromosomes} &&
+        bcftools view {input.merged_vcf} -O z8 -o {output.filtered_vcf} --regions {params.chromosomes};
 
-        bcftools index --threads {threads} {output.filtered_vcf} -o {output.filtered_vcf_csi} && 
+        bcftools index --threads {threads} {output.filtered_vcf} -o {output.filtered_vcf_csi}; 
 
         echo "Total snps in {output.filtered_vcf}: $(cat {output.filtered_vcf} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
         

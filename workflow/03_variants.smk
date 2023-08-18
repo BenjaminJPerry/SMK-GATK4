@@ -28,10 +28,11 @@ SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam
 
 rule all:
     input:
-        "results/02_snvs/merged.chrom.bcftools.vcf.gz",
-        "results/02_snvs/merged.chrom.freebayes.vcf.gz",
-        "results/02_snvs/merged.chrom.bcftools.vcf.gz.csi",
-        "results/02_snvs/merged.chrom.freebayes.vcf.gz.csi"
+        "results/02_snvs/merged.chrom.DPFilt.bcftools.vcf.gz",
+        "results/02_snvs/merged.chrom.DPFilt.freebayes.vcf.gz",
+
+        # "results/02_snvs/merged.chrom.bcftools.vcf.gz.csi",
+        # "results/02_snvs/merged.chrom.freebayes.vcf.gz.csi"
         
         #"results/02_snvs/merged.rawsnvs.bcftools.vcf.gz",
         #"results/02_snvs/merged.rawsnvs.freebayes.vcf.gz",
@@ -51,7 +52,8 @@ rule bcftools_vcf:
         bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
     output:
-        vcf = temp("results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz"),
+        vcf = temp("results/02_snvs/{samples}.rawsnvs.DPFilt.bcftools.vcf.gz"),
+        csi = temp("results/02_snvs/{samples}.rawsnvs.DPFilt.bcftools.vcf.gz.csi"),
     log:
         "logs/bcftools_vcf.{samples}.log"
     benchmark:
@@ -66,54 +68,29 @@ rule bcftools_vcf:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        "bcftools mpileup "
-        "--seed 1953 "
-        "--threads {threads} "
+        "bcftools mpileup --seed 1953 --threads {threads} "
         "--max-depth 250 " # Max raw per-file depth; avoids excessive memory usage [250]
         "-q 30 " # skip alignment with mapQ less than
         "-Q 20 " # Skip bases with baseQ/BAQ less than
         "-m 10 " # Minimum number gapped reads for indel candidates
-        "-Ou "
-        "-f {input.referenceGenome} {input.bam} "
+        "-f {input.referenceGenome} "
+        "{input.bam} "
         "| bcftools call "
         "--threads {threads} "
         "-v " # Output variant sites only
         "-m " # Alternative model for multiallelic and rare-variant calling
-        "-Oz8 > {output.vcf}"
-
-
-rule index_bcftools_vcf:
-    priority:100
-    input:
-        vcfgz = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz",
-    output:
-        csi = temp("results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz.csi"),
-    benchmark:
-        "benchmarks/index_bcftools_vcf.{samples}.tsv"
-    threads: 8
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        """
-        
-        bcftools index --threads {threads} {input.vcfgz} -o {output.csi}
-
-        """
+        "| bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>500' -o {output.vcf}; "
+        "bcftools index --threads {threads} {output.vcf} -o  {output.csi} "
 
 
 rule merge_bcftools_vcf: #TODO
     priority:100
     input:
-        vcfgz = expand("results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz", samples = SAMPLES),
-        csi = expand("results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz.csi", samples = SAMPLES),
+        vcfgz = expand("results/02_snvs/{samples}.rawsnvs.DPFilt.bcftools.vcf.gz", samples = SAMPLES),
+        csi = expand("results/02_snvs/{samples}.rawsnvs.DPFilt.bcftools.vcf.gz.csi", samples = SAMPLES),
     output:
-        merged = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz"
+        merged = "results/02_snvs/merged.rawsnvs.DPFilt.bcftools.vcf.gz",
+        csi = "results/02_snvs/merged.rawsnvs.DPFilt.bcftools.vcf.gz.csi"
     benchmark:
         "benchmarks/merge_bcftools_vcf.tsv"
     threads: 16
@@ -128,38 +105,15 @@ rule merge_bcftools_vcf: #TODO
     shell:
         """
         
-        bcftools merge --threads {threads} {input.vcfgz} -Oz8 -o {output.merged} &&
+        bcftools merge --threads {threads} {input.vcfgz} -O z8 -o {output.merged};
+
+        bcftools index --threads {threads} {output.merged} -o {output.csi};
 
         echo "Total snps in {output.filtered_vcf}: $(cat {output.filtered_vcf} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
 
 
         """
 
-
-rule index_merged_bcftools_vcf:
-    priority:100
-    input:
-        vcfgz = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz",
-    output:
-        csi = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz.csi",
-    benchmark:
-        "benchmarks/index_merged_bcftools_vcf.tsv"
-    threads: 8
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        """
-        
-        bcftools index --threads {threads} {input.vcfgz} -o {output.csi}
-
-        """
-      
 
 ### freebayes
 
@@ -170,7 +124,8 @@ rule freebayes_vcf:
         bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
     output:
-        vcf = temp("results/02_snvs/{samples}.rawsnvs.freebayes.vcf"),
+        vcfgz = temp("results/02_snvs/{samples}.rawsnvs.DPFilt.freebayes.vcf.gz"),
+        csi = temp("results/02_snvs/{samples}.rawsnvs.DPFilt.freebayes.vcf.gz.csi"),
     log:
         "logs/freebayes_vcf.{samples}.log"
     benchmark:
@@ -191,66 +146,19 @@ rule freebayes_vcf:
         #"--pooled-continuous " # Output all alleles which pass input filters, regardles of genotyping outcome or model.
         #"--trim-complex-tail " # Trim complex tails.
         #"-F 0.01 " # minimum fraction of observations supporting alternate allele within one individual [0.05]
-        "-f {input.referenceGenome} {input.bam} > {output.vcf}"
-
-
-rule bgzip_freebayes_vcf:
-    priority:1000
-    input:
-        vcf = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf",
-    output:
-        vcfgz = temp("results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz"),
-    benchmark:
-        "benchmarks/bgzip_freebayes_vcf.{samples}.tsv"
-    threads: 8
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        """
-        
-        bgzip -c -l 8 --threads {threads} {input.vcf} > {output.vcfgz}
-
-        """
-
-
-rule index_freebayes_vcf:
-    priority:100
-    input:
-        vcfgz = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz",
-    output:
-        csi = temp("results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi"),
-    benchmark:
-        "benchmarks/index_freebayes_vcf.{samples}.tsv"
-    threads: 8
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        """
-        
-        bcftools index --threads {threads} {input.vcfgz} -o {output.csi}
-
-        """
+        "-f {input.referenceGenome} {input.bam} "
+        "| bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>500' -o {output.vcf}; "
+        "bcftools index --threads {threads} {output.vcf} -o  {output.csi} "
 
 
 rule merge_freebayes_vcf:
     priority:100
     input:
-        vcfgz = expand("results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz", samples = SAMPLES),
-        csi = expand("results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi", samples = SAMPLES),
+        vcfgz = expand("results/02_snvs/{samples}.rawsnvs.DPFilt.freebayes.vcf.gz", samples = SAMPLES),
+        csi = expand("results/02_snvs/{samples}.rawsnvs.DPFilt.freebayes.vcf.gz.csi", samples = SAMPLES),
     output:
-        merged = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz"
+        merged = "results/02_snvs/merged.rawsnvs.DPFilt.freebayes.vcf.gz",
+        csi = "results/02_snvs/merged.rawsnvs.DPFilt.freebayes.vcf.gz.csi",
     benchmark:
         "benchmarks/merge_freebayes_vcf.tsv"
     threads: 16
@@ -265,34 +173,11 @@ rule merge_freebayes_vcf:
     shell:
         """
         
-        bcftools merge --threads {threads} {input.vcfgz} -Oz8 -o {output.merged} &&
+        bcftools merge --threads {threads} {input.vcfgz} -O z8 -o {output.merged} &&
+
+        bcftools index --threads {threads} {output.merged} -o {output.csi};
 
         echo "Total snps in {output.filtered_vcf}: $(cat {output.filtered_vcf} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-
-        """
-
-
-rule index_merged_freebayes_vcf:
-    priority:100
-    input:
-        vcfgz = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz",
-    output:
-        csi = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz.csi",
-    benchmark:
-        "benchmarks/index_merged_freebayes_vcf.tsv"
-    threads: 8
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 16 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 240),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        """
-        
-        bcftools index --threads {threads} {input.vcfgz} -o {output.csi}
 
         """
 
@@ -300,11 +185,11 @@ rule index_merged_freebayes_vcf:
 rule view_bcftools_chrom:
     priority:100
     input:
-        merged_vcf = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz",
-        csi = "results/02_snvs/merged.rawsnvs.bcftools.vcf.gz.csi",
+        merged = "results/02_snvs/merged.rawsnvs.DPFilt.bcftools.vcf.gz",
+        csi = "results/02_snvs/merged.rawsnvs.DPFilt.bcftools.vcf.gz.csi"
     output:
-        filtered_vcf = "results/02_snvs/merged.chrom.bcftools.vcf.gz",
-        filtered_vcf_csi = "results/02_snvs/merged.chrom.bcftools.vcf.gz.csi"
+        filtered_vcf = "results/02_snvs/merged.chrom.DPFilt.bcftools.vcf.gz",
+        filtered_vcf_csi = "results/02_snvs/merged.chrom.DPFilt.bcftools.vcf.gz.csi"
     params:
         chromosomes = "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chr23,chr24,chr25,chr26,chr27,chr28,chr29,chrX,chrY" #TODO move to config; Also, removed ChrM
     benchmark:
@@ -321,7 +206,7 @@ rule view_bcftools_chrom:
     shell:
         """
 
-        bcftools view {input.merged_vcf} -Oz8 -o {output.filtered_vcf} --regions {params.chromosomes} &&
+        bcftools view {input.merged_vcf} -O z8 -o {output.filtered_vcf} --regions {params.chromosomes} &&
 
         bcftools index --threads {threads} {output.filtered_vcf} -o {output.filtered_vcf_csi} &&
 
@@ -333,11 +218,11 @@ rule view_bcftools_chrom:
 rule view_freebayes_chrom:
     priority:100
     input:
-        merged_vcf = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz",
-        csi = "results/02_snvs/merged.rawsnvs.freebayes.vcf.gz.csi",
+        merged = "results/02_snvs/merged.rawsnvs.DPFilt.freebayes.vcf.gz",
+        csi = "results/02_snvs/merged.rawsnvs.DPFilt.freebayes.vcf.gz.csi",
     output:
-        filtered_vcf = "results/02_snvs/merged.chrom.freebayes.vcf.gz",
-        filtered_vcf_csi = "results/02_snvs/merged.chrom.freebayes.vcf.gz.csi"
+        filtered_vcf = "results/02_snvs/merged.chrom.DPFilt.freebayes.vcf.gz",
+        filtered_vcf_csi = "results/02_snvs/merged.chrom.DPFilt.freebayes.vcf.gz.csi"
     params:
         chromosomes = "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chr23,chr24,chr25,chr26,chr27,chr28,chr29,chrX,chrY" #TODO move to config; Also, removed ChrM
     benchmark:
@@ -354,7 +239,7 @@ rule view_freebayes_chrom:
     shell:
         """
 
-        bcftools view {input.merged_vcf} -Oz8 -o {output.filtered_vcf} --regions {params.chromosomes} &&
+        bcftools view {input.merged_vcf} -O z8 -o {output.filtered_vcf} --regions {params.chromosomes} &&
 
         bcftools index --threads {threads} {output.filtered_vcf} -o {output.filtered_vcf_csi} && 
 
