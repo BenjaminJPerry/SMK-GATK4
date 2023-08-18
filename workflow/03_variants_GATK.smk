@@ -46,6 +46,7 @@ rule gatk_HaplotypeCaller_vcf:
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
     output:
         vcf_chrom = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz"),
+        csi = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz.csi")
     params:
         chromosome = '{chromosome}'
     log:
@@ -60,7 +61,7 @@ rule gatk_HaplotypeCaller_vcf:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        'module load GATK/4.4.0.0-gimkl-2022a ; '
+        'module load GATK/4.4.0.0-gimkl-2022a 2>&1 {log}; '
         'gatk --java-options "-Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}"  '
         'HaplotypeCaller '
         '--base-quality-score-threshold 20 ' 
@@ -72,7 +73,9 @@ rule gatk_HaplotypeCaller_vcf:
         '-O {output.vcf_chrom} '
         '--tmp-dir {resources.DTMP} '
         '&> {log}.attempt.{resources.attempt} && '
-        'rm results/02_snvs/{wildcards.samples}.rawsnvs.{wildcards.chromosome}.haplotypeCaller.vcf.gz.tbi '
+        'rm results/02_snvs/{wildcards.samples}.rawsnvs.{wildcards.chromosome}.haplotypeCaller.vcf.gz.tbi; '
+        'bcftools index --threads {threads} {output.vcf_chrom} -o {output.csi};
+
 
 
 
@@ -80,6 +83,7 @@ rule DPFilt_replicons_vcf:
     priority:100
     input:
         vcfgz = "results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz",
+        csi = "results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz.csi",
     output:
         filt = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.filt.vcf.gz"),
         csi = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.filt.vcf.gz.csi"),
@@ -96,7 +100,6 @@ rule DPFilt_replicons_vcf:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        bcftools index --threads {threads} {input.vcfgz};
 
         bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>500' -o {output.filt} {input.vcfgz};
 
