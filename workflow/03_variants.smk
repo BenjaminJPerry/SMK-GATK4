@@ -147,8 +147,8 @@ rule freebayes_vcf:
         #"--trim-complex-tail " # Trim complex tails.
         #"-F 0.01 " # minimum fraction of observations supporting alternate allele within one individual [0.05]
         "-f {input.referenceGenome} {input.bam} "
-        "| bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>500' -o {output.vcf}; "
-        "bcftools index --threads {threads} {output.vcf} -o  {output.csi} "
+        "| bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>500' -o {output.vcfgz}; "
+        "bcftools index --threads {threads} {output.vcfgz} -o  {output.csi} "
 
 
 rule merge_freebayes_vcf:
