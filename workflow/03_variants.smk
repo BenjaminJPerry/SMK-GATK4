@@ -78,7 +78,7 @@ rule bcftools_vcf:
         "--threads {threads} "
         "-v " # Output variant sites only
         "-m " # Alternative model for multiallelic and rare-variant calling
-        "| bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>500' -o {output.vcf}; "
+        "| bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.vcf}; "
         "bcftools index --threads {threads} {output.vcf} -o  {output.csi} "
 
 
@@ -145,7 +145,7 @@ rule freebayes_vcf:
         #"--trim-complex-tail " # Trim complex tails.
         #"-F 0.01 " # minimum fraction of observations supporting alternate allele within one individual [0.05]
         "-f {input.referenceGenome} {input.bam} "
-        "| bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>500' -o {output.vcfgz}; "
+        "| bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.vcfgz}; "
         "bcftools index --threads {threads} {output.vcfgz} -o  {output.csi} "
 
 
@@ -189,7 +189,7 @@ rule view_bcftools_chrom:
         filtered_vcf = "results/02_snvs/merged.chrom.DPFilt.bcftools.vcf.gz",
         filtered_vcf_csi = "results/02_snvs/merged.chrom.DPFilt.bcftools.vcf.gz.csi"
     params:
-        chromosomes = "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chr23,chr24,chr25,chr26,chr27,chr28,chr29,chrX,chrY" #TODO move to config; Also, removed ChrM
+        chromosomes = "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chr23,chr24,chr25,chr26,chr27,chr28,chr29,chrX,chrY,chrM" #TODO move to config
     benchmark:
         "benchmarks/view_bcftools_chrom.tsv"
     threads: 8
@@ -222,7 +222,7 @@ rule view_freebayes_chrom:
         filtered_vcf = "results/02_snvs/merged.chrom.DPFilt.freebayes.vcf.gz",
         filtered_vcf_csi = "results/02_snvs/merged.chrom.DPFilt.freebayes.vcf.gz.csi"
     params:
-        chromosomes = "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chr23,chr24,chr25,chr26,chr27,chr28,chr29,chrX,chrY" #TODO move to config; Also, removed ChrM
+        chromosomes = "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chr23,chr24,chr25,chr26,chr27,chr28,chr29,chrX,chrY,chrM" #TODO move to config
     benchmark:
         "benchmarks/view_freebayes_chrom.tsv"
     threads: 8

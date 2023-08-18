@@ -24,7 +24,7 @@ onstart:
 
 
 SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam")
-CHROM = ('chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19', 'chr20', 'chr21', 'chr22', 'chr23', 'chr24', 'chr25', 'chr26', 'chr27', 'chr28', 'chr29', 'chrX', 'chrY') #Removed chrM
+CHROM = ('chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19', 'chr20', 'chr21', 'chr22', 'chr23', 'chr24', 'chr25', 'chr26', 'chr27', 'chr28', 'chr29', 'chrX', 'chrY', 'chrM')
 
 
 # wildcard_constraints:
@@ -61,7 +61,7 @@ rule gatk_HaplotypeCaller_vcf:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        'module load GATK/4.4.0.0-gimkl-2022a 2>&1 {log}; '
+        'module load GATK/4.4.0.0-gimkl-2022a '
         'gatk --java-options "-Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}"  '
         'HaplotypeCaller '
         '--base-quality-score-threshold 20 ' 
@@ -73,8 +73,8 @@ rule gatk_HaplotypeCaller_vcf:
         '-O {output.vcf_chrom} '
         '--tmp-dir {resources.DTMP} '
         '&> {log}.attempt.{resources.attempt} && '
-        'rm results/02_snvs/{wildcards.samples}.rawsnvs.{wildcards.chromosome}.haplotypeCaller.vcf.gz.tbi; '
-        'bcftools index --threads {threads} {output.vcf_chrom} -o {output.csi};
+        'rm results/02_snvs/{wildcards.samples}.rawsnvs.{wildcards.chromosome}.haplotypeCaller.vcf.gz.tbi && '
+        'bcftools index --threads {threads} {output.vcf_chrom} -o {output.csi}'
 
 
 
@@ -101,7 +101,7 @@ rule DPFilt_replicons_vcf:
     shell:
         """
 
-        bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>500' -o {output.filt} {input.vcfgz};
+        bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filt} {input.vcfgz};
 
         bcftools index --threads {threads} {output.filt} -o {output.csi}
 
