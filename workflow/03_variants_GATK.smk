@@ -40,7 +40,7 @@ rule all:
 
 
 rule gatk_HaplotypeCaller_vcf:
-    priority: 1
+    priority: 100
     input:
         bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
@@ -54,8 +54,8 @@ rule gatk_HaplotypeCaller_vcf:
         "benchmarks/gatk_HaplotypeCaller_vcf.{samples}.{chromosome}.tsv"
     threads: 4
     resources:
-        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 720 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 12),
+        time = lambda wildcards, attempt: 240 + ((attempt - 1) * 240),
         partition = "milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -89,8 +89,8 @@ rule DPFilt_replicons_vcf: #TODO
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 4 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 30 + ((attempt - 1) * 240),
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -118,8 +118,8 @@ rule concatenate_replicons_vcf: #TODO
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 120),
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -133,7 +133,7 @@ rule concatenate_replicons_vcf: #TODO
         """
 
 
-rule merge_animals_vcf: #TODO
+rule merge_animals_vcf:
     priority:100
     input:
         vcfgz = expand("results/02_snvs/{samples}.rawsnvs.DPFilt.haplotypeCaller.vcf.gz", samples = SAMPLES),
@@ -142,13 +142,13 @@ rule merge_animals_vcf: #TODO
         merged = "results/02_snvs/merged.rawsnvs.DPFilt.haplotypeCaller.vcf.gz",
         csi = "results/02_snvs/merged.rawsnvs.DPFilt.haplotypeCaller.vcf.gz.csi",
     benchmark:
-        "benchmarks/merge_varscan2_vcf.tsv"
+        "benchmarks/merge_animals_vcf.tsv"
     threads: 16
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -181,8 +181,8 @@ rule view_haplotype_chrom:
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 720 + ((attempt - 1) * 720),
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
