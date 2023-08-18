@@ -45,7 +45,6 @@ rule all:
 
 ### bcftools 
 
-
 rule bcftools_vcf:
     priority: 100
     input:
@@ -62,8 +61,8 @@ rule bcftools_vcf:
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 2880 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 720 + ((attempt - 1) * 720),
         partition = "milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -97,8 +96,8 @@ rule merge_bcftools_vcf:
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -117,7 +116,6 @@ rule merge_bcftools_vcf:
 
 ### freebayes
 
-
 rule freebayes_vcf:
     priority: 100
     input:
@@ -134,8 +132,8 @@ rule freebayes_vcf:
     conda:
         "freebayes"
     resources:
-        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 2880 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 12),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
         partition = "milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -165,8 +163,8 @@ rule merge_freebayes_vcf:
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 64 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -198,8 +196,8 @@ rule view_bcftools_chrom:
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 720 + ((attempt - 1) * 720),
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -231,8 +229,8 @@ rule view_freebayes_chrom:
     conda:
         "bcftools"
     resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 720 + ((attempt - 1) * 720),
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,

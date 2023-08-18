@@ -25,6 +25,10 @@ onstart:
 
 SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam")
 
+# ENTRY POINTS
+#         "results/02_snvs/merged.chrom.DPFilt.bcftools.vcf.gz",
+#         "results/02_snvs/merged.chrom.DPFilt.freebayes.vcf.gz",
+#         "results/02_snvs/merged.chrom.DPFilt.haplotypeCaller.vcf.gz"
 
 rule all:
     input:
@@ -32,17 +36,6 @@ rule all:
         expand("results/04_animals/{samples}.chrom.freebayes.QUAL60.LIC565.TBulls.DP10.vcf.gz", samples = SAMPLES),
         expand("results/04_animals/{samples}.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.DP10.vcf.gz", samples = SAMPLES),
 
-        # "results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz",
-        # "results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz",
-        # "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.vcf.gz",
-
-        # "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.vcf.gz",
-        # "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.vcf.gz",
-        # "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.vcf.gz",
-
-        # "results/03_filtered/merged.chrom.haplotypeCaller.QUAL60.LIC565.TBulls.DP10.vcf.gz",
-        # "results/03_filtered/merged.chrom.bcftools.QUAL60.LIC565.TBulls.DP10.vcf.gz",
-        # "results/03_filtered/merged.chrom.freebayes.QUAL60.LIC565.TBulls.DP10.vcf.gz",
 
         # #"results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz.pigmentSNPs.vcf",
         #"results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz.pigmentSNPs.vcf",
