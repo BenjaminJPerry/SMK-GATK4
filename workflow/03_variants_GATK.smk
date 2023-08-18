@@ -96,7 +96,8 @@ rule DPFilt_replicons_vcf: #TODO
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        
+        bcftools index --threads {threads} {input.vcfgz};
+
         bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>500' -o {output.filt} {input.vcfgz};
 
         bcftools index --threads {threads} {output.filt} -o {output.csi}
