@@ -81,8 +81,8 @@ rule DPFilt_replicons_vcf: #TODO
     input:
         vcfgz = "results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz",
     output:
-        filt = temp("results/02_snvs/{samples}.rawsnvs.DPFilt.{chromosome}.haplotypeCaller.vcf.gz"),
-        csi = temp("results/02_snvs/{samples}.rawsnvs.DPFilt.{chromosome}.haplotypeCaller.vcf.gz.csi"),
+        filt = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.DPFilt.vcf.gz"),
+        csi = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.DPFilt.vcf.gz.csi"),
     benchmark:
         "benchmarks/index_replicons_vcf.{samples}.{chromosome}.tsv"
     threads: 8
@@ -107,8 +107,8 @@ rule DPFilt_replicons_vcf: #TODO
 rule concatenate_replicons_vcf: #TODO
     priority:100
     input:
-        vcfgz = expand("results/02_snvs/{samples}.rawsnvs.DPFilt.{chromosome}.haplotypeCaller.vcf.gz", chromosome = CHROM, allow_missing=True),
-        csi = expand("results/02_snvs/{samples}.rawsnvs.DPFilt.{chromosome}.haplotypeCaller.vcf.gz.csi", chromosome = CHROM, allow_missing=True),
+        vcfgz = expand("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.DPFilt.vcf.gz", chromosome = CHROM, allow_missing=True),
+        csi = expand("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.DPFilt.vcf.gz.csi", chromosome = CHROM, allow_missing=True),
     output:
         merged = temp("results/02_snvs/{samples}.rawsnvs.DPFilt.haplotypeCaller.vcf.gz"),
         csi = temp("results/02_snvs/{samples}.rawsnvs.DPFilt.haplotypeCaller.vcf.gz.csi"),
