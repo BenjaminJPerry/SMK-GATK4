@@ -206,7 +206,7 @@ rule view_bcftools_chrom:
     shell:
         """
 
-        bcftools view {input.merged_vcf} -O z8 -o {output.filtered_vcf} --regions {params.chromosomes} &&
+        bcftools view {input.merged} -O z8 -o {output.filtered_vcf} --regions {params.chromosomes} &&
 
         bcftools index --threads {threads} {output.filtered_vcf} -o {output.filtered_vcf_csi} &&
 
