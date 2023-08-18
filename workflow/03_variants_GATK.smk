@@ -53,6 +53,8 @@ rule gatk_HaplotypeCaller_vcf:
         "logs/gatk_HaplotypeCaller_vcf.{samples}.{chromosome}.log"
     benchmark:
         "benchmarks/gatk_HaplotypeCaller_vcf.{samples}.{chromosome}.tsv"
+    conda:
+        "bcftools"
     threads: 4
     resources:
         mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 12),
