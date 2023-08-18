@@ -177,7 +177,7 @@ rule merge_freebayes_vcf:
 
         bcftools index --threads {threads} {output.merged} -o {output.csi};
 
-        echo "Total snps in {output.filtered_vcf}: $(cat {output.filtered_vcf} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
 
         """
 
