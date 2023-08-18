@@ -169,7 +169,7 @@ rule view_haplotype_chrom:
     priority:100
     input:
         merged_vcf = "results/02_snvs/merged.rawsnvs.haplotypeCaller.DPFilt.vcf.gz",
-        csi = "results/02_snvs/merged.rawsnvs.freebayes.DPFilt.vcf.gz.csi",
+        csi = "results/02_snvs/merged.rawsnvs.haplotypeCaller.DPFilt.vcf.gz.csi",
     output:
         filtered_vcf = "results/02_snvs/merged.chrom.haplotypeCaller.DPFilt.vcf.gz",
         filtered_vcf_csi = "results/02_snvs/merged.chrom.haplotypeCaller.DPFilt.vcf.gz.csi"
