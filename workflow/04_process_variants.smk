@@ -226,7 +226,7 @@ rule isec_haplotypeCaller_LIC565:
         snps_LIC_csi = "resources/LIC_565.ch.frmt.sorted.vcf.gz.csi",
     output:
         LICFiltered = "results/03_filtered/merged.chrom.DPFilt.haplotypeCaller.QUAL60.LIC565.vcf.gz",
-        csi = "rresults/03_filtered/merged.chrom.DPFilt.haplotypeCaller.QUAL60.LIC565.vcf.gz.csi"
+        csi = "results/03_filtered/merged.chrom.DPFilt.haplotypeCaller.QUAL60.LIC565.vcf.gz.csi"
     threads:8
     conda:
         "bcftools"
@@ -323,7 +323,7 @@ rule isec_haplotypeCaller_TBulls:
     priority:100
     input:
         LICFiltered = "results/03_filtered/merged.chrom.DPFilt.haplotypeCaller.QUAL60.LIC565.vcf.gz",
-        csi = "rresults/03_filtered/merged.chrom.DPFilt.haplotypeCaller.QUAL60.LIC565.vcf.gz.csi",
+        csi = "results/03_filtered/merged.chrom.DPFilt.haplotypeCaller.QUAL60.LIC565.vcf.gz.csi",
         snps_TBulls = "resources/ARS_1000bullsgenome.frmt.sorted.vcf.gz",
         snps_TBulls_csi = "resources/ARS_1000bullsgenome.frmt.sorted.vcf.gz.csi",
     output:
