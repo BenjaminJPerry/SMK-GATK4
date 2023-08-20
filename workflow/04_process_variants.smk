@@ -46,7 +46,7 @@ rule bcftools_private_snps:
     priority:100
     input:
         merged = "results/02_snvs/merged.chrom.bcftools.vcf.gz",
-        csi = "results/02_snvs/merged.chrom.bcftools.vcf.gz",
+        csi = "results/02_snvs/merged.chrom.bcftools.vcf.gz.csi",
     output:
         private = temp("results/03_filtered/{samples}.chrom.private.bcftools.vcf.gz"),
         csi = temp("results/03_filtered/{samples}.chrom.private.bcftools.vcf.gz.csi"),
@@ -63,7 +63,7 @@ rule bcftools_private_snps:
         """ 
         sleep 5;
 
-        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.TBullsFiltered} -o {output.private} ;
+        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.merged} -o {output.private} ;
 
         bcftools index --threads {threads} {output.private} -o {output.csi}
 
@@ -78,7 +78,7 @@ rule freebayes_private_snps:
     priority:100
     input:
         merged = "results/02_snvs/merged.chrom.freebayes.vcf.gz",
-        csi = "results/02_snvs/merged.chrom.freebayes.vcf.gz",
+        csi = "results/02_snvs/merged.chrom.freebayes.vcf.gz.csi",
     output:
         private = temp("results/03_filtered/{samples}.chrom.private.freebayes.vcf.gz"),
         csi = temp("results/03_filtered/{samples}.chrom.private.freebayes.vcf.gz.csi"),
@@ -95,7 +95,7 @@ rule freebayes_private_snps:
         """ 
         sleep 5;
 
-        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.TBullsFiltered} -o {output.private} ;
+        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.merged} -o {output.private} ;
 
         bcftools index --threads {threads} {output.private} -o {output.csi}
 
@@ -110,7 +110,7 @@ rule haplotypeCaller_private_snps:
     priority:100
     input:
         merged = "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz",
-        csi = "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz",
+        csi = "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz.csi",
     output:
         private = temp("results/03_filtered/{samples}.chrom.private.haplotypeCaller.vcf.gz"),
         csi = temp("results/03_filtered/{samples}.chrom.private.haplotypeCaller.vcf.gz.csi"),
@@ -127,7 +127,7 @@ rule haplotypeCaller_private_snps:
         """ 
         sleep 5;
 
-        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.TBullsFiltered} -o {output.private} ;
+        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.merged} -o {output.private} ;
 
         bcftools index --threads {threads} {output.private} -o {output.csi}
 
@@ -146,8 +146,6 @@ rule bcftools_DPFilter_private:
     output:
         filtered = temp("results/03_filtered/{samples}.chrom.private.DPFilt.bcftools.vcf.gz"),
         csi = temp("results/03_filtered/{samples}.chrom.private.DPFilt.bcftools.vcf.gz.csi"),
-    benchmark:
-        "benchmarks/index_replicons_vcf.{samples}.{chromosome}.tsv"
     threads: 8
     conda:
         "bcftools"
@@ -160,9 +158,9 @@ rule bcftools_DPFilter_private:
     shell:
         """
 
-        bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filt} {input.vcfgz};
+        bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filtered} {input.private};
 
-        bcftools index --threads {threads} {output.filt} -o {output.csi}
+        bcftools index --threads {threads} {output.filtered} -o {output.csi}
 
         """
 
@@ -175,8 +173,6 @@ rule freebayes_DPFilter_private:
     output:
         filtered = temp("results/03_filtered/{samples}.chrom.private.DPFilt.freebayes.vcf.gz"),
         csi = temp("results/03_filtered/{samples}.chrom.private.DPFilt.freebayes.vcf.gz.csi"),
-    benchmark:
-        "benchmarks/index_replicons_vcf.{samples}.{chromosome}.tsv"
     threads: 8
     conda:
         "bcftools"
@@ -189,9 +185,9 @@ rule freebayes_DPFilter_private:
     shell:
         """
 
-        bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filt} {input.vcfgz};
+        bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filtered} {input.private};
 
-        bcftools index --threads {threads} {output.filt} -o {output.csi}
+        bcftools index --threads {threads} {output.filtered} -o {output.csi}
 
         """
 
@@ -204,8 +200,6 @@ rule haplotypeCaller_DPFilter_private:
     output:
         filtered = temp("results/03_filtered/{samples}.chrom.private.DPFilt.haplotypeCaller.vcf.gz"),
         csi = temp("results/03_filtered/{samples}.chrom.private.DPFilt.haplotypeCaller.vcf.gz.csi"),
-    benchmark:
-        "benchmarks/index_replicons_vcf.{samples}.{chromosome}.tsv"
     threads: 8
     conda:
         "bcftools"
@@ -218,23 +212,21 @@ rule haplotypeCaller_DPFilter_private:
     shell:
         """
 
-        bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filt} {input.vcfgz};
+        bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filtered} {input.private};
 
-        bcftools index --threads {threads} {output.filt} -o {output.csi}
+        bcftools index --threads {threads} {output.filtered} -o {output.csi}
 
         """
 
 
-rule bcftools_filter_private_QUAL60: #TODO fix up the file collecting the SNP counts
+rule bcftools_filter_private_QUAL60: 
     priority:100
     input:
-        merged = "results/03_filtered/{samples}.chrom.private.DPFilt.bcftools.vcf.gz",
+        DPFilt = "results/03_filtered/{samples}.chrom.private.DPFilt.bcftools.vcf.gz",
         index = "results/03_filtered/{samples}.chrom.private.DPFilt.bcftools.vcf.gz.csi"
     output:
         filtered = temp("results/03_filtered/{samples}.chrom.private.DPFilt.QUAL60.bcftools.vcf.gz"),
         csi = temp("results/03_filtered/{samples}.chrom.private.DPFilt.QUAL60.bcftools.vcf.gz.csi"),
-    benchmark:
-        "benchmarks/filter_bcftools_vcf_QUAL60.tsv"
     threads:8
     conda:
         "bcftools"
@@ -246,31 +238,22 @@ rule bcftools_filter_private_QUAL60: #TODO fix up the file collecting the SNP co
         attempt = lambda wildcards, attempt: attempt,
     shell:
         '''
-        sleep 5
-        bcftools view -e 'QUAL<60' {input.merged} -O z8 -o {output.filtered} &&
+
+        bcftools view -e 'QUAL<60' {input.DPFilt} -O z8 -o {output.filtered};
+
         bcftools index --threads {threads} {output.filtered} -o {output.csi} 
-
-        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
-
-        exit 0;
 
         '''
 
 
-rule freebayes_filter_private_QUAL60: #TODO fix up the file collecting the SNP counts
+rule freebayes_filter_private_QUAL60:
     priority:100
     input:
-        merged = "results/03_filtered/{samples}.chrom.private.DPFilt.freebayes.vcf.gz",
+        DPFilt = "results/03_filtered/{samples}.chrom.private.DPFilt.freebayes.vcf.gz",
         index = "results/03_filtered/{samples}.chrom.private.DPFilt.freebayes.vcf.gz.csi"
     output:
         filtered = temp("results/03_filtered/{samples}.chrom.private.DPFilt.QUAL60.freebayes.vcf.gz"),
         csi = temp("results/03_filtered/{samples}.chrom.private.DPFilt.QUAL60.freebayes.vcf.gz.csi"),
-    benchmark:
-        "benchmarks/filter_bcftools_vcf_QUAL60.tsv"
     threads:8
     conda:
         "bcftools"
@@ -282,31 +265,22 @@ rule freebayes_filter_private_QUAL60: #TODO fix up the file collecting the SNP c
         attempt = lambda wildcards, attempt: attempt,
     shell:
         '''
-        sleep 5
-        bcftools view -e 'QUAL<60' {input.merged} -O z8 -o {output.filtered} &&
+        
+        bcftools view -e 'QUAL<60' {input.DPFilt} -O z8 -o {output.filtered};
+        
         bcftools index --threads {threads} {output.filtered} -o {output.csi} 
-
-        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
-
-        exit 0;
 
         '''
 
 
-rule haplotypeCaller_filter_private_QUAL60: #TODO fix up the file collecting the SNP counts
+rule haplotypeCaller_filter_private_QUAL60:
     priority:100
     input:
-        merged = "results/03_filtered/{samples}.chrom.private.DPFilt.haplotypeCaller.vcf.gz",
+        DPFilt = "results/03_filtered/{samples}.chrom.private.DPFilt.haplotypeCaller.vcf.gz",
         index = "results/03_filtered/{samples}.chrom.private.DPFilt.haplotypeCaller.vcf.gz.csi"
     output:
         filtered = temp("results/03_filtered/{samples}.chrom.private.DPFilt.QUAL60.haplotypeCaller.vcf.gz"),
         csi = temp("results/03_filtered/{samples}.chrom.private.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi"),
-    benchmark:
-        "benchmarks/filter_bcftools_vcf_QUAL60.tsv"
     threads:8
     conda:
         "bcftools"
@@ -318,22 +292,15 @@ rule haplotypeCaller_filter_private_QUAL60: #TODO fix up the file collecting the
         attempt = lambda wildcards, attempt: attempt,
     shell:
         '''
-        sleep 5
-        bcftools view -e 'QUAL<60' {input.merged} -O z8 -o {output.filtered} &&
+        
+        bcftools view -e 'QUAL<60' {input.DPFilt} -O z8 -o {output.filtered};
+
         bcftools index --threads {threads} {output.filtered} -o {output.csi} 
-
-        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
-
-        exit 0;
 
         '''
 
 
-rule bcftools_gather_private: #TODO fix the shell commands !!!
+rule bcftools_gather_private:
     priority:100
     input:
         filtered = expand("results/03_filtered/{samples}.chrom.private.DPFilt.QUAL60.bcftools.vcf.gz", samples=SAMPLES),
@@ -352,20 +319,16 @@ rule bcftools_gather_private: #TODO fix the shell commands !!!
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """ 
-        sleep 5;
+        bcftools merge --threads {threads} {input.filtered} -O z8 -o {output.merged};
 
-        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.TBullsFiltered} -o {output.private} ;
+        bcftools index --threads {threads} {output.merged} -o {output.csi};
 
-        bcftools index --threads {threads} {output.private} -o {output.csi}
-
-        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a results/04_animals/bcftools.animals.private.snps.counts.summary.txt &&
-
-        exit 0;
+        echo "Total snps in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
         """
 
 
-rule freebayes_gather_private: #TODO fix the shell commands !!!
+rule freebayes_gather_private:
     priority:100
     input:
         filtered = expand("results/03_filtered/{samples}.chrom.private.DPFilt.QUAL60.freebayes.vcf.gz", samples=SAMPLES),
@@ -384,20 +347,17 @@ rule freebayes_gather_private: #TODO fix the shell commands !!!
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """ 
-        sleep 5;
+        bcftools merge --threads {threads} {input.filtered} -O z8 -o {output.merged};
 
-        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.TBullsFiltered} -o {output.private} ;
+        bcftools index --threads {threads} {output.merged} -o {output.csi};
 
-        bcftools index --threads {threads} {output.private} -o {output.csi}
-
-        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a results/04_animals/freebayes.animals.private.snps.counts.summary.txt &&
-
-        exit 0;
+        echo "Total snps in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
         """
 
 
-rule haplotypeCaller_gather_private: #TODO fix the shell commands !!!
+
+rule haplotypeCaller_gather_private:
     priority:100
     input:
         filtered = expand("results/03_filtered/{samples}.chrom.private.DPFilt.QUAL60.haplotypeCaller.vcf.gz", samples=SAMPLES),
@@ -416,15 +376,11 @@ rule haplotypeCaller_gather_private: #TODO fix the shell commands !!!
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """ 
-        sleep 5;
+        bcftools merge --threads {threads} {input.filtered} -O z8 -o {output.merged};
 
-        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.TBullsFiltered} -o {output.private} ;
+        bcftools index --threads {threads} {output.merged} -o {output.csi};
 
-        bcftools index --threads {threads} {output.private} -o {output.csi}
-
-        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a results/04_animals/haplotypeCaller.animals.private.snps.counts.summary.txt &&
-
-        exit 0;
+        echo "Total snps in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
         """
 
