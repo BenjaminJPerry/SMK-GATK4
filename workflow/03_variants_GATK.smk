@@ -75,7 +75,7 @@ rule gatk_HaplotypeCaller_vcf:
         '-O {output.vcf_chrom} '
         '--tmp-dir {resources.DTMP} '
         '&> {log}.attempt.{resources.attempt} && '
-        'rm results/02_snvs/{wildcards.samples}.rawsnvs.{wildcards.chromosome}.haplotypeCaller.vcf.gz.tbi && '
+        'rm results/02_snvs/{wildcards.samples}.rawsnvs.{wildcards.chromosome}.haplotypeCaller.vcf.gz.tbi; '
         'bcftools index --threads {threads} {output.vcf_chrom} -o {output.csi}'
 
 
@@ -130,7 +130,7 @@ rule merge_animals_vcf:
     shell:
         """
         
-        bcftools merge --threads {threads} {input.vcfgz} -Oz8 -o {output.merged};
+        bcftools merge --threads {threads} {input.vcfgz} -O z8 -o {output.merged};
 
         bcftools index --threads {threads} {output.merged} -o {output.csi};
 
