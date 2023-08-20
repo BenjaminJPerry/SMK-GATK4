@@ -34,8 +34,8 @@ CHROM = ('chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9',
 
 rule all:
     input:
-        "results/02_snvs/merged.chrom.DPFilt.haplotypeCaller.vcf.gz",
-        "results/02_snvs/merged.chrom.DPFilt.haplotypeCaller.vcf.gz.csi"
+        "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz",
+        "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz.csi"
 
 
 
@@ -79,42 +79,11 @@ rule gatk_HaplotypeCaller_vcf:
         'bcftools index --threads {threads} {output.vcf_chrom} -o {output.csi}'
 
 
-
-
-rule DPFilt_replicons_vcf:
-    priority:100
-    input:
-        vcfgz = "results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz",
-        csi = "results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz.csi",
-    output:
-        filt = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.filt.vcf.gz"),
-        csi = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.filt.vcf.gz.csi"),
-    benchmark:
-        "benchmarks/index_replicons_vcf.{samples}.{chromosome}.tsv"
-    threads: 8
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        """
-
-        bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filt} {input.vcfgz};
-
-        bcftools index --threads {threads} {output.filt} -o {output.csi}
-
-        """
-
-
 rule concatenate_replicons_vcf: #TODO
     priority:100
     input:
-        vcfgz = expand("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.filt.vcf.gz", chromosome = CHROM, allow_missing=True),
-        csi = expand("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.filt.vcf.gz.csi", chromosome = CHROM, allow_missing=True),
+        vcfgz = expand("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz", chromosome = CHROM, allow_missing=True),
+        csi = expand("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz", chromosome = CHROM, allow_missing=True),
     output:
         merged = temp("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz"),
         csi = temp("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi"),
@@ -145,8 +114,8 @@ rule merge_animals_vcf:
         vcfgz = expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz", samples = SAMPLES),
         csi = expand("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi", samples = SAMPLES),
     output:
-        merged = "results/02_snvs/merged.rawsnvs.haplotypeCaller.DPFilt.vcf.gz",
-        csi = "results/02_snvs/merged.rawsnvs.haplotypeCaller.DPFilt.vcf.gz.csi",
+        merged = "results/02_snvs/merged.rawsnvs.haplotypeCaller.vcf.gz",
+        csi = "results/02_snvs/merged.rawsnvs.haplotypeCaller.vcf.gz.csi",
     benchmark:
         "benchmarks/merge_animals_vcf.tsv"
     threads: 16
@@ -174,11 +143,11 @@ rule merge_animals_vcf:
 rule view_haplotype_chrom:
     priority:100
     input:
-        merged_vcf = "results/02_snvs/merged.rawsnvs.haplotypeCaller.DPFilt.vcf.gz",
-        csi = "results/02_snvs/merged.rawsnvs.haplotypeCaller.DPFilt.vcf.gz.csi",
+        merged_vcf = "results/02_snvs/merged.rawsnvs.haplotypeCaller.vcf.gz",
+        csi = "results/02_snvs/merged.rawsnvs.haplotypeCaller.vcf.gz.csi",
     output:
-        filtered_vcf = "results/02_snvs/merged.chrom.DPFilt.haplotypeCaller.vcf.gz",
-        filtered_vcf_csi = "results/02_snvs/merged.chrom.DPFilt.haplotypeCaller.vcf.gz.csi"
+        filtered_vcf = "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz",
+        filtered_vcf_csi = "results/02_snvs/merged.chrom.haplotypeCaller.vcf.gz.csi"
     params:
         chromosomes = "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chr23,chr24,chr25,chr26,chr27,chr28,chr29,chrX,chrY" #TODO move to config; Also, removed ChrM
     benchmark:
