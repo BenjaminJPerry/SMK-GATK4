@@ -166,7 +166,7 @@ rule bcftools_DPFilter_private:
     shell:
         """
 
-        bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filtered} {input.private};
+        bcftools norm --threads {threads} -m- -f /nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa {input.private} | bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filtered} - ;
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi}
 
@@ -195,7 +195,7 @@ rule freebayes_DPFilter_private:
     shell:
         """
 
-        bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filtered} {input.private};
+        bcftools norm --threads {threads} -m- -f /nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa {input.private} | bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filtered} - ;
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi}
        
@@ -224,7 +224,7 @@ rule haplotypeCaller_DPFilter_private:
     shell:
         """
 
-        bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filtered} {input.private};
+        bcftools norm --threads {threads} -m- -f /nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa {input.private} | bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filtered} - ;
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi}
 
