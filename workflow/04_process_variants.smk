@@ -737,13 +737,13 @@ rule bcftools_norm_merged:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-    """
+        """
 
-    bcftools norm --threads {threads} -O z8 -m- -f /nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa -o {output.normal} {input.unnormal};
+        bcftools norm --threads {threads} -O z8 -m- -f /nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa -o {output.normal} {input.unnormal};
     
-    bcftools index --threads {threads} {output.normal};
+        bcftools index --threads {threads} {output.normal};
     
-    """
+        """
 
 
 rule freebayes_norm_merged:
@@ -762,13 +762,13 @@ rule freebayes_norm_merged:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-    """
+        """
 
-    bcftools norm --threads {threads} -O z8 -m- -f /nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa -o {output.normal} {input.unnormal};
+        bcftools norm --threads {threads} -O z8 -m- -f /nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa -o {output.normal} {input.unnormal};
     
-    bcftools index --threads {threads} {output.normal};
+        bcftools index --threads {threads} {output.normal};
     
-    """
+        """
 
 
 rule haplotypeCaller_norm_merged:
@@ -787,13 +787,13 @@ rule haplotypeCaller_norm_merged:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-    """
+        """
 
-    bcftools norm --threads {threads} -O z8 -m- -f /nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa -o {output.normal} {input.unnormal};
+        bcftools norm --threads {threads} -O z8 -m- -f /nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa -o {output.normal} {input.unnormal};
     
-    bcftools index --threads {threads} {output.normal};
+        bcftools index --threads {threads} {output.normal};
     
-    """
+        """
 
 
 rule ensemble_intersection:
@@ -819,32 +819,32 @@ rule ensemble_intersection:
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-    """
+        """
 
         bcftools isec -O z8 -p results/05_ensemble -n=3 --threads {threads} {input.bcftools} {input.freebayes} {input.haplotypeCaller};
 
-        mv 0001.vcf.gz {output.bcftools_uniq}
-        echo "Total snps in {output.bcftools_uniq}: $(bcftools view --threads {threads} {output.bcftools_uniq} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt
+        mv 0001.vcf.gz {output.bcftools_uniq};
+        echo "Total snps in {output.bcftools_uniq}: $(bcftools view --threads {threads} {output.bcftools_uniq} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
-        mv 0002.vcf.gz {output.freebayes_uniq}
-        echo "Total snps in {output.freebayes_uniq}: $(bcftools view --threads {threads} {output.freebayes_uniq} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt
+        mv 0002.vcf.gz {output.freebayes_uniq};
+        echo "Total snps in {output.freebayes_uniq}: $(bcftools view --threads {threads} {output.freebayes_uniq} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
-        mv 0003.vcf.gz {output.haplotypeCaller_uniq}
-        echo "Total snps in {output.haplotypeCaller_uniq}: $(bcftools view --threads {threads} {output.haplotypeCaller_uniq} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt
+        mv 0003.vcf.gz {output.haplotypeCaller_uniq};
+        echo "Total snps in {output.haplotypeCaller_uniq}: $(bcftools view --threads {threads} {output.haplotypeCaller_uniq} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
-        bcftools view -O z8 --threads {threads} -R results/05_ensemble/sites.txt {input.bcftools} -o {output.bcftools_common}
-        bcftools index --threads {threads} {output.bcftools_common}
-        echo "Total snps in {output.bcftools_common}: $(bcftools view --threads {threads} {output.bcftools_common} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt
+        bcftools view -O z8 --threads {threads} -R results/05_ensemble/sites.txt {input.bcftools} -o {output.bcftools_common};
+        bcftools index --threads {threads} {output.bcftools_common};
+        echo "Total snps in {output.bcftools_common}: $(bcftools view --threads {threads} {output.bcftools_common} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
-        bcftools view -O z8 --threads {threads} -R results/05_ensemble/sites.txt {input.freebayes} -o {output.freebayes_common}
-        bcftools index --threads {threads} {output.freebayes_common}
-        echo "Total snps in {output.freebayes_common}: $(bcftools view --threads {threads} {output.freebayes_common} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt
+        bcftools view -O z8 --threads {threads} -R results/05_ensemble/sites.txt {input.freebayes} -o {output.freebayes_common};
+        bcftools index --threads {threads} {output.freebayes_common};
+        echo "Total snps in {output.freebayes_common}: $(bcftools view --threads {threads} {output.freebayes_common} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
-        bcftools view -O z8 --threads {threads} -R results/05_ensemble/sites.txt {input.haplotypeCaller} -o {output.haplotypeCaller_common}
-        bcftools index --threads {threads} {output.haplotypeCaller_common}
-        echo "Total snps in {output.haplotypeCaller_common}: $(bcftools view --threads {threads} {output.haplotypeCaller_common} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt
+        bcftools view -O z8 --threads {threads} -R results/05_ensemble/sites.txt {input.haplotypeCaller} -o {output.haplotypeCaller_common};
+        bcftools index --threads {threads} {output.haplotypeCaller_common};
+        echo "Total snps in {output.haplotypeCaller_common}: $(bcftools view --threads {threads} {output.haplotypeCaller_common} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
-    """
+        """
 
 
 rule view_bcftools_regions: #TODO Updated files
