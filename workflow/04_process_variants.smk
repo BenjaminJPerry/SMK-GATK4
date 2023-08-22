@@ -35,6 +35,9 @@ rule all:
         expand("results/04_animals/{samples}.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.vcf.gz", samples = SAMPLES),
         expand("results/04_animals/{samples}.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.vcf.gz", samples = SAMPLES),
         expand("results/04_animals/{samples}.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.vcf.gz", samples = SAMPLES),
+        "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.bcftools.vcf.gz",
+        "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.freebayes.vcf.gz",
+        "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.vcf.gz"
 
 
         # #"results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz.pigmentSNPs.vcf",
@@ -306,8 +309,8 @@ rule bcftools_gather_private:
         filtered = expand("results/03_filtered/{samples}.chrom.private.DPFilt.QUAL60.bcftools.vcf.gz", samples=SAMPLES),
         csi = expand("results/03_filtered/{samples}.chrom.private.DPFilt.QUAL60.bcftools.vcf.gz.csi", samples=SAMPLES),
     output:
-        merged = temp("results/03_filtered/merged.chrom.private.DPFilt.QUAL60.bcftools.vcf.gz"),
-        csi = temp("results/03_filtered/merged.chrom.private.DPFilt.QUAL60.bcftools.vcf.gz.csi"),
+        merged = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.bcftools.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.bcftools.vcf.gz.csi",
     threads:6
     conda:
         "bcftools"
@@ -334,8 +337,8 @@ rule freebayes_gather_private:
         filtered = expand("results/03_filtered/{samples}.chrom.private.DPFilt.QUAL60.freebayes.vcf.gz", samples=SAMPLES),
         csi = expand("results/03_filtered/{samples}.chrom.private.DPFilt.QUAL60.freebayes.vcf.gz.csi", samples=SAMPLES),
     output:
-        merged = temp("results/03_filtered/merged.chrom.private.DPFilt.QUAL60.freebayes.vcf.gz"),
-        csi = temp("results/03_filtered/merged.chrom.private.DPFilt.QUAL60.freebayes.vcf.gz.csi"),
+        merged = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.freebayes.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.freebayes.vcf.gz.csi",
     threads:6
     conda:
         "bcftools"
@@ -363,8 +366,8 @@ rule haplotypeCaller_gather_private:
         filtered = expand("results/03_filtered/{samples}.chrom.private.DPFilt.QUAL60.haplotypeCaller.vcf.gz", samples=SAMPLES),
         csi = expand("results/03_filtered/{samples}.chrom.private.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi", samples=SAMPLES),
     output:
-        merged = temp("results/03_filtered/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.vcf.gz"),
-        csi = temp("results/03_filtered/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi"),
+        merged = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.vcf.gz",
+        csi = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi",
     threads:6
     conda:
         "bcftools"
@@ -785,7 +788,7 @@ rule haplotypeCaller_final_private_snps:
 
         bcftools index --threads {threads} {output.private} -o {output.csi}
 
-        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a results/04_animals/freebayes.animals.private.snps.counts.summary.txt &&
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a results/04_animals/haplotypeCaller.animals.private.snps.counts.summary.txt &&
 
         exit 0;
 
