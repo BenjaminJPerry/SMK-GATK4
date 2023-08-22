@@ -339,11 +339,11 @@ rule bcftools_gather_private:
         bcftools index --threads {threads} {output.merged} -o {output.csi};
 
         echo "Total snps in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
+        echo "Total snps in {output.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {output.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {output.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {output.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {output.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
 
         """
 
@@ -372,11 +372,11 @@ rule freebayes_gather_private:
         bcftools index --threads {threads} {output.merged} -o {output.csi};
 
         echo "Total snps in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
+        echo "Total snps in {output.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {output.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {output.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {output.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {output.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
 
         """
 
@@ -406,11 +406,11 @@ rule haplotypeCaller_gather_private:
         bcftools index --threads {threads} {output.merged} -o {output.csi};
 
         echo "Total snps in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
+        echo "Total snps in {output.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {output.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {output.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {output.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {output.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
 
 
         """
