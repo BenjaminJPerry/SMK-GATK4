@@ -70,7 +70,7 @@ rule bcftools_private_snps:
 
         bcftools index --threads {threads} {output.private} -o {output.csi}
 
-        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a results/04_animals/bcftools.animals.private.snps.counts.summary.txt &&
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a bcftools.animals.private.snps.counts.summary.txt &&
 
         exit 0;
 
@@ -102,7 +102,7 @@ rule freebayes_private_snps:
 
         bcftools index --threads {threads} {output.private} -o {output.csi}
 
-        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a results/04_animals/freebayes.animals.private.snps.counts.summary.txt &&
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a freebayes.animals.private.snps.counts.summary.txt &&
 
         exit 0;
 
@@ -134,7 +134,7 @@ rule haplotypeCaller_private_snps:
 
         bcftools index --threads {threads} {output.private} -o {output.csi}
 
-        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a results/04_animals/haplotypeCaller.animals.private.snps.counts.summary.txt &&
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a haplotypeCaller.animals.private.snps.counts.summary.txt &&
 
         exit 0;
 
@@ -165,6 +165,8 @@ rule bcftools_DPFilter_private:
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi}
 
+        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a bcftools.animals.private.snps.counts.summary.txt &&
+
         """
 
 
@@ -191,6 +193,8 @@ rule freebayes_DPFilter_private:
         bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filtered} {input.private};
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi}
+       
+        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a freebayes.animals.private.snps.counts.summary.txt &&
 
         """
 
@@ -219,6 +223,8 @@ rule haplotypeCaller_DPFilter_private:
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi}
 
+        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a haplotypeCaller.animals.private.snps.counts.summary.txt &&
+
         """
 
 
@@ -245,6 +251,8 @@ rule bcftools_filter_private_QUAL60:
         bcftools view -e 'QUAL<60' {input.DPFilt} -O z8 -o {output.filtered};
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi} 
+
+        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a bcftools.animals.private.snps.counts.summary.txt &&
 
         '''
 
@@ -273,6 +281,8 @@ rule freebayes_filter_private_QUAL60:
         
         bcftools index --threads {threads} {output.filtered} -o {output.csi} 
 
+        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a freebayes.animals.private.snps.counts.summary.txt &&
+
         '''
 
 
@@ -299,6 +309,8 @@ rule haplotypeCaller_filter_private_QUAL60:
         bcftools view -e 'QUAL<60' {input.DPFilt} -O z8 -o {output.filtered};
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi} 
+
+        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a haplotypeCaller.animals.private.snps.counts.summary.txt &&
 
         '''
 
@@ -327,6 +339,11 @@ rule bcftools_gather_private:
         bcftools index --threads {threads} {output.merged} -o {output.csi};
 
         echo "Total snps in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
+        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
 
         """
 
@@ -355,6 +372,11 @@ rule freebayes_gather_private:
         bcftools index --threads {threads} {output.merged} -o {output.csi};
 
         echo "Total snps in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
+        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
 
         """
 
@@ -384,115 +406,14 @@ rule haplotypeCaller_gather_private:
         bcftools index --threads {threads} {output.merged} -o {output.csi};
 
         echo "Total snps in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
+        echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
+        echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
+
 
         """
-
-
-# rule filter_bcftools_vcf_QUAL60:
-#     priority:100
-#     input:
-#         merged = "results/02_snvs/merged.chrom.DPFilt.bcftools.vcf.gz",
-#         index = "results/02_snvs/merged.chrom.DPFilt.bcftools.vcf.gz.csi"
-#     output:
-#         filtered = "results/03_filtered/merged.chrom.DPFilt.bcftools.QUAL60.vcf.gz",
-#         csi = "results/03_filtered/merged.chrom.DPFilt.bcftools.QUAL60.vcf.gz.csi"
-#     benchmark:
-#         "benchmarks/filter_bcftools_vcf_QUAL60.tsv"
-#     threads:8
-#     conda:
-#         "bcftools"
-#     resources:
-#         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-#         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
-#         partition = "large,milan",
-#         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-#         attempt = lambda wildcards, attempt: attempt,
-#     shell:
-#         '''
-#         sleep 5
-#         bcftools view -e 'QUAL<60' {input.merged} -O z8 -o {output.filtered} &&
-#         bcftools index --threads {threads} {output.filtered} -o {output.csi} 
-
-#         echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-#         echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-#         echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-#         echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-#         echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
-
-#         exit 0;
-
-#         '''
-
-
-# rule filter_freebayes_vcf_QUAL60:
-#     priority:100
-#     input:
-#         merged = "results/02_snvs/merged.chrom.DPFilt.freebayes.vcf.gz",
-#         index = "results/02_snvs/merged.chrom.DPFilt.freebayes.vcf.gz.csi"
-#     output:
-#         filtered = "results/03_filtered/merged.chrom.DPFilt.freebayes.QUAL60.vcf.gz",
-#         csi = "results/03_filtered/merged.chrom.DPFilt.freebayes.QUAL60.vcf.gz.csi"
-#     benchmark:
-#         "benchmarks/filter_freebayes_vcf_QUAL60.tsv"
-#     threads:8
-#     conda:
-#         "bcftools"
-#     resources:
-#         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-#         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
-#         partition = "large,milan",
-#         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-#         attempt = lambda wildcards, attempt: attempt,
-#     shell:
-#         '''
-#         sleep 5
-#         bcftools view -e 'QUAL<60' {input.merged} -O z8 -o {output.filtered} &&
-#         bcftools index --threads {threads} {output.filtered} -o {output.csi} 
-
-#         echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-#         echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-#         echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-#         echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-#         echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
-
-#         exit 0;
-#         '''
-
-
-# rule filter_haplotypeCaller_vcf_QUAL60:
-#     priority:100
-#     input:
-#         merged = "results/04_animals/merged.chrom.private.haplotypeCaller.vcf.gz",
-#         csi = "results/04_animals/merged.chrom.private.haplotypeCaller.vcf.gz.csi",
-#     output:
-#         filtered = "results/03_filtered/merged.chrom.private.haplotypeCaller.QUAL60.vcf.gz",
-#         csi = "results/03_filtered/merged.chrom.private.haplotypeCaller.QUAL60.vcf.gz.csi"
-#     benchmark:
-#         "benchmarks/filter_haplotypeCaller_vcf_QUAL60.tsv"
-#     threads:8
-#     conda:
-#         "bcftools"
-#     resources:
-#         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-#         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
-#         partition = "large,milan",
-#         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-#         attempt = lambda wildcards, attempt: attempt,
-#     shell:
-#         '''
-#         sleep 5
-#         bcftools view -e 'QUAL<60' {input.merged} -O z8 -o {output.filtered} &&
-#         bcftools index --threads {threads} {output.filtered} -o {output.csi} 
-
-#         echo "Total snps in {input.merged} at QUAL>=60: $(bcftools view --threads {threads} -i 'QUAL>=60' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
-#         echo "Total snps in {input.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-#         echo "Total snps in {input.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
-#         echo "Total snps in {input.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
-#         echo "Total snps in {input.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {input.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
-
-#         exit 0;
-
-#         '''
 
 
 rule isec_bcftools_LIC565:
@@ -724,7 +645,7 @@ rule bcftools_final_private_snps:
 
         bcftools index --threads {threads} {output.private} -o {output.csi}
 
-        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a results/04_animals/bcftools.animals.private.snps.counts.summary.txt &&
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a bcftools.animals.private.snps.counts.summary.txt &&
 
         exit 0;
 
@@ -756,7 +677,7 @@ rule freebayes_final_private_snps:
 
         bcftools index --threads {threads} {output.private} -o {output.csi}
 
-        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a results/04_animals/freebayes.animals.private.snps.counts.summary.txt &&
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a freebayes.animals.private.snps.counts.summary.txt &&
 
         exit 0;
 
@@ -788,7 +709,7 @@ rule haplotypeCaller_final_private_snps:
 
         bcftools index --threads {threads} {output.private} -o {output.csi}
 
-        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a results/04_animals/haplotypeCaller.animals.private.snps.counts.summary.txt &&
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a haplotypeCaller.animals.private.snps.counts.summary.txt &&
 
         exit 0;
 
