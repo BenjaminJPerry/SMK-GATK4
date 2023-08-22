@@ -223,13 +223,3 @@ rule mosdepth_stats_merged:
 #         "-F 0.01 "
 #         "-f {input.referenceGenome} {input.bam} > {output.vcf}"
 
-# rule bcftools_stats_bcftools_raw:
-# rule bcftools_stats_freebayes_filtered:
-# rule bcftools_stats_bcftools_filtered:
-
-# rule rtg_vcfstats_freebayes_raw:
-# rule rtg_vcfstats_freebayes_filtered:
-# rule rtg_vcfstats_bcftools_raw:
-# rule rtg_vcfstats_bcftools_filtered:
-
-

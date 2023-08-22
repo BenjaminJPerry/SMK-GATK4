@@ -71,13 +71,11 @@ rule bcftools_private_snps:
         """ 
         sleep 5;
 
-        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.merged} -o {output.private} ;
+        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.merged} -o {output.private};
 
-        bcftools index --threads {threads} {output.private} -o {output.csi}
+        bcftools index --threads {threads} {output.private} -o {output.csi};
 
-        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a bcftools.animals.private.snps.counts.summary.txt &&
-
-        exit 0;
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a bcftools.animals.private.snps.counts.summary.txt;
 
         """
 
@@ -103,13 +101,11 @@ rule freebayes_private_snps:
         """ 
         sleep 5;
 
-        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.merged} -o {output.private} ;
+        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.merged} -o {output.private};
 
-        bcftools index --threads {threads} {output.private} -o {output.csi}
+        bcftools index --threads {threads} {output.private} -o {output.csi};
 
-        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a freebayes.animals.private.snps.counts.summary.txt &&
-
-        exit 0;
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a freebayes.animals.private.snps.counts.summary.txt;
 
         """
 
@@ -139,9 +135,7 @@ rule haplotypeCaller_private_snps:
 
         bcftools index --threads {threads} {output.private} -o {output.csi}
 
-        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a haplotypeCaller.animals.private.snps.counts.summary.txt &&
-
-        exit 0;
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a haplotypeCaller.animals.private.snps.counts.summary.txt 
 
         """
 
@@ -166,11 +160,11 @@ rule bcftools_DPFilter_private:
     shell:
         """
 
-        bcftools norm --threads {threads} -m- -f /nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa {input.private} | bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filtered} - ;
+        bcftools norm --threads {threads} -m- -f /nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa {input.private} | bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filtered};
 
-        bcftools index --threads {threads} {output.filtered} -o {output.csi}
+        bcftools index --threads {threads} {output.filtered} -o {output.csi};
 
-        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a bcftools.animals.private.snps.counts.summary.txt &&
+        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a bcftools.animals.private.snps.counts.summary.txt;
 
         """
 
@@ -195,11 +189,11 @@ rule freebayes_DPFilter_private:
     shell:
         """
 
-        bcftools norm --threads {threads} -m- -f /nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa {input.private} | bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filtered} - ;
+        bcftools norm --threads {threads} -m- -f /nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa {input.private} | bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filtered};
 
-        bcftools index --threads {threads} {output.filtered} -o {output.csi}
+        bcftools index --threads {threads} {output.filtered} -o {output.csi};
        
-        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a freebayes.animals.private.snps.counts.summary.txt &&
+        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a freebayes.animals.private.snps.counts.summary.txt;
 
         """
 
@@ -226,9 +220,9 @@ rule haplotypeCaller_DPFilter_private:
 
         bcftools norm --threads {threads} -m- -f /nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa {input.private} | bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filtered} - ;
 
-        bcftools index --threads {threads} {output.filtered} -o {output.csi}
+        bcftools index --threads {threads} {output.filtered} -o {output.csi};
 
-        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a haplotypeCaller.animals.private.snps.counts.summary.txt &&
+        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a haplotypeCaller.animals.private.snps.counts.summary.txt;
 
         """
 
@@ -255,9 +249,9 @@ rule bcftools_filter_private_QUAL60:
 
         bcftools view -e 'QUAL<60' {input.DPFilt} -O z8 -o {output.filtered};
 
-        bcftools index --threads {threads} {output.filtered} -o {output.csi} 
+        bcftools index --threads {threads} {output.filtered} -o {output.csi};
 
-        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a bcftools.animals.private.snps.counts.summary.txt &&
+        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a bcftools.animals.private.snps.counts.summary.txt;
 
         '''
 
