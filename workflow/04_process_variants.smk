@@ -40,10 +40,10 @@ rule all:
         "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.vcf.gz",
         "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.unique.vcf.gz",
         "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.unique.vcf.gz",
-        "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypCaller.LIC565.TBulls.norm.unique.vcf.gz",
+        "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.unique.vcf.gz",
         "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz",
         "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz",
-        "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypCaller.LIC565.TBulls.norm.intersect.vcf.gz",
+        "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz",
 
         # #"results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz.pigmentSNPs.vcf",
         #"results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz.pigmentSNPs.vcf",
