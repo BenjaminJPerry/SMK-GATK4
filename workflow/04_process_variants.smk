@@ -725,7 +725,7 @@ rule bcftools_norm_merged:
     priority: 100
     input:
         unnormal = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.vcf.gz",
-    output:=
+    output:
         normal = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.vcf.gz",
     threads:6
     conda:
@@ -750,7 +750,7 @@ rule freebayes_norm_merged:
     priority: 100
     input:
         unnormal = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.vcf.gz",
-    output:=
+    output:
         normal = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.vcf.gz",
     threads:6
     conda:
@@ -775,7 +775,7 @@ rule haplotypeCaller_norm_merged:
     priority: 100
     input:
         unnormal = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.vcf.gz",
-    output:=
+    output:
         normal = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.vcf.gz",
     threads:6
     conda:
