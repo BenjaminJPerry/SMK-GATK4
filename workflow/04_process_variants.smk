@@ -696,7 +696,7 @@ rule isec_haplotypeCaller_TBulls:
         """
 
 
-rule bcftools_private_snps:
+rule bcftools_final_private_snps:
     priority:100
     input:
         TBullsFiltered = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.vcf.gz",
@@ -728,7 +728,7 @@ rule bcftools_private_snps:
         """
 
 
-rule freebayes_private_snps:
+rule freebayes_final_private_snps:
     priority:100
     input:
         TBullsFiltered = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.vcf.gz",
@@ -760,7 +760,7 @@ rule freebayes_private_snps:
         """
 
 
-rule haplotypeCaller_private_snps:
+rule haplotypeCaller_final_private_snps:
     priority:100
     input:
         TBullsFiltered = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.vcf.gz",
