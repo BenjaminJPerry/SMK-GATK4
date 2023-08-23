@@ -35,15 +35,18 @@ rule all:
         expand("results/04_animals/{samples}.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.vcf.gz", samples = SAMPLES),
         expand("results/04_animals/{samples}.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.vcf.gz", samples = SAMPLES),
         expand("results/04_animals/{samples}.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.vcf.gz", samples = SAMPLES),
+
         "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.bcftools.vcf.gz",
         "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.freebayes.vcf.gz",
         "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.vcf.gz",
-        "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.unique.vcf.gz",
-        "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.unique.vcf.gz",
-        "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.unique.vcf.gz",
+
         "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz",
         "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz",
         "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz",
+
+        expand("results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz", samples = SAMPLES),
+        expand("results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz", samples = SAMPLES),
+        expand("results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz", samples = SAMPLES),
 
         # #"results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz.pigmentSNPs.vcf",
         #"results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz.pigmentSNPs.vcf",
@@ -830,6 +833,99 @@ rule ensemble_intersection:
         bcftools index --threads {threads} {output.haplotypeCaller_common};
 
         """
+
+
+rule bcftools_ensemble_private_snps:
+    priority:100
+    input:
+        bcftools_common = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz",
+    output:
+        private = "results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz",
+        csi = "results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz.csi",
+    threads:6
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """ 
+        sleep 5;
+
+        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.bcftools_common} -o {output.private};
+
+        bcftools index --threads {threads} {output.private} -o {output.csi};
+
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a bcftools.animals.private.snps.counts.summary.txt;
+
+        """
+
+
+rule freebayes_ensemble_private_snps:
+    priority:100
+    input:
+        freebayes_common = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz",
+    output:
+        private = "results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz",
+        csi = "results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz.csi",
+    threads:6
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """ 
+        sleep 5;
+
+        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.freebayes_common} -o {output.private};
+
+        bcftools index --threads {threads} {output.private} -o {output.csi};
+
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a freebayes.animals.private.snps.counts.summary.txt;
+
+        exit 0;
+
+        """
+
+
+rule haplotypeCaller_ensemble_private_snps:
+    priority:100
+    input:
+        haplotypeCaller_common = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz",
+    output:
+        private = "results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz",
+        csi = "results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz.csi",
+    threads:6
+    conda:
+        "bcftools"
+    resources:
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
+        partition = "large,milan",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """ 
+        sleep 5;
+
+        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.haplotypeCaller_common} -o {output.private};
+
+        bcftools index --threads {threads} {output.private} -o {output.csi};
+
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a haplotypeCaller.animals.private.snps.counts.summary.txt;
+
+        exit 0;
+
+        """
+
+
 
 
 rule view_bcftools_regions: #TODO Updated files
