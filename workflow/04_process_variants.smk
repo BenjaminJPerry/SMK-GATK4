@@ -815,7 +815,7 @@ rule ensemble_intersection:
     shell:
         """
 
-        bcftools isec -O z8 -p results/05_ensemble -n=3 --threads {threads} {input.bcftools} {input.freebayes} {input.haplotypeCaller};
+        bcftools isec -O z8 -p results/05_ensemble -n~111 --threads {threads} {input.bcftools} {input.freebayes} {input.haplotypeCaller};
 
         mv results/05_ensemble/0000.vcf.gz {output.bcftools_common};
         echo "Total snps in {output.bcftools_common}: $(bcftools view --threads {threads} {output.bcftools_common} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
