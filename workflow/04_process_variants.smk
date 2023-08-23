@@ -310,7 +310,7 @@ rule haplotypeCaller_filter_private_QUAL60:
         bcftools index --threads {threads} {output.filtered} -o {output.csi} 
 
         echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a haplotypeCaller.animals.private.snps.counts.summary.txt;
-        
+
         '''
 
 
@@ -342,7 +342,7 @@ rule bcftools_gather_private:
         echo "Total snps in {output.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
         echo "Total snps in {output.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
         echo "Total snps in {output.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {output.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
+        echo "Total snps in {output.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt ;
 
         """
 
@@ -375,7 +375,7 @@ rule freebayes_gather_private:
         echo "Total snps in {output.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
         echo "Total snps in {output.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
         echo "Total snps in {output.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {output.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
+        echo "Total snps in {output.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt ;
 
         """
 
@@ -409,7 +409,7 @@ rule haplotypeCaller_gather_private:
         echo "Total snps in {output.merged} at QUAL>=50: $(bcftools view --threads {threads} -i 'QUAL>=50' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
         echo "Total snps in {output.merged} at QUAL>=40: $(bcftools view --threads {threads} -i 'QUAL>=40' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
         echo "Total snps in {output.merged} at QUAL>=30: $(bcftools view --threads {threads} -i 'QUAL>=30' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-        echo "Total snps in {output.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt &&
+        echo "Total snps in {output.merged} at QUAL>=20: $(bcftools view --threads {threads} -i 'QUAL>=20' {output.merged} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt ;
 
 
         """
@@ -436,13 +436,13 @@ rule isec_bcftools_LIC565:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        bcftools isec -O v -p results/03_filtered/isec_bcftools_LIC565 {input.snps_LIC} {input.filtered} &&
+        bcftools isec -O v -p results/03_filtered/isec_bcftools_LIC565 {input.snps_LIC} {input.filtered} ;
 
-        bcftools view --threads {threads} -O z8 results/03_filtered/isec_bcftools_LIC565/0001.vcf -o {output.LICFiltered} &&
+        bcftools view --threads {threads} -O z8 results/03_filtered/isec_bcftools_LIC565/0001.vcf -o {output.LICFiltered} ;
 
-        bcftools index --threads {threads} {output.LICFiltered} -o {output.csi} && 
+        bcftools index --threads {threads} {output.LICFiltered} -o {output.csi} ; 
 
-        rm -r results/03_filtered/isec_bcftools_LIC565 &&
+        rm -r results/03_filtered/isec_bcftools_LIC565 ;
 
         echo "Total snps in {output.LICFiltered}: $(bcftools view --threads {threads} {output.LICFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
 
@@ -470,13 +470,13 @@ rule isec_freebayes_LIC565:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        bcftools isec -O v -p results/03_filtered/isec_freebayes_LIC565 {input.snps_LIC} {input.filtered} &&
+        bcftools isec -O v -p results/03_filtered/isec_freebayes_LIC565 {input.snps_LIC} {input.filtered} ;
 
-        bcftools view --threads {threads} -O z8 results/03_filtered/isec_freebayes_LIC565/0001.vcf -o {output.LICFiltered} &&
+        bcftools view --threads {threads} -O z8 results/03_filtered/isec_freebayes_LIC565/0001.vcf -o {output.LICFiltered} ;
 
-        bcftools index --threads {threads} {output.LICFiltered} -o {output.csi} && 
+        bcftools index --threads {threads} {output.LICFiltered} -o {output.csi} ; 
 
-        rm -r results/03_filtered/isec_freebayes_LIC565 &&
+        rm -r results/03_filtered/isec_freebayes_LIC565 ;
 
         echo "Total snps in {output.LICFiltered}: $(bcftools view --threads {threads} {output.LICFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
 
@@ -504,13 +504,13 @@ rule isec_haplotypeCaller_LIC565:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        bcftools isec -O v -p results/03_filtered/isec_haplotypeCaller_LIC565 {input.snps_LIC} {input.filtered} &&
+        bcftools isec -O v -p results/03_filtered/isec_haplotypeCaller_LIC565 {input.snps_LIC} {input.filtered} ;
 
-        bcftools view --threads {threads} -O z8 results/03_filtered/isec_haplotypeCaller_LIC565/0001.vcf -o {output.LICFiltered} &&
+        bcftools view --threads {threads} -O z8 results/03_filtered/isec_haplotypeCaller_LIC565/0001.vcf -o {output.LICFiltered} ;
 
-        bcftools index --threads {threads} {output.LICFiltered} -o {output.csi} && 
+        bcftools index --threads {threads} {output.LICFiltered} -o {output.csi} ; 
 
-        rm -r results/03_filtered/isec_haplotypeCaller_LIC565 &&
+        rm -r results/03_filtered/isec_haplotypeCaller_LIC565 ;
 
         echo "Total snps in {output.LICFiltered}: $(bcftools view --threads {threads} {output.LICFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
 
@@ -538,13 +538,13 @@ rule isec_bcftools_TBulls:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        bcftools isec -O v -p results/03_filtered/isec_bcftools_TBulls {input.snps_TBulls} {input.LICFiltered} &&
+        bcftools isec -O v -p results/03_filtered/isec_bcftools_TBulls {input.snps_TBulls} {input.LICFiltered} ;
 
-        bcftools view --threads {threads} -O z8 results/03_filtered/isec_bcftools_TBulls/0001.vcf -o {output.TBullsFiltered} &&
+        bcftools view --threads {threads} -O z8 results/03_filtered/isec_bcftools_TBulls/0001.vcf -o {output.TBullsFiltered} ;
 
-        bcftools index --threads {threads} {output.TBullsFiltered} -o {output.csi} && 
+        bcftools index --threads {threads} {output.TBullsFiltered} -o {output.csi} ; 
 
-        rm -r results/03_filtered/isec_bcftools_TBulls &&
+        rm -r results/03_filtered/isec_bcftools_TBulls ;
 
         echo "Total snps in {output.TBullsFiltered}: $(bcftools view --threads {threads} {output.TBullsFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
 
@@ -572,13 +572,13 @@ rule isec_freebayes_TBulls:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        bcftools isec -O v -p results/03_filtered/isec_freebayes_TBulls {input.snps_TBulls} {input.LICFiltered} &&
+        bcftools isec -O v -p results/03_filtered/isec_freebayes_TBulls {input.snps_TBulls} {input.LICFiltered} ;
 
-        bcftools view --threads {threads} -O z8 results/03_filtered/isec_freebayes_TBulls/0001.vcf -o {output.TBullsFiltered} &&
+        bcftools view --threads {threads} -O z8 results/03_filtered/isec_freebayes_TBulls/0001.vcf -o {output.TBullsFiltered} ;
 
-        bcftools index --threads {threads} {output.TBullsFiltered} -o {output.csi} && 
+        bcftools index --threads {threads} {output.TBullsFiltered} -o {output.csi} ; 
 
-        rm -r results/03_filtered/isec_freebayes_TBulls &&
+        rm -r results/03_filtered/isec_freebayes_TBulls ;
 
         echo "Total snps in {output.TBullsFiltered}: $(bcftools view --threads {threads} {output.TBullsFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
 
@@ -606,13 +606,13 @@ rule isec_haplotypeCaller_TBulls:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        bcftools isec -O v -p results/03_filtered/isec_haplotypeCaller_TBulls {input.snps_TBulls} {input.LICFiltered} &&
+        bcftools isec -O v -p results/03_filtered/isec_haplotypeCaller_TBulls {input.snps_TBulls} {input.LICFiltered} ;
 
-        bcftools view --threads {threads} -O z8 results/03_filtered/isec_haplotypeCaller_TBulls/0001.vcf -o {output.TBullsFiltered} &&
+        bcftools view --threads {threads} -O z8 results/03_filtered/isec_haplotypeCaller_TBulls/0001.vcf -o {output.TBullsFiltered} ;
 
-        bcftools index --threads {threads} {output.TBullsFiltered} -o {output.csi} && 
+        bcftools index --threads {threads} {output.TBullsFiltered} -o {output.csi} ; 
 
-        rm -r results/03_filtered/isec_haplotypeCaller_TBulls &&
+        rm -r results/03_filtered/isec_haplotypeCaller_TBulls ;
 
         echo "Total snps in {output.TBullsFiltered}: $(bcftools view --threads {threads} {output.TBullsFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
 
@@ -644,7 +644,7 @@ rule bcftools_final_private_snps:
 
         bcftools index --threads {threads} {output.private} -o {output.csi}
 
-        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a bcftools.animals.private.snps.counts.summary.txt &&
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a bcftools.animals.private.snps.counts.summary.txt ;
 
         exit 0;
 
@@ -676,7 +676,7 @@ rule freebayes_final_private_snps:
 
         bcftools index --threads {threads} {output.private} -o {output.csi}
 
-        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a freebayes.animals.private.snps.counts.summary.txt &&
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a freebayes.animals.private.snps.counts.summary.txt ;
 
         exit 0;
 
@@ -708,7 +708,7 @@ rule haplotypeCaller_final_private_snps:
 
         bcftools index --threads {threads} {output.private} -o {output.csi}
 
-        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a haplotypeCaller.animals.private.snps.counts.summary.txt &&
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a haplotypeCaller.animals.private.snps.counts.summary.txt ;
 
         exit 0;
 
