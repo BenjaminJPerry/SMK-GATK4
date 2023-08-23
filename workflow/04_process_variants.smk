@@ -832,6 +832,10 @@ rule ensemble_intersection:
 
         bcftools index --threads {threads} {output.haplotypeCaller_common};
 
+        rm results/05_ensemble/0000.vcf.gz.tbi
+        rm results/05_ensemble/0001.vcf.gz.tbi
+        rm results/05_ensemble/0002.vcf.gz.tbi
+
         """
 
 
@@ -924,8 +928,6 @@ rule haplotypeCaller_ensemble_private_snps:
         exit 0;
 
         """
-
-
 
 
 rule view_bcftools_regions: #TODO Updated files
