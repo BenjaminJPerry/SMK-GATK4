@@ -817,13 +817,13 @@ rule ensemble_intersection:
 
         bcftools isec -O z8 -p results/05_ensemble -n=3 --threads {threads} {input.bcftools} {input.freebayes} {input.haplotypeCaller};
 
-        mv 0001.vcf.gz {output.bcftools_uniq};
+        mv 0000.vcf.gz {output.bcftools_uniq};
         echo "Total snps in {output.bcftools_uniq}: $(bcftools view --threads {threads} {output.bcftools_uniq} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
-        mv 0002.vcf.gz {output.freebayes_uniq};
+        mv 0001.vcf.gz {output.freebayes_uniq};
         echo "Total snps in {output.freebayes_uniq}: $(bcftools view --threads {threads} {output.freebayes_uniq} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
-        mv 0003.vcf.gz {output.haplotypeCaller_uniq};
+        mv 0002.vcf.gz {output.haplotypeCaller_uniq};
         echo "Total snps in {output.haplotypeCaller_uniq}: $(bcftools view --threads {threads} {output.haplotypeCaller_uniq} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
         bcftools view -O z8 --threads {threads} -R results/05_ensemble/sites.txt {input.bcftools} -o {output.bcftools_common};
