@@ -280,7 +280,7 @@ rule freebayes_filter_private_QUAL60:
         
         bcftools index --threads {threads} {output.filtered} -o {output.csi} 
 
-        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a freebayes.animals.private.snps.counts.summary.txt &&
+        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a freebayes.animals.private.snps.counts.summary.txt;
 
         '''
 
@@ -309,8 +309,8 @@ rule haplotypeCaller_filter_private_QUAL60:
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi} 
 
-        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a haplotypeCaller.animals.private.snps.counts.summary.txt &&
-
+        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a haplotypeCaller.animals.private.snps.counts.summary.txt;
+        
         '''
 
 
