@@ -797,9 +797,6 @@ rule ensemble_intersection:
         freebayes = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.vcf.gz",
         haplotypeCaller = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.vcf.gz",
     output:
-        bcftools_uniq = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.unique.vcf.gz",
-        freebayes_uniq = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.unique.vcf.gz",
-        haplotypeCaller_uniq = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.unique.vcf.gz",
         bcftools_common = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz",
         freebayes_common = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz",
         haplotypeCaller_common = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz",
@@ -817,26 +814,20 @@ rule ensemble_intersection:
 
         bcftools isec -O z8 -p results/05_ensemble -n=3 --threads {threads} {input.bcftools} {input.freebayes} {input.haplotypeCaller};
 
-        mv results/05_ensemble/0000.vcf.gz {output.bcftools_uniq};
-        echo "Total snps in {output.bcftools_uniq}: $(bcftools view --threads {threads} {output.bcftools_uniq} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-
-        mv results/05_ensemble/0001.vcf.gz {output.freebayes_uniq};
-        echo "Total snps in {output.freebayes_uniq}: $(bcftools view --threads {threads} {output.freebayes_uniq} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-
-        mv results/05_ensemble/0002.vcf.gz {output.haplotypeCaller_uniq};
-        echo "Total snps in {output.haplotypeCaller_uniq}: $(bcftools view --threads {threads} {output.haplotypeCaller_uniq} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-
-        bcftools view -O z8 --threads {threads} -R results/05_ensemble/sites.txt {input.bcftools} -o {output.bcftools_common};
-        bcftools index --threads {threads} {output.bcftools_common};
+        mv results/05_ensemble/0000.vcf.gz {output.bcftools_common};
         echo "Total snps in {output.bcftools_common}: $(bcftools view --threads {threads} {output.bcftools_common} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
-        bcftools view -O z8 --threads {threads} -R results/05_ensemble/sites.txt {input.freebayes} -o {output.freebayes_common};
-        bcftools index --threads {threads} {output.freebayes_common};
+        mv results/05_ensemble/0001.vcf.gz {output.freebayes_common};
         echo "Total snps in {output.freebayes_common}: $(bcftools view --threads {threads} {output.freebayes_common} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
-        bcftools view -O z8 --threads {threads} -R results/05_ensemble/sites.txt {input.haplotypeCaller} -o {output.haplotypeCaller_common};
-        bcftools index --threads {threads} {output.haplotypeCaller_common};
+        mv results/05_ensemble/0002.vcf.gz {output.haplotypeCaller_common};
         echo "Total snps in {output.haplotypeCaller_common}: $(bcftools view --threads {threads} {output.haplotypeCaller_common} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
+
+        bcftools index --threads {threads} {output.bcftools_common};
+
+        bcftools index --threads {threads} {output.freebayes_common};
+
+        bcftools index --threads {threads} {output.haplotypeCaller_common};
 
         """
 
