@@ -44,9 +44,9 @@ rule all:
         "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz",
         "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz",
 
-        expand("results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz", samples = SAMPLES),
-        expand("results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz", samples = SAMPLES),
-        expand("results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz", samples = SAMPLES),
+        expand("results/05_ensemble//private/{samples}.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz", samples = SAMPLES),
+        expand("results/05_ensemble//private/{samples}.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz", samples = SAMPLES),
+        expand("results/05_ensemble//private/{samples}.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz", samples = SAMPLES),
 
         # #"results/03_filtered/merged.chrom.freebayes.QUAL60.vcf.gz.pigmentSNPs.vcf",
         #"results/03_filtered/merged.chrom.bcftools.QUAL60.vcf.gz.pigmentSNPs.vcf",
@@ -844,8 +844,8 @@ rule bcftools_ensemble_private_snps:
     input:
         bcftools_common = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz",
     output:
-        private = "results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz",
-        csi = "results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz.csi",
+        private = "results/05_ensemble/private/{samples}.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz",
+        csi = "results/05_ensemble/private/{samples}.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz.csi",
     threads:6
     conda:
         "bcftools"
@@ -873,8 +873,8 @@ rule freebayes_ensemble_private_snps:
     input:
         freebayes_common = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz",
     output:
-        private = "results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz",
-        csi = "results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz.csi",
+        private = "results/05_ensemble/private/{samples}.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz",
+        csi = "results/05_ensemble/private/{samples}.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz.csi",
     threads:6
     conda:
         "bcftools"
@@ -904,8 +904,8 @@ rule haplotypeCaller_ensemble_private_snps:
     input:
         haplotypeCaller_common = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz",
     output:
-        private = "results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz",
-        csi = "results/05_animals/private/{samples}.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz.csi",
+        private = "results/05_ensemble/private/{samples}.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz",
+        csi = "results/05_ensemble/private/{samples}.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz.csi",
     threads:6
     conda:
         "bcftools"
