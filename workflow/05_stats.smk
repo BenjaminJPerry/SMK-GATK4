@@ -38,15 +38,14 @@ rule all:
         expand("results/00_stats/fastqc/{samples}_R1_fastqc.zip", samples = AHJNKHDSX5),
         expand("results/00_stats/fastqc/{samples}_R1_fastqc.zip", samples = BHJNVTDSX5),
         expand("results/00_stats/fastqc/{samples}_R1_fastqc.zip", samples = MGI),
-        expand("results/00_stats/{samples}.sorted.mkdups.merged.bam.samtools_stats.txt", samples = SAMPLES),
-        expand("results/00_stats/{samples}.mosdepth.summary.txt", samples = SAMPLES),
-        expand("results/00_stats/{samples}.mosdepth.median.summary.txt", samples = SAMPLES),
-        "results/00_stats/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.vcf.gz.bcftools-stats.txt",
-        "results/00_stats/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.vcf.gz.bcftools-stats.txt",
-        "results/00_stats/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.vcf.gz.bcftools-stats.txt",
-        "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz.bcftools-stats.txt",
-        "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz.bcftools-stats.txt",
-        "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz.bcftools-stats.txt"
+        expand("results/00_stats/samtools/{samples}.sorted.mkdups.merged.bam.samtools_stats.txt", samples = SAMPLES),
+        expand("results/00_stats/mosdepth/{samples}.mosdepth.summary.txt", samples = SAMPLES),
+        "results/00_stats/bcftools/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.vcf.gz.bcftools-stats.txt",
+        "results/00_stats/bcftools/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.vcf.gz.bcftools-stats.txt",
+        "results/00_stats/bcftools/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.vcf.gz.bcftools-stats.txt",
+        "results/00_stats/bcftools/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz.bcftools-stats.txt",
+        "results/00_stats/bcftools/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz.bcftools-stats.txt",
+        "results/00_stats/bcftools/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz.bcftools-stats.txt"
 
 
 rule fastqc_AHJNKHDSX5:
@@ -59,7 +58,7 @@ rule fastqc_AHJNKHDSX5:
         zip2 = "results/00_stats/fastqc/{samples}_R2_fastqc.zip"
     conda:
         "fastqc"
-    threads: 12
+    threads: 24
     resources:
         mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
@@ -84,7 +83,7 @@ rule fastqc_BHJNVTDSX5:
         zip2 = "results/00_stats/fastqc/{samples}_R2_fastqc.zip"
     conda:
         "fastqc"
-    threads: 12
+    threads: 24
     resources:
         mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
@@ -109,10 +108,10 @@ rule fastqc_MGI:
         zip2 = "results/00_stats/fastqc/{samples}_R2_fastqc.zip"
     conda:
         "fastqc"
-    threads: 12
+    threads: 36
     resources:
-        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
+        mem_gb = lambda wildcards, attempt: 24 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 360 + ((attempt - 1) * 120),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,    
@@ -156,7 +155,7 @@ rule samtools_stats_merged:
         bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
         referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa"
     output:
-        stats = "results/00_stats/{samples}.sorted.mkdups.merged.bam.samtools_stats.txt"
+        stats = "results/00_stats/samtools/{samples}.sorted.mkdups.merged.bam.samtools_stats.txt"
     log:
         "logs/samtools_stats_merged.{samples}.log"
     benchmark:
@@ -179,35 +178,7 @@ rule mosdepth_stats_merged:
     input:
         bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
     output:
-        stats = "results/00_stats/{samples}.mosdepth.summary.txt",
-    log:
-        "logs/mosdepth_stats_merged.{samples}.log"
-    benchmark:
-        "benchmarks/mosdepth_stats_merged.{samples}.tsv"
-    conda:
-        "mosdepth"
-    threads: 12
-    resources:
-        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 60),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        "mosdepth "
-        "--fast-mode " # dont look at internal cigar operations or correct mate overlaps (recommended for most use-cases).
-        "--no-per-base " # dont output per-base depth.
-        "--threads {threads} "
-        "results/00_stats/{wildcards.samples} " # output prefix
-        "{input.bam} "
-
-
-rule mosdepth_stats_merged_median:
-    priority: 100
-    input:
-        bam = "results/01_mapping/{samples}.sorted.mkdups.merged.bam",
-    output:
-        stats = "results/00_stats/{samples}.mosdepth.median.summary.txt",
+        stats = "results/00_stats/mosdepth/{samples}.mosdepth.summary.txt",
     log:
         "logs/mosdepth_stats_merged.{samples}.log"
     benchmark:
@@ -227,7 +198,7 @@ rule mosdepth_stats_merged_median:
         "--fast-mode " # dont look at internal cigar operations or correct mate overlaps (recommended for most use-cases).
         "--no-per-base " # dont output per-base depth.
         "--threads {threads} "
-        "results/00_stats/{wildcards.samples} " # output prefix
+        "results/00_stats/mosdepth/{wildcards.samples} " # output prefix
         "{input.bam} "
 
 
@@ -236,7 +207,7 @@ rule bcftools_stats:
     input:
         vcf = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.vcf.gz",
     output:
-        stats = "results/00_stats/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.vcf.gz.bcftools-stats.txt",
+        stats = "results/00_stats/bcftools/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.vcf.gz.bcftools-stats.txt",
     threads: 6
     conda:
         "bcftools"
@@ -260,7 +231,7 @@ rule freebayes_stats:
     input:
         vcf = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.vcf.gz",
     output:
-        stats = "results/00_stats/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.vcf.gz.bcftools-stats.txt",
+        stats = "results/00_stats/bcftools/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.vcf.gz.bcftools-stats.txt",
     threads: 6
     conda:
         "bcftools"
@@ -284,7 +255,7 @@ rule haplotypeCaller_stats:
     input:
         vcf = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.vcf.gz",
     output:
-        stats = "results/00_stats/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.vcf.gz.bcftools-stats.txt",
+        stats = "results/00_stats/bcftools/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.vcf.gz.bcftools-stats.txt",
     threads: 6
     conda:
         "bcftools"
@@ -308,7 +279,7 @@ rule bcftools_stats_int:
     input:
         vcf = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz",
     output:
-        stats = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz.bcftools-stats.txt",
+        stats = "results/00_stats/bcftools/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz.bcftools-stats.txt",
     threads: 6
     conda:
         "bcftools"
@@ -332,7 +303,7 @@ rule freebayes_stats_int:
     input:
         vcf = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz",
     output:
-        stats = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz.bcftools-stats.txt",
+        stats = "results/00_stats/bcftools/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz.bcftools-stats.txt",
     threads: 6
     conda:
         "bcftools"
@@ -356,7 +327,7 @@ rule haplotypeCaller_stats_int:
     input:
         vcf = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz",
     output:
-        stats = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz.bcftools-stats.txt",
+        stats = "results/00_stats/bcftools/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz.bcftools-stats.txt",
     threads: 6
     conda:
         "bcftools"
