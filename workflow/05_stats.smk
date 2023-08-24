@@ -40,7 +40,7 @@ rule all:
         expand("results/00_stats/fastqc/{samples}_R1_fastqc.zip", samples = MGI),
         expand("results/00_stats/{samples}.sorted.mkdups.merged.bam.samtools_stats.txt", samples = SAMPLES),
         expand("results/00_stats/{samples}.mosdepth.summary.txt", samples = SAMPLES),
-        expand("results/00_stats/{samples}.mosdepth.median.summary.txt", samples, SAMPLES),
+        expand("results/00_stats/{samples}.mosdepth.median.summary.txt", samples = SAMPLES),
         "results/00_stats/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.vcf.gz.bcftools-stats.txt",
         "results/00_stats/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.vcf.gz.bcftools-stats.txt",
         "results/00_stats/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.vcf.gz.bcftools-stats.txt",
