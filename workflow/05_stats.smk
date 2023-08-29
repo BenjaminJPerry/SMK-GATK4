@@ -31,13 +31,13 @@ MGI, = glob_wildcards("fastq/MGI/{samples}_R1.fastq.gz")
 
 rule all:
     input:
-        # "results/00_stats/seqkit.fastq.stats.txt",
-        # expand("results/00_stats/fastqc/{samples}_R2_fastqc.zip", samples = AHJNKHDSX5),
-        # expand("results/00_stats/fastqc/{samples}_R2_fastqc.zip", samples = BHJNVTDSX5),
-        # expand("results/00_stats/fastqc/{samples}_R2_fastqc.zip", samples = MGI),
-        # expand("results/00_stats/fastqc/{samples}_R1_fastqc.zip", samples = AHJNKHDSX5),
-        # expand("results/00_stats/fastqc/{samples}_R1_fastqc.zip", samples = BHJNVTDSX5),
-        # expand("results/00_stats/fastqc/{samples}_R1_fastqc.zip", samples = MGI),
+        "results/00_stats/seqkit.fastq.stats.txt",
+        expand("results/00_stats/fastqc/{samples}_R2_fastqc.zip", samples = AHJNKHDSX5),
+        expand("results/00_stats/fastqc/{samples}_R2_fastqc.zip", samples = BHJNVTDSX5),
+        expand("results/00_stats/fastqc/{samples}_R2_fastqc.zip", samples = MGI),
+        expand("results/00_stats/fastqc/{samples}_R1_fastqc.zip", samples = AHJNKHDSX5),
+        expand("results/00_stats/fastqc/{samples}_R1_fastqc.zip", samples = BHJNVTDSX5),
+        expand("results/00_stats/fastqc/{samples}_R1_fastqc.zip", samples = MGI),
         expand("results/00_stats/samtools/{samples}.sorted.mkdups.merged.bam.samtools_stats.txt", samples = SAMPLES),
         expand("results/00_stats/mosdepth/{samples}.mosdepth.summary.txt", samples = SAMPLES),
         "results/00_stats/bcftools/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.vcf.gz.bcftools-stats.txt",
@@ -58,10 +58,10 @@ rule fastqc_AHJNKHDSX5:
         zip2 = "results/00_stats/fastqc/{samples}_R2_fastqc.zip"
     conda:
         "fastqc"
-    threads: 24
+    threads: 36
     resources:
         mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 120),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,    
@@ -83,10 +83,10 @@ rule fastqc_BHJNVTDSX5:
         zip2 = "results/00_stats/fastqc/{samples}_R2_fastqc.zip"
     conda:
         "fastqc"
-    threads: 24
+    threads: 36
     resources:
         mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 120),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,    
@@ -111,7 +111,7 @@ rule fastqc_MGI:
     threads: 36
     resources:
         mem_gb = lambda wildcards, attempt: 24 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 360 + ((attempt - 1) * 120),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 120),
         partition = "large,milan",
         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
         attempt = lambda wildcards, attempt: attempt,    
