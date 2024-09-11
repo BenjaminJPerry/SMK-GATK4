@@ -43,7 +43,7 @@ rule bwa_mem:
     benchmark:
         "benchmarks/bwa_mem.{samples}.tsv"
     conda:
-        "bwa"
+        "bwa-0.7"
     threads:24
     resources:
         mem_gb = lambda wildcards, attempt: 24 + ((attempt - 1) * 24),
@@ -71,7 +71,7 @@ rule samtools_sort:
     benchmark:
         "benchmarks/samtools_sort_bwa.{samples}.tsv"
     conda:
-        "bwa"
+        "bwa-0.7"
     threads: 12
     resources:
         mem_gb = lambda wildcards, attempt: 32 + ((attempt -1) * 24),
