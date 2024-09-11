@@ -158,7 +158,7 @@ rule bcftools_DPFilter_private:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
         partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        DTMP = "tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
@@ -220,8 +220,8 @@ rule haplotypeCaller_DPFilter_private:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-
-        bcftools norm --threads {threads} -m- -f /nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa {input.private} | bcftools view --threads {threads} -O z8 -e 'INFO/DP<10 || INFO/DP>2500' -o {output.filtered} - ;
+        # -e is 'exclude'
+        bcftools view --threads {threads} -e 'INFO/DP<10 || INFO/DP>2500' {input.private} -O z8 -o {output.filtered} - ;
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi};
 
@@ -249,7 +249,7 @@ rule bcftools_filter_private_QUAL60:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         '''
-
+        # -e is 'exclude'
         bcftools view -e 'QUAL<60' {input.DPFilt} -O z8 -o {output.filtered};
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi};
