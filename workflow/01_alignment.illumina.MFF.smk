@@ -95,6 +95,8 @@ rule gatk_MarkDuplicates:
         "logs/gatk_MarkDuplicates.{samples}.log"
     benchmark:
         "benchmarks/gatk_MarkDuplicates.{samples}.tsv"
+    conda:
+        "gatk-4.5.0.0"
     threads:2
     resources:
         mem_gb = lambda wildcards, attempt: 128 + ((attempt - 1) * 64),
@@ -103,7 +105,6 @@ rule gatk_MarkDuplicates:
         DTMP = "tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        'module load GATK/4.3.0.0-gimkl-2022a; '
         'gatk --java-options "-Xms2G -Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}" '
         'MarkDuplicates '
         '-I {input} '
