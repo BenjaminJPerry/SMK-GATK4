@@ -23,7 +23,7 @@ onstart:
     os.system('echo "  CONDA VERSION: $(conda --version)"')
 
 
-SAMPLES, = glob_wildcards("fastq/AHJNKHDSX5/{samples}_R1.fastq.gz")
+SAMPLES, = glob_wildcards("fastq/MFF/{samples}_R1.fastq.gz")
 
 
 rule all:
@@ -33,9 +33,9 @@ rule all:
 
 rule bwa_mem:
     input:
-        read1 = "fastq/AHJNKHDSX5/{samples}_R1.fastq.gz",
-        read2 = "fastq/AHJNKHDSX5/{samples}_R2.fastq.gz",
-        referenceGenome = "/nesi/nobackup/agresearch03735/reference/ARS_lic_less_alts.male.pGL632_pX330_Slick_CRISPR_24.fa",
+        read1 = "fastq/MFF/{samples}_R1.fastq.gz",
+        read2 = "fastq/MFF/{samples}_R2.fastq.gz",
+        referenceGenome = "resources/GCF_016772045.1_ARS-UI_Ramb_v2.0_genomic.fna",
     output: 
         temp("results/01_mapping/{samples}.bam")
     log:
@@ -48,13 +48,13 @@ rule bwa_mem:
     resources:
         mem_gb = lambda wildcards, attempt: 24 + ((attempt - 1) * 24),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition="large,milan",
+        partition="compute",
     shell:
         """
         ANIMAL="$(echo {wildcards.samples} | cut -d "_" -f 1)"
-        RUN="$(echo {wildcards.samples} | cut -d "_" -f 4)"
-        LANE="$(echo {wildcards.samples} | cut -d "_" -f 3)"
-        READGROUP="@RG\\tID:$ANIMAL\\tPU:$RUN.$LANE\\tSM:$ANIMAL\\tPL:ILLUMINA\\tLB:ILLUMINA"
+        #RUN="$(echo {wildcards.samples} | cut -d "_" -f 4)"
+        #LANE="$(echo {wildcards.samples} | cut -d "_" -f 3)"
+        READGROUP="@RG\\tID:$ANIMAL\\tPU:MFF\\tSM:$ANIMAL\\tPL:ILLUMINA\\tLB:ILLUMINA"
 
         bwa mem -Y -R $READGROUP -t {threads} -K 10000000 {input.referenceGenome} {input.read1} {input.read2} | samtools view --threads {threads} -bS -o {output}
 
@@ -76,7 +76,7 @@ rule samtools_sort:
     resources:
         mem_gb = lambda wildcards, attempt: 32 + ((attempt -1) * 24),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition = "large,milan"
+        partition = "compute"
     shell:
         """
 
@@ -99,8 +99,8 @@ rule gatk_MarkDuplicates:
     resources:
         mem_gb = lambda wildcards, attempt: 128 + ((attempt - 1) * 64),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        partition = "compute",
+        DTMP = "tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
         'module load GATK/4.3.0.0-gimkl-2022a; '

@@ -1,23 +1,23 @@
-#!/usr/bin/env python3
-# Forked from: https://github.com/rusalkaguy/snakemake-slurm-module/blob/master/slurm-status.py
+#!/usr/bin/env python
 
-import re
 import subprocess
-import shlex
 import sys
-import time
+# From Peter Maxwell @ NeSI 11-2023
+#
+jobid = sys.argv[1]
 
+try:
+    output = subprocess.check_output(["squeue", "-j", str(jobid), "--Format=state", "--states=ALL", "--noheader"], 
+            universal_newlines=True).strip().split()[0]
+except subprocess.CalledProcessError:
+    output = subprocess.check_output(["sacct", "-j", str(jobid), "--format=state", "--noheader"], 
+            universal_newlines=True).strip().split()[0]
 
-jobid = sys.argv[1] # original from https://github.com/Snakemake-Profiles/slurm
-#jobid = jobid.split()[3] # needed when --parsable not indicated with sbatch
+failure_states = {"FAILED", "TIMEOUT", "OUT_OF_MEMORY", "DEADLINE", "CANCELLED"}
 
-output = str(subprocess.check_output("sacct -j %s --format State --noheader | head -1 | awk '{print $1}'" % jobid, shell=True).strip())
-
-running_status=["PENDING", "CONFIGURING", "COMPLETING", "RUNNING", "SUSPENDED", "BadConstraints"]
-if "COMPLETED" in output:
-  print("success")
-elif any(r in output for r in running_status):
-  print("running")
+if output == "COMPLETED":
+    print("success")
+elif output in failure_states:
+    print("failed")
 else:
-  print("failed")
-
+    print("running")
