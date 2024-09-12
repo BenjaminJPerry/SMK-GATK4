@@ -52,7 +52,7 @@ rule gatk_HaplotypeCaller_vcf:
     benchmark:
         "benchmarks/gatk_HaplotypeCaller_vcf.{samples}.{chromosome}.tsv"
     conda:
-        "bcftools"
+        "gatk-4.5.0.0"
     threads: 4
     resources:
         mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 12),
@@ -61,7 +61,6 @@ rule gatk_HaplotypeCaller_vcf:
         DTMP = "tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        'module load GATK/4.4.0.0-gimkl-2022a; '
         'gatk --java-options "-Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}"  '
         'HaplotypeCaller '
         '--base-quality-score-threshold 20 ' 
