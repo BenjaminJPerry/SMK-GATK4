@@ -27,6 +27,9 @@ SAMPLES = ('OFF3', '1945')
 CHROM = ('NC_056054.1', 'NC_056055.1', 'NC_056056.1', 'NC_056057.1', 'NC_056058.1', 'NC_056059.1', 'NC_056060.1', 'NC_056061.1', 'NC_056062.1', 'NC_056063.1', 'NC_056064.1', 'NC_056065.1', 'NC_056066.1', 'NC_056067.1', 'NC_056068.1', 'NC_056069.1', 'NC_056070.1', 'NC_056071.1', 'NC_056072.1', 'NC_056073.1', 'NC_056074.1', 'NC_056075.1', 'NC_056076.1', 'NC_056077.1', 'NC_056078.1', 'NC_056079.1', 'NC_056080.1')
 
 
+wildcard_constraints:
+    chromosome = "\w+.1"
+
 rule all:
     input:
         "results/02_snvs/merged.MFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz",
@@ -40,8 +43,8 @@ rule gatk_HaplotypeCaller_vcf:
         bam = "results/01_mapping/{samples}.sorted.mkdups.bam",
         referenceGenome = "resources/GCF_016772045.1_ARS-UI_Ramb_v2.0_genomic.fna",
     output:
-        vcf_chrom = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz"),
-        csi = temp("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz.csi")
+        vcf_chrom = temp("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz"),
+        csi = temp("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz.csi")
     params:
         chromosome = '{chromosome}'
     log:
@@ -75,10 +78,10 @@ rule gatk_HaplotypeCaller_vcf:
 
 
 rule concatenate_replicons_vcf: #TODO
-    priority:100
+    priority:1000
     input:
-        vcfgz = expand("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz", chromosome = CHROM, allow_missing=True),
-        csi = expand("results/02_snvs/{samples}.rawsnvs.{chromosome}.haplotypeCaller.vcf.gz.csi", chromosome = CHROM, allow_missing=True),
+        vcfgz = expand("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz", chromosome = CHROM, allow_missing = True),
+        csi = expand("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz", chromosome = CHROM, allow_missing = True),
     output:
         merged = temp("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz"),
         csi = temp("results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi"),
