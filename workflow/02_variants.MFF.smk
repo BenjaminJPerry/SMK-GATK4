@@ -48,7 +48,7 @@ rule bcftools_vcf:
         "benchmarks/bcftools_vcf.{samples}.tsv"
     threads: 24
     conda:
-        "bcftools"
+        "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 720 + ((attempt - 1) * 720),
@@ -81,7 +81,7 @@ rule norm_samples_bcftools:
         csi = temp("results/02_snvs/{samples}.rawsnvs.norm.bcftools.vcf.gz.csi"),
     threads:6
     conda:
-        "bcftools"
+        "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
@@ -110,7 +110,7 @@ rule merge_bcftools_vcf:
         "benchmarks/merge_bcftools_vcf.tsv"
     threads: 16
     conda:
-        "bcftools"
+        "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
@@ -144,7 +144,7 @@ rule view_bcftools_chrom:
         "benchmarks/view_bcftools_chrom.tsv"
     threads: 8
     conda:
-        "bcftools"
+        "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
@@ -208,7 +208,7 @@ rule norm_samples_freebayes:
         csi = temp("results/02_snvs/{samples}.rawsnvs.norm.freebayes.vcf.gz.csi"),
     threads:6
     conda:
-        "bcftools"
+        "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
@@ -237,7 +237,7 @@ rule merge_freebayes_vcf:
         "benchmarks/merge_freebayes_vcf.tsv"
     threads: 16
     conda:
-        "bcftools"
+        "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
@@ -270,7 +270,7 @@ rule view_freebayes_chrom:
         "benchmarks/view_freebayes_chrom.tsv"
     threads: 8
     conda:
-        "bcftools"
+        "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),

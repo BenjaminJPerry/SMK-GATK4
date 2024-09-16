@@ -88,7 +88,7 @@ rule concatenate_replicons_vcf: #TODO
         "benchmarks/{samples}_concatenate_replicons_vcf.tsv"
     threads: 8
     conda:
-        "bcftools"
+        "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
@@ -115,7 +115,7 @@ rule bcftools_norm_samples:
         csi = temp("results/02_snvs/{samples}.rawsnvs.norm.haplotypeCaller.vcf.gz.csi"),
     threads:6
     conda:
-        "bcftools"
+        "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
@@ -142,7 +142,7 @@ rule filter_DP:
         csi = temp("results/03_filtered/{samples}.rawsnvs.norm.DPFilt.haplotypeCaller.vcf.gz.csi"),
     threads: 8
     conda:
-        "bcftools"
+        "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
@@ -172,7 +172,7 @@ rule filter_QUAL60:
         csi = temp("results/03_filtered/{samples}.rawsnvs.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi"),
     threads:8
     conda:
-        "bcftools"
+        "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
@@ -204,7 +204,7 @@ rule merge_animals_vcf:
         "benchmarks/merge_animals_vcf.tsv"
     threads: 16
     conda:
-        "bcftools"
+        "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
@@ -239,7 +239,7 @@ rule view_haplotype_chrom:
         "benchmarks/view_haplotypeCaller_chrom.tsv"
     threads: 8
     conda:
-        "bcftools"
+        "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
