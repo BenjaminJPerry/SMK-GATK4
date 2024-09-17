@@ -65,14 +65,15 @@ rule gatk_HaplotypeCaller_vcf:
         'HaplotypeCaller '
         '--base-quality-score-threshold 20 ' 
         '--min-base-quality-score 20 '
-        #'--create-output-variant-index '
+        '-f '
+        '--create-output-variant-index '
         '-R {input.referenceGenome} '
         '-I {input.bam} '
         '-L {params.chromosome} '
         '-O {output.vcf_chrom} '
         '--tmp-dir {resources.DTMP} '
         '&> {log}.attempt.{resources.attempt} && '
-        #'rm results/02_snvs/{wildcards.samples}.{wildcards.chromosome}.rawsnvs.haplotypeCaller.vcf.gz.tbi; '
+        'rm results/02_snvs/{wildcards.samples}.{wildcards.chromosome}.rawsnvs.haplotypeCaller.vcf.gz.tbi; '
         'bcftools index --threads {threads} {output.vcf_chrom} -o {output.csi}'
 
 
