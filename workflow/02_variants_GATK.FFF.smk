@@ -217,7 +217,7 @@ rule filter_QUAL60:
         '''
         # -e is 'exclude'
 
-        bcftools view -e 'QUAL<60' {input.dpfiltered} -O z8 -o {output.filtered};
+        bcftools view -e 'QUAL<60' {input.filtered} -O z8 -o {output.filtered};
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi};
 
