@@ -179,7 +179,7 @@ rule freebayes_vcf:
         "benchmarks/freebayes_vcf.{samples}.tsv"
     threads: 2
     conda:
-        "freebayes"
+        "freebayes-1.3.8"
     resources:
         mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 12),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),

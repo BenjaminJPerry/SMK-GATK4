@@ -40,8 +40,8 @@ rule bcftools_vcf:
         bam = "results/01_mapping/{samples}.sorted.mkdups.bam",
         referenceGenome = "resources/GCF_016772045.1_ARS-UI_Ramb_v2.0_genomic.fna",
     output:
-        vcf = temp("results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz"),
-        csi = temp("results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz.csi"),
+        vcf = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz", # removed temp
+        csi = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz.csi", # removed temp
     log:
         "logs/bcftools_vcf.{samples}.log"
     benchmark:
@@ -231,15 +231,15 @@ rule freebayes_vcf:
         bam = "results/01_mapping/{samples}.sorted.mkdups.bam",
         referenceGenome = "resources/GCF_016772045.1_ARS-UI_Ramb_v2.0_genomic.fna",
     output:
-        vcfgz = temp("results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz"),
-        csi = temp("results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi"),
+        vcfgz = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz", # removed temp
+        csi = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi", # removed temp
     log:
         "logs/freebayes_vcf.{samples}.log"
     benchmark:
         "benchmarks/freebayes_vcf.{samples}.tsv"
     threads: 2
     conda:
-        "freebayes"
+        "freebayes-1.3.8"
     resources:
         mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 12),
         time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
