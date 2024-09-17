@@ -73,15 +73,15 @@ rule bcftools_vcf:
 rule view_bcftools_chrom: #TODO
     priority:100
     input:
-        merged = "results/02_snvs/merged.FFF.rawsnvs.norm.DPFilt.QUAL60.bcftools.vcf.gz",
-        csi = "results/02_snvs/merged.FFF.rawsnvs.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi"
+        vcf = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz", # removed temp
+        csi = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz.csi", # removed temp
     output:
-        filtered_vcf = "results/02_snvs/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz",
-        filtered_vcf_csi = "results/02_snvs/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi"
+        filtered_vcf = "results/02_snvs/{samples}.chrom.bcftools.vcf.gz", # removed temp
+        filtered_vcf_csi = "results/02_snvs/{samples}.chrom.bcftools.vcf.gz.csi", # removed temp
     params:
         chromosomes = "NC_056054.1,NC_056055.1,NC_056056.1,NC_056057.1,NC_056058.1,NC_056059.1,NC_056060.1,NC_056061.1,NC_056062.1,NC_056063.1,NC_056064.1,NC_056065.1,NC_056066.1,NC_056067.1,NC_056068.1,NC_056069.1,NC_056070.1,NC_056071.1,NC_056072.1,NC_056073.1,NC_056074.1,NC_056075.1,NC_056076.1,NC_056077.1,NC_056078.1,NC_056079.1,NC_056080.1"
     benchmark:
-        "benchmarks/view_bcftools_chrom.tsv"
+        "benchmarks/view_bcftools_chrom.{samples}.tsv"
     threads: 8
     conda:
         "bcftools-1.19"
@@ -106,11 +106,11 @@ rule view_bcftools_chrom: #TODO
 rule norm_samples_bcftools:
     priority: 100
     input:
-        unnormal = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz",
-        csi = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz.csi",
+        unnormal = "results/02_snvs/{samples}.chrom.bcftools.vcf.gz", # removed temp
+        csi = "results/02_snvs/{samples}.chrom.bcftools.vcf.gz.csi", # removed temp
     output:
-        norm = temp("results/02_snvs/{samples}.rawsnvs.norm.bcftools.vcf.gz"),
-        csi = temp("results/02_snvs/{samples}.rawsnvs.norm.bcftools.vcf.gz.csi"),
+        norm = temp("results/02_snvs/{samples}.chrom.norm.bcftools.vcf.gz"),
+        csi = temp("results/02_snvs/{samples}.chrom.norm.bcftools.vcf.gz.csi"),
     threads:6
     conda:
         "bcftools-1.19"
@@ -133,11 +133,11 @@ rule norm_samples_bcftools:
 rule filter_DP_bcftools:
     priority:100
     input:
-        norm = "results/02_snvs/{samples}.rawsnvs.norm.bcftools.vcf.gz",
-        csi = "results/02_snvs/{samples}.rawsnvs.norm.bcftools.vcf.gz.csi",
+        norm = "results/02_snvs/{samples}.chrom.norm.bcftools.vcf.gz",
+        csi = "results/02_snvs/{samples}.chrom.norm.bcftools.vcf.gz.csi",
     output:
-        filtered = temp("results/03_filtered/{samples}.rawsnvs.norm.DPFilt.bcftools.vcf.gz"),
-        csi = temp("results/03_filtered/{samples}.rawsnvs.norm.DPFilt.bcftools.vcf.gz.csi"),
+        filtered = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.bcftools.vcf.gz"),
+        csi = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.bcftools.vcf.gz.csi"),
     threads: 8
     conda:
         "bcftools-1.19"
@@ -163,11 +163,11 @@ rule filter_DP_bcftools:
 rule filter_QUAL60_bcftools: 
     priority:100
     input:
-        dpfiltered = "results/03_filtered/{samples}.rawsnvs.norm.DPFilt.bcftools.vcf.gz",
-        csi = "results/03_filtered/{samples}.rawsnvs.norm.DPFilt.bcftools.vcf.gz.csi",
+        dpfiltered = "results/03_filtered/{samples}.chrom.norm.DPFilt.bcftools.vcf.gz",
+        csi = "results/03_filtered/{samples}.chrom.norm.DPFilt.bcftools.vcf.gz.csi",
     output:
-        filtered = temp("results/03_filtered/{samples}.rawsnvs.norm.DPFilt.QUAL60.bcftools.vcf.gz"),
-        csi = temp("results/03_filtered/{samples}.rawsnvs.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi"),
+        filtered = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz"),
+        csi = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi"),
     threads:8
     conda:
         "bcftools-1.19"
@@ -193,11 +193,11 @@ rule filter_QUAL60_bcftools:
 rule merge_bcftools_vcf:
     priority:100
     input:
-        vcfgz = expand("results/03_filtered/{samples}.rawsnvs.norm.DPFilt.QUAL60.bcftools.vcf.gz", samples = SAMPLES),
-        csi = expand("results/03_filtered/{samples}.rawsnvs.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi", samples = SAMPLES),
+        vcfgz = expand("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz", samples = SAMPLES),
+        csi = expand("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi", samples = SAMPLES),
     output:
-        merged = "results/02_snvs/merged.FFF.rawsnvs.norm.DPFilt.QUAL60.bcftools.vcf.gz",
-        csi = "results/02_snvs/merged.FFF.rawsnvs.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi"
+        merged = "results/02_snvs/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz",
+        csi = "results/02_snvs/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi"
     benchmark:
         "benchmarks/merge_bcftools_vcf.tsv"
     threads: 16
@@ -259,15 +259,15 @@ rule freebayes_vcf:
 rule view_freebayes_chrom: #TODO
     priority:100
     input:
-        merged = "results/02_snvs/merged.FFF.rawsnvs.norm.DPFilt.QUAL60.freebayes.vcf.gz",
-        csi = "results/02_snvs/merged.FFF.rawsnvs.norm.DPFilt.QUAL60.freebayes.vcf.gz.csi"
+        vcf = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz", # removed temp
+        csi = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi", # removed temp
     output:
-        filtered_vcf = "results/02_snvs/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz",
-        filtered_vcf_csi = "results/02_snvs/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz.csi"
+        filtered_vcf = "results/02_snvs/{samples}.chrom.freebayes.vcf.gz", # removed temp
+        filtered_vcf_csi = "results/02_snvs/{samples}.chrom.freebayes.vcf.gz.csi", # removed temp
     params:
         chromosomes = "NC_056054.1,NC_056055.1,NC_056056.1,NC_056057.1,NC_056058.1,NC_056059.1,NC_056060.1,NC_056061.1,NC_056062.1,NC_056063.1,NC_056064.1,NC_056065.1,NC_056066.1,NC_056067.1,NC_056068.1,NC_056069.1,NC_056070.1,NC_056071.1,NC_056072.1,NC_056073.1,NC_056074.1,NC_056075.1,NC_056076.1,NC_056077.1,NC_056078.1,NC_056079.1,NC_056080.1"
     benchmark:
-        "benchmarks/view_freebayes_chrom.tsv"
+        "benchmarks/view_freebayes_chrom.{samples}.tsv"
     threads: 8
     conda:
         "bcftools-1.19"
@@ -280,7 +280,7 @@ rule view_freebayes_chrom: #TODO
     shell:
         """
 
-        bcftools view {input.merged} -O z8 -o {output.filtered_vcf} --regions {params.chromosomes} &&
+        bcftools view {input.vcf} -O z8 -o {output.filtered_vcf} --regions {params.chromosomes} &&
 
         bcftools index --threads {threads} {output.filtered_vcf} -o {output.filtered_vcf_csi} &&
 
@@ -292,11 +292,11 @@ rule view_freebayes_chrom: #TODO
 rule norm_samples_freebayes:
     priority: 100
     input:
-        unnormal = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz",
-        csi = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi",
+        unnormal = "results/02_snvs/{samples}.chrom.freebayes.vcf.gz",
+        csi = "results/02_snvs/{samples}.chrom.freebayes.vcf.gz.csi",
     output:
-        norm = temp("results/02_snvs/{samples}.rawsnvs.norm.freebayes.vcf.gz"),
-        csi = temp("results/02_snvs/{samples}.rawsnvs.norm.freebayes.vcf.gz.csi"),
+        norm = temp("results/02_snvs/{samples}.chrom.norm.freebayes.vcf.gz"),
+        csi = temp("results/02_snvs/{samples}.chrom.norm.freebayes.vcf.gz.csi"),
     threads:6
     conda:
         "bcftools-1.19"
@@ -321,11 +321,11 @@ rule norm_samples_freebayes:
 rule filter_DP_freebayes:
     priority:100
     input:
-        norm = "results/02_snvs/{samples}.rawsnvs.norm.freebayes.vcf.gz",
-        csi = "results/02_snvs/{samples}.rawsnvs.norm.freebayes.vcf.gz.csi",
+        norm = "results/02_snvs/{samples}.chrom.norm.freebayes.vcf.gz",
+        csi = "results/02_snvs/{samples}.chrom.norm.freebayes.vcf.gz.csi",
     output:
-        filtered = temp("results/03_filtered/{samples}.rawsnvs.norm.DPFilt.freebayes.vcf.gz"),
-        csi = temp("results/03_filtered/{samples}.rawsnvs.norm.DPFilt.freebayes.vcf.gz.csi"),
+        filtered = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.freebayes.vcf.gz"),
+        csi = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.freebayes.vcf.gz.csi"),
     threads: 8
     conda:
         "bcftools-1.19"
@@ -351,11 +351,11 @@ rule filter_DP_freebayes:
 rule filter_QUAL60_freebayes: 
     priority:100
     input:
-        dpfiltered = "results/03_filtered/{samples}.rawsnvs.norm.DPFilt.freebayes.vcf.gz",
-        csi = "results/03_filtered/{samples}.rawsnvs.norm.DPFilt.freebayes.vcf.gz.csi",
+        dpfiltered = "results/03_filtered/{samples}.chrom.norm.DPFilt.freebayes.vcf.gz",
+        csi = "results/03_filtered/{samples}.chrom.norm.DPFilt.freebayes.vcf.gz.csi",
     output:
-        filtered = temp("results/03_filtered/{samples}.rawsnvs.norm.DPFilt.QUAL60.freebayes.vcf.gz"),
-        csi = temp("results/03_filtered/{samples}.rawsnvs.norm.DPFilt.QUAL60.freebayes.vcf.gz.csi"),
+        filtered = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz"),
+        csi = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz.csi"),
     threads:8
     conda:
         "bcftools-1.19"
@@ -381,11 +381,11 @@ rule filter_QUAL60_freebayes:
 rule merge_freebayes_vcf:
     priority:100
     input:
-        vcfgz = expand("results/03_filtered/{samples}.rawsnvs.norm.DPFilt.QUAL60.freebayes.vcf.gz", samples = SAMPLES),
-        csi = expand("results/03_filtered/{samples}.rawsnvs.norm.DPFilt.QUAL60.freebayes.vcf.gz.csi", samples = SAMPLES),
+        vcfgz = expand("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz", samples = SAMPLES),
+        csi = expand("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz.csi", samples = SAMPLES),
     output:
-        merged = "results/02_snvs/merged.FFF.rawsnvs.norm.DPFilt.QUAL60.freebayes.vcf.gz",
-        csi = "results/02_snvs/merged.FFF.rawsnvs.norm.DPFilt.QUAL60.freebayes.vcf.gz.csi"
+        merged = "results/02_snvs/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz",
+        csi = "results/02_snvs/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz.csi"
     benchmark:
         "benchmarks/merge_freebayes_vcf.tsv"
     threads: 16
