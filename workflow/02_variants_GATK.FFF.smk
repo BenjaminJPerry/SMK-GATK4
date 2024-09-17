@@ -65,7 +65,6 @@ rule gatk_HaplotypeCaller_vcf:
         'HaplotypeCaller '
         '--base-quality-score-threshold 20 ' 
         '--min-base-quality-score 20 '
-        '-f '
         '--create-output-variant-index '
         '-R {input.referenceGenome} '
         '-I {input.bam} '
