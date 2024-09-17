@@ -159,7 +159,7 @@ rule bcftools_norm_samples:
     shell:
         """
 
-        bcftools norm --threads {threads} -O z8 -m- -f resources/GCF_016772045.1_ARS-UI_Ramb_v2.0_genomic.fna -o {output.norm} {input.unnormal};
+        bcftools norm --threads {threads} -O z8 -m+ -s -D -f resources/GCF_016772045.1_ARS-UI_Ramb_v2.0_genomic.fna -o {output.norm} {input.unnormal};
     
         echo "Total snps in {output.norm}: $(bcftools view --threads {threads} {output.norm} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
