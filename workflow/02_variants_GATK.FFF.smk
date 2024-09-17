@@ -234,7 +234,7 @@ rule merge_animals_vcf:
         vcfgz = expand("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz", samples = SAMPLES),
         csi = expand("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi", samples = SAMPLES),
     output:
-        merged_vcf = "results/02_snvs/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz",
+        merged = "results/02_snvs/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz",
         csi = "results/02_snvs/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi",
     benchmark:
         "benchmarks/merge_animals_vcf.tsv"
