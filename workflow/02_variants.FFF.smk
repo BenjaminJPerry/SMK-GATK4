@@ -33,7 +33,6 @@ rule all:
 
 
 ### bcftools 
-
 rule bcftools_vcf:
     priority: 100
     input:
@@ -224,7 +223,6 @@ rule merge_bcftools_vcf:
 
 
 ### freebayes
-
 rule freebayes_vcf:
     priority: 100
     input:
@@ -401,13 +399,12 @@ rule merge_freebayes_vcf:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        
+
         bcftools merge --threads {threads} {input.vcfgz} -O z8 -o {output.merged};
 
         bcftools index --threads {threads} {output.merged} -o {output.csi};
 
         echo "Total snps in {output.merged}: $(cat {output.merged} | gunzip | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt 
-
 
         """
 
