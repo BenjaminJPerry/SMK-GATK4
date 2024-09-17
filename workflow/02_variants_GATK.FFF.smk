@@ -108,7 +108,7 @@ rule concatenate_replicons_vcf: #TODO
 rule view_haplotype_chrom:
     priority:100
     input:
-        merged = "results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz", # removing temp
+        vcf = "results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz", # removing temp
         csi = "results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi", # removing temp
     output:
         filtered_vcf = "results/02_snvs/{samples}.chrom.haplotypeCaller.vcf.gz",
@@ -117,7 +117,7 @@ rule view_haplotype_chrom:
         chromosomes = "NC_056054.1,NC_056055.1,NC_056056.1,NC_056057.1,NC_056058.1,NC_056059.1,NC_056060.1,NC_056061.1,NC_056062.1,NC_056063.1,NC_056064.1,NC_056065.1,NC_056066.1,NC_056067.1,NC_056068.1,NC_056069.1,NC_056070.1,NC_056071.1,NC_056072.1,NC_056073.1,NC_056074.1,NC_056075.1,NC_056076.1,NC_056077.1,NC_056078.1,NC_056079.1,NC_056080.1"
 
     benchmark:
-        "benchmarks/view_haplotypeCaller_chrom.tsv"
+        "benchmarks/view_haplotypeCaller_chrom.{samples}.tsv"
     threads: 8
     conda:
         "bcftools-1.19"
@@ -130,7 +130,7 @@ rule view_haplotype_chrom:
     shell:
         """
 
-        bcftools view {input.merged_vcf} -O z8 -o {output.filtered_vcf} --regions {params.chromosomes};
+        bcftools view {input.vcf} -O z8 -o {output.filtered_vcf} --regions {params.chromosomes};
 
         bcftools index --threads {threads} {output.filtered_vcf} -o {output.filtered_vcf_csi}; 
 
