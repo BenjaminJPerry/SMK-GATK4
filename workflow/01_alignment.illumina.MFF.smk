@@ -100,7 +100,7 @@ rule gatk_MarkDuplicates:
     threads:2
     resources:
         mem_gb = lambda wildcards, attempt: 128 + ((attempt - 1) * 64),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        time = lambda wildcards, attempt: 2880 + ((attempt - 1) * 1440),
         partition = "compute",
         DTMP = "tmp",
         attempt = lambda wildcards, attempt: attempt,
