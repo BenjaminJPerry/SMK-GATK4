@@ -44,7 +44,7 @@ rule gatk_HaplotypeCaller_vcf:
         referenceGenome = "resources/GCF_016772045.1_ARS-UI_Ramb_v2.0_genomic.fna",
     output:
         vcf_chrom = temp("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz"),
-        csi = temp("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz.tbi")
+        csi = temp("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz.csi")
     params:
         chromosome = '{chromosome}'
     log:
@@ -61,7 +61,6 @@ rule gatk_HaplotypeCaller_vcf:
         DTMP = "tmp",
         attempt = lambda wildcards, attempt: attempt,
     shell:
-        'rm results/02_snvs/{wildcards.samples}.{wildcards.chromosome}.rawsnvs.haplotypeCaller.vcf.gz.tbi; '
         'gatk --java-options "-Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}"  '
         'HaplotypeCaller '
         '--base-quality-score-threshold 20 ' 
@@ -73,6 +72,7 @@ rule gatk_HaplotypeCaller_vcf:
         '-O {output.vcf_chrom} '
         '--tmp-dir {resources.DTMP} '
         '&> {log}.attempt.{resources.attempt} && '
+        #'rm results/02_snvs/{wildcards.samples}.{wildcards.chromosome}.rawsnvs.haplotypeCaller.vcf.gz.tbi; '
         'bcftools index --threads {threads} {output.vcf_chrom} -o {output.csi}'
 
 
