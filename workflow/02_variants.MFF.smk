@@ -28,8 +28,8 @@ SAMPLES = ('OFF3', '1945')
 
 rule all:
     input:
-        "results/02_snvs/merged.MFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz",
-        "results/02_snvs/merged.MFF.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz",
+        "results/04_merged/merged.MFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz",
+        "results/04_merged/merged.MFF.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz",
 
 
 ### bcftools 
@@ -196,8 +196,8 @@ rule merge_bcftools_vcf:
         vcfgz = expand("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz", samples = SAMPLES),
         csi = expand("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi", samples = SAMPLES),
     output:
-        merged = "results/02_snvs/merged.MFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz",
-        csi = "results/02_snvs/merged.MFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi"
+        merged = "results/04_merged/merged.MFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz",
+        csi = "results/04_merged/merged.MFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi"
     benchmark:
         "benchmarks/merge_bcftools_vcf.tsv"
     threads: 16
@@ -384,8 +384,8 @@ rule merge_freebayes_vcf:
         vcfgz = expand("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz", samples = SAMPLES),
         csi = expand("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz.csi", samples = SAMPLES),
     output:
-        merged = "results/02_snvs/merged.MFF.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz",
-        csi = "results/02_snvs/merged.MFF.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz.csi"
+        merged = "results/04_merged/merged.MFF.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz",
+        csi = "results/04_merged/merged.MFF.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz.csi"
     benchmark:
         "benchmarks/merge_freebayes_vcf.tsv"
     threads: 16

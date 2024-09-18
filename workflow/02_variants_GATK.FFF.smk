@@ -32,8 +32,8 @@ wildcard_constraints:
 
 rule all:
     input:
-        "results/02_snvs/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz",
-        "results/02_snvs/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi"
+        "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz",
+        "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi"
 
 
 
@@ -234,8 +234,8 @@ rule merge_animals_vcf:
         vcfgz = expand("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz", samples = SAMPLES),
         csi = expand("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi", samples = SAMPLES),
     output:
-        merged = "results/02_snvs/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz",
-        csi = "results/02_snvs/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi",
+        merged = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz",
+        csi = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi",
     benchmark:
         "benchmarks/merge_animals_vcf.tsv"
     threads: 16
