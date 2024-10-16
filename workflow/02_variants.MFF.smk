@@ -39,8 +39,8 @@ rule bcftools_vcf:
         bam = "results/01_mapping/{samples}.sorted.mkdups.bam",
         referenceGenome = "resources/GCF_016772045.1_ARS-UI_Ramb_v2.0_genomic.fna",
     output:
-        vcf = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz", # removed temp
-        csi = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz.csi", # removed temp
+        vcf = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz",
+        csi = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz.csi",
     log:
         "logs/bcftools_vcf.{samples}.log"
     benchmark:
@@ -73,11 +73,11 @@ rule bcftools_vcf:
 rule view_bcftools_chrom: #TODO
     priority:100
     input:
-        vcf = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz", # removed temp
-        csi = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz.csi", # removed temp
+        vcf = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz",
+        csi = "results/02_snvs/{samples}.rawsnvs.bcftools.vcf.gz.csi",
     output:
-        filtered_vcf = "results/02_snvs/{samples}.chrom.bcftools.vcf.gz", # removed temp
-        filtered_vcf_csi = "results/02_snvs/{samples}.chrom.bcftools.vcf.gz.csi", # removed temp
+        filtered_vcf = temp("results/02_snvs/{samples}.chrom.bcftools.vcf.gz"),
+        filtered_vcf_csi = temp("results/02_snvs/{samples}.chrom.bcftools.vcf.gz.csi"),
     params:
         chromosomes = "NC_056054.1,NC_056055.1,NC_056056.1,NC_056057.1,NC_056058.1,NC_056059.1,NC_056060.1,NC_056061.1,NC_056062.1,NC_056063.1,NC_056064.1,NC_056065.1,NC_056066.1,NC_056067.1,NC_056068.1,NC_056069.1,NC_056070.1,NC_056071.1,NC_056072.1,NC_056073.1,NC_056074.1,NC_056075.1,NC_056076.1,NC_056077.1,NC_056078.1,NC_056079.1,NC_056080.1"
     benchmark:
@@ -106,8 +106,8 @@ rule view_bcftools_chrom: #TODO
 rule norm_samples_bcftools:
     priority: 100
     input:
-        unnormal = "results/02_snvs/{samples}.chrom.bcftools.vcf.gz", # removed temp
-        csi = "results/02_snvs/{samples}.chrom.bcftools.vcf.gz.csi", # removed temp
+        unnormal = "results/02_snvs/{samples}.chrom.bcftools.vcf.gz",
+        csi = "results/02_snvs/{samples}.chrom.bcftools.vcf.gz.csi",
     output:
         norm = temp("results/02_snvs/{samples}.chrom.norm.bcftools.vcf.gz"),
         csi = temp("results/02_snvs/{samples}.chrom.norm.bcftools.vcf.gz.csi"),
@@ -229,8 +229,8 @@ rule freebayes_vcf:
         bam = "results/01_mapping/{samples}.sorted.mkdups.bam",
         referenceGenome = "resources/GCF_016772045.1_ARS-UI_Ramb_v2.0_genomic.fna",
     output:
-        vcfgz = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz", # removed temp
-        csi = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi", # removed temp
+        vcfgz = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz",
+        csi = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi",
     log:
         "logs/freebayes_vcf.{samples}.log"
     benchmark:
@@ -256,14 +256,14 @@ rule freebayes_vcf:
         "bcftools index --threads {threads} {output.vcfgz} -o  {output.csi} "
 
 
-rule view_freebayes_chrom: #TODO
+rule view_freebayes_chrom:
     priority:100
     input:
-        vcf = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz", # removed temp
-        csi = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi", # removed temp
+        vcf = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz",
+        csi = "results/02_snvs/{samples}.rawsnvs.freebayes.vcf.gz.csi",
     output:
-        filtered_vcf = "results/02_snvs/{samples}.chrom.freebayes.vcf.gz", # removed temp
-        filtered_vcf_csi = "results/02_snvs/{samples}.chrom.freebayes.vcf.gz.csi", # removed temp
+        filtered_vcf = temp("results/02_snvs/{samples}.chrom.freebayes.vcf.gz"),
+        filtered_vcf_csi = temp("results/02_snvs/{samples}.chrom.freebayes.vcf.gz.csi"),
     params:
         chromosomes = "NC_056054.1,NC_056055.1,NC_056056.1,NC_056057.1,NC_056058.1,NC_056059.1,NC_056060.1,NC_056061.1,NC_056062.1,NC_056063.1,NC_056064.1,NC_056065.1,NC_056066.1,NC_056067.1,NC_056068.1,NC_056069.1,NC_056070.1,NC_056071.1,NC_056072.1,NC_056073.1,NC_056074.1,NC_056075.1,NC_056076.1,NC_056077.1,NC_056078.1,NC_056079.1,NC_056080.1"
     benchmark:
