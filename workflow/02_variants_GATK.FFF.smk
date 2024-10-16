@@ -82,8 +82,8 @@ rule concatenate_replicons_vcf: #TODO
         vcfgz = expand("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz", chromosome = CHROM, allow_missing = True),
         csi = expand("results/02_snvs/{samples}.{chromosome}.rawsnvs.haplotypeCaller.vcf.gz", chromosome = CHROM, allow_missing = True),
     output:
-        merged = "results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz", # removing temp
-        csi = "results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi", # removing temp
+        merged = "results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz", 
+        csi = "results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi",
     benchmark:
         "benchmarks/{samples}_concatenate_replicons_vcf.tsv"
     threads: 8
@@ -111,8 +111,8 @@ rule view_haplotype_chrom:
         vcf = "results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz", # removing temp
         csi = "results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi", # removing temp
     output:
-        filtered_vcf = "results/02_snvs/{samples}.chrom.haplotypeCaller.vcf.gz",
-        filtered_vcf_csi = "results/02_snvs/{samples}.chrom.haplotypeCaller.vcf.gz.csi"
+        filtered_vcf = temp("results/02_snvs/{samples}.chrom.haplotypeCaller.vcf.gz"),
+        filtered_vcf_csi = temp("results/02_snvs/{samples}.chrom.haplotypeCaller.vcf.gz.csi")
     params:
         chromosomes = "NC_056054.1,NC_056055.1,NC_056056.1,NC_056057.1,NC_056058.1,NC_056059.1,NC_056060.1,NC_056061.1,NC_056062.1,NC_056063.1,NC_056064.1,NC_056065.1,NC_056066.1,NC_056067.1,NC_056068.1,NC_056069.1,NC_056070.1,NC_056071.1,NC_056072.1,NC_056073.1,NC_056074.1,NC_056075.1,NC_056076.1,NC_056077.1,NC_056078.1,NC_056079.1,NC_056080.1"
 
@@ -145,9 +145,8 @@ rule bcftools_norm_samples:
         unnormal = "results/02_snvs/{samples}.chrom.haplotypeCaller.vcf.gz",
         filtered_vcf_csi = "results/02_snvs/{samples}.chrom.haplotypeCaller.vcf.gz.csi"
     output:
-        norm = "results/02_snvs/{samples}.chrom.norm.haplotypeCaller.vcf.gz", # removing temp
-        csi = "results/02_snvs/{samples}.chrom.norm.haplotypeCaller.vcf.gz.csi", # removing temp
-    threads:6
+        norm = temp("results/02_snvs/{samples}.chrom.norm.haplotypeCaller.vcf.gz"),
+        csi = temp("results/02_snvs/{samples}.chrom.norm.haplotypeCaller.vcf.gz.csi"),
     conda:
         "bcftools-1.19"
     resources:
@@ -171,11 +170,11 @@ rule bcftools_norm_samples:
 rule filter_DP:
     priority:100
     input:
-        norm = "results/02_snvs/{samples}.chrom.norm.haplotypeCaller.vcf.gz", # removing temp
-        csi = "results/02_snvs/{samples}.chrom.norm.haplotypeCaller.vcf.gz.csi", # removing temp
+        norm = "results/02_snvs/{samples}.chrom.norm.haplotypeCaller.vcf.gz", 
+        csi = "results/02_snvs/{samples}.chrom.norm.haplotypeCaller.vcf.gz.csi", 
     output:
-        filtered = "results/03_filtered/{samples}.chrom.norm.DPFilt.haplotypeCaller.vcf.gz", # removing temp
-        csi = "results/03_filtered/{samples}.chrom.norm.DPFilt.haplotypeCaller.vcf.gz.csi", # removing temp
+        filtered = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.haplotypeCaller.vcf.gz"),
+        csi = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.haplotypeCaller.vcf.gz.csi"),
     threads: 8
     conda:
         "bcftools-1.19"
@@ -201,11 +200,11 @@ rule filter_DP:
 rule filter_QUAL60: 
     priority:100
     input:
-        filtered = "results/03_filtered/{samples}.chrom.norm.DPFilt.haplotypeCaller.vcf.gz", # removing temp
-        csi = "results/03_filtered/{samples}.chrom.norm.DPFilt.haplotypeCaller.vcf.gz.csi", # removing temp
+        filtered = "results/03_filtered/{samples}.chrom.norm.DPFilt.haplotypeCaller.vcf.gz",
+        csi = "results/03_filtered/{samples}.chrom.norm.DPFilt.haplotypeCaller.vcf.gz.csi",
     output:
-        filtered = "results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz", # removing temp
-        csi = "results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi", # removing temp
+        filtered = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz"),
+        csi = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi"),
     threads:8
     conda:
         "bcftools-1.19"
