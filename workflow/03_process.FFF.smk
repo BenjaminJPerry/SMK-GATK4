@@ -34,10 +34,7 @@ SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam
 
 rule all:
     input:
-        "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz",
-        "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz",
-        "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz",
-
+        "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.eva.vcf.gz"
 
 rule get_eva_snvs:
     output:
@@ -62,8 +59,8 @@ rule rename_eva_snvs:
         csi = "resources/eva/9913_GCA_002263795.2_current_ids.vcf.gz.csi"
         sed_file = "eva_rename.sed"
     output:
-        vcf = "resources/eva/9913_GCA_002263795.2_current_ids.vcf.gz",
-        csi = "resources/eva/9913_GCA_002263795.2_current_ids.vcf.gz.csi"
+        vcf = "resources/eva/9913_GCA_002263795.2_current_ids.sed.vcf.gz",
+        csi = "resources/eva/9913_GCA_002263795.2_current_ids.sed.vcf.gz.csi"
     threads: 8
     conda:
         "bcftools"
@@ -74,21 +71,23 @@ rule rename_eva_snvs:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        sed -f {input.sed_file} 
+        zcat {input.vcf} | sed -f {input.sed_file} | bcftools view --threads {threads} -O z8 -o {output.vcf} -
+
+        bcftools index --threads {threads} {output.vcf} -o {output.csi} ; 
         
         """
 
 
-rule isec_bcftools_LIC565:
+rule isec_bcftools_eva:
     priority:100
     input:
-        filtered = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.bcftools.vcf.gz",
-        csi = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.bcftools.vcf.gz.csi",
-        snps_LIC = "resources/LIC_565.ch.frmt.sorted.vcf.gz",
-        snps_LIC_csi = "resources/LIC_565.ch.frmt.sorted.vcf.gz.csi",
+        filtered = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz",
+        csi = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi",
+        eva = "resources/eva/9913_GCA_002263795.2_current_ids.sed.vcf.gz",
+        csi = "resources/eva/9913_GCA_002263795.2_current_ids.sed.vcf.gz.csi"
     output:
-        LICFiltered = temp("results/03_filtered/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.vcf.gz"),
-        csi = temp("results/03_filtered/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.vcf.gz.csi"),
+        eva_filtered = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.eva.vcf.gz",
+        csi = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.eva.vcf.gz.csi",
     threads:8
     conda:
         "bcftools"
@@ -99,15 +98,15 @@ rule isec_bcftools_LIC565:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        bcftools isec -O v -p results/03_filtered/isec_bcftools_LIC565 {input.snps_LIC} {input.filtered} ;
+        bcftools isec -O v -p results/04_merged/isec_bcftools_eva {input.eva} {input.filtered} ;
 
-        bcftools view --threads {threads} -O z8 results/03_filtered/isec_bcftools_LIC565/0001.vcf -o {output.LICFiltered} ;
+        bcftools view --threads {threads} -O z8 results/04_merged/isec_bcftools_eva/0001.vcf -o {output.eva_filtered} ;
 
-        bcftools index --threads {threads} {output.LICFiltered} -o {output.csi} ; 
+        bcftools index --threads {threads} {output.eva_filtered} -o {output.csi} ; 
 
-        rm -r results/03_filtered/isec_bcftools_LIC565 ;
+        rm -r results/04_merged/isec_bcftools_eva ;
 
-        echo "Total snps in {output.LICFiltered}: $(bcftools view --threads {threads} {output.LICFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
+        echo "Total snps in {output.eva_filtered}: $(bcftools view --threads {threads} {output.eva_filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
 
         """
 
