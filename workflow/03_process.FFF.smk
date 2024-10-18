@@ -188,11 +188,11 @@ rule ensemble_intersection:
         freebayes = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.eva.vcf.gz",
         freebayes_csi = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.eva.vcf.gz.csi",
         haplotypecaller = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.eva.vcf.gz",
-        haplotypecaller_evacsi = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.eva.vcf.gz.csi",
+        haplotypecaller_csi = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.eva.vcf.gz.csi",
     output:
         bcftools_common = "results/05_ensemble/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.eva.intersect.vcf.gz",
         freebayes_common = "results/05_ensemble/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.eva.intersect.vcf.gz",
-        haplotypeCaller_common = "results/05_ensemble/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.eva.intersect.vcf.gz",
+        haplotypecaller_common = "results/05_ensemble/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.eva.intersect.vcf.gz",
     threads:6
     conda:
         "bcftools"
@@ -205,7 +205,7 @@ rule ensemble_intersection:
     shell:
         """
 
-        bcftools isec -O z8 -p results/05_ensemble -n~111 --threads {threads} {input.bcftools} {input.freebayes} {input.haplotypeCaller};
+        bcftools isec -O z8 -p results/05_ensemble -n~111 --threads {threads} {input.bcftools} {input.freebayes} {input.haplotypecaller};
 
         mv results/05_ensemble/0000.vcf.gz {output.bcftools_common};
         echo "Total snps in {output.bcftools_common}: $(bcftools view --threads {threads} {output.bcftools_common} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
@@ -213,14 +213,14 @@ rule ensemble_intersection:
         mv results/05_ensemble/0001.vcf.gz {output.freebayes_common};
         echo "Total snps in {output.freebayes_common}: $(bcftools view --threads {threads} {output.freebayes_common} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
-        mv results/05_ensemble/0002.vcf.gz {output.haplotypeCaller_common};
-        echo "Total snps in {output.haplotypeCaller_common}: $(bcftools view --threads {threads} {output.haplotypeCaller_common} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
+        mv results/05_ensemble/0002.vcf.gz {output.haplotypecaller_common};
+        echo "Total snps in {output.haplotypecaller_common}: $(bcftools view --threads {threads} {output.haplotypecaller_common} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
         bcftools index --threads {threads} {output.bcftools_common};
 
         bcftools index --threads {threads} {output.freebayes_common};
 
-        bcftools index --threads {threads} {output.haplotypeCaller_common};
+        bcftools index --threads {threads} {output.haplotypecaller_common};
 
         rm results/05_ensemble/0000.vcf.gz.tbi
         rm results/05_ensemble/0001.vcf.gz.tbi
