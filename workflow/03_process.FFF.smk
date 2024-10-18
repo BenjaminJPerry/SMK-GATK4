@@ -34,9 +34,9 @@ SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam
 
 rule all:
     input:
-        "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.eva.vcf.gz",
-        "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.eva.vcf.gz",
-        "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.eva.vcf.gz",
+        "results/05_ensemble/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.eva.intersect.vcf.gz",
+        "results/05_ensemble/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.eva.intersect.vcf.gz",
+        "results/05_ensemble/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.eva.intersect.vcf.gz",
 
 
 rule get_eva_snvs:
@@ -183,13 +183,16 @@ rule isec_haplotypeCaller_eva:
 rule ensemble_intersection:
     priority: 100
     input:
-        bcftools = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.vcf.gz",
-        freebayes = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.vcf.gz",
-        haplotypeCaller = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.vcf.gz",
+        bcftools = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.eva.vcf.gz",
+        bcftools_csi = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.eva.vcf.gz.csi",
+        freebayes = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.eva.vcf.gz",
+        freebayes_csi = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.eva.vcf.gz.csi",
+        haplotypecaller = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.eva.vcf.gz",
+        haplotypecaller_evacsi = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.eva.vcf.gz.csi",
     output:
-        bcftools_common = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.norm.intersect.vcf.gz",
-        freebayes_common = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.norm.intersect.vcf.gz",
-        haplotypeCaller_common = "results/05_ensemble/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.norm.intersect.vcf.gz",
+        bcftools_common = "results/05_ensemble/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.eva.intersect.vcf.gz",
+        freebayes_common = "results/05_ensemble/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.eva.intersect.vcf.gz",
+        haplotypeCaller_common = "results/05_ensemble/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.eva.intersect.vcf.gz",
     threads:6
     conda:
         "bcftools"
