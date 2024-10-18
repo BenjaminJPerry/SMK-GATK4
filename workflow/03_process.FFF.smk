@@ -85,7 +85,7 @@ rule isec_bcftools_eva:
         filtered = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz",
         csi = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi",
         eva = "resources/eva/9913_GCA_002263795.2_current_ids.sed.vcf.gz",
-        csi = "resources/eva/9913_GCA_002263795.2_current_ids.sed.vcf.gz.csi"
+        eva_csi = "resources/eva/9913_GCA_002263795.2_current_ids.sed.vcf.gz.csi"
     output:
         eva_filtered = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.eva.vcf.gz",
         csi = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.eva.vcf.gz.csi",
