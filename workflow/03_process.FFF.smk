@@ -35,6 +35,8 @@ SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam
 rule all:
     input:
         "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.eva.vcf.gz",
+        "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.eva.vcf.gz",
+        "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.eva.vcf.gz",
 
 
 rule get_eva_snvs:
@@ -112,19 +114,19 @@ rule isec_bcftools_eva:
         """
 
 
-rule isec_freebayes_LIC565:
+rule isec_freebayes_eva:
     priority:100
     input:
-        filtered = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.freebayes.vcf.gz",
-        csi = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.freebayes.vcf.gz.csi",
-        snps_LIC = "resources/LIC_565.ch.frmt.sorted.vcf.gz",
-        snps_LIC_csi = "resources/LIC_565.ch.frmt.sorted.vcf.gz.csi",
+        filtered = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz",
+        csi = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz.csi",
+        eva = "resources/eva/9940_GCA_016772045.1_current_ids.sed.vcf.gz",
+        eva_csi = "resources/eva/9940_GCA_016772045.1_current_ids.sed.vcf.gz.csi"
     output:
-        LICFiltered = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.vcf.gz",
-        csi = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.vcf.gz.csi"
+        eva_filtered = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.eva.vcf.gz",
+        csi = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.eva.vcf.gz.csi",
     threads:8
     conda:
-        "bcftools"
+        "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
@@ -132,149 +134,48 @@ rule isec_freebayes_LIC565:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        bcftools isec -O v -p results/03_filtered/isec_freebayes_LIC565 {input.snps_LIC} {input.filtered} ;
+        bcftools isec -O v -p results/04_merged/isec_freebayes_eva {input.eva} {input.filtered} ;
 
-        bcftools view --threads {threads} -O z8 results/03_filtered/isec_freebayes_LIC565/0001.vcf -o {output.LICFiltered} ;
+        bcftools view --threads {threads} -O z8 results/04_merged/isec_freebayes_eva/0001.vcf -o {output.eva_filtered} ;
 
-        bcftools index --threads {threads} {output.LICFiltered} -o {output.csi} ; 
+        bcftools index --threads {threads} {output.eva_filtered} -o {output.csi} ; 
 
-        rm -r results/03_filtered/isec_freebayes_LIC565 ;
+        rm -r results/04_merged/isec_freebayes_eva ;
 
-        echo "Total snps in {output.LICFiltered}: $(bcftools view --threads {threads} {output.LICFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
+        echo "Total snps in {output.eva_filtered}: $(bcftools view --threads {threads} {output.eva_filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
 
         """
 
 
-rule isec_haplotypeCaller_LIC565:
+rule isec_haplotypeCaller_eva:
     priority:100
     input:
-        filtered = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.vcf.gz",
-        csi = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi",
-        snps_LIC = "resources/LIC_565.ch.frmt.sorted.vcf.gz",
-        snps_LIC_csi = "resources/LIC_565.ch.frmt.sorted.vcf.gz.csi",
+        filtered = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz",
+        csi = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi",
+        eva = "resources/eva/9940_GCA_016772045.1_current_ids.sed.vcf.gz",
+        eva_csi = "resources/eva/9940_GCA_016772045.1_current_ids.sed.vcf.gz.csi"
     output:
-        LICFiltered = temp("results/03_filtered/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.vcf.gz"),
-        csi = temp("results/03_filtered/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.vcf.gz.csi")
+        eva_filtered = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.eva.vcf.gz",
+        csi = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.eva.vcf.gz.csi",
     threads:8
     conda:
-        "bcftools"
+        "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
+        partition = "compute",
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        bcftools isec -O v -p results/03_filtered/isec_haplotypeCaller_LIC565 {input.snps_LIC} {input.filtered} ;
+        bcftools isec -O v -p results/04_merged/isec_haplotypeCaller_eva {input.eva} {input.filtered} ;
 
-        bcftools view --threads {threads} -O z8 results/03_filtered/isec_haplotypeCaller_LIC565/0001.vcf -o {output.LICFiltered} ;
+        bcftools view --threads {threads} -O z8 results/04_merged/isec_haplotypeCaller_eva/0001.vcf -o {output.eva_filtered} ;
 
-        bcftools index --threads {threads} {output.LICFiltered} -o {output.csi} ; 
+        bcftools index --threads {threads} {output.eva_filtered} -o {output.csi} ; 
 
-        rm -r results/03_filtered/isec_haplotypeCaller_LIC565 ;
+        rm -r results/04_merged/isec_haplotypeCaller_eva ;
 
-        echo "Total snps in {output.LICFiltered}: $(bcftools view --threads {threads} {output.LICFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
-
-        """
-
-
-rule isec_bcftools_TBulls:
-    priority:100
-    input:
-        LICFiltered = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.vcf.gz",
-        csi = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.vcf.gz.csi",
-        snps_TBulls = "resources/ARS_1000bullsgenome.frmt.sorted.vcf.gz",
-        snps_TBulls_csi = "resources/ARS_1000bullsgenome.frmt.sorted.vcf.gz.csi",
-    output:
-        TBullsFiltered = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.vcf.gz",
-        csi = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.bcftools.LIC565.TBulls.vcf.gz.csi"
-    threads:8
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        """
-        bcftools isec -O v -p results/03_filtered/isec_bcftools_TBulls {input.snps_TBulls} {input.LICFiltered} ;
-
-        bcftools view --threads {threads} -O z8 results/03_filtered/isec_bcftools_TBulls/0001.vcf -o {output.TBullsFiltered} ;
-
-        bcftools index --threads {threads} {output.TBullsFiltered} -o {output.csi} ; 
-
-        rm -r results/03_filtered/isec_bcftools_TBulls ;
-
-        echo "Total snps in {output.TBullsFiltered}: $(bcftools view --threads {threads} {output.TBullsFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
-
-        """
-
-
-rule isec_freebayes_TBulls:
-    priority:100
-    input:
-        LICFiltered = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.vcf.gz",
-        csi = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.vcf.gz.csi",
-        snps_TBulls = "resources/ARS_1000bullsgenome.frmt.sorted.vcf.gz",
-        snps_TBulls_csi = "resources/ARS_1000bullsgenome.frmt.sorted.vcf.gz.csi",
-    output:
-        TBullsFiltered = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.vcf.gz",
-        csi = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.freebayes.LIC565.TBulls.vcf.gz.csi"
-    threads:8
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        """
-        bcftools isec -O v -p results/03_filtered/isec_freebayes_TBulls {input.snps_TBulls} {input.LICFiltered} ;
-
-        bcftools view --threads {threads} -O z8 results/03_filtered/isec_freebayes_TBulls/0001.vcf -o {output.TBullsFiltered} ;
-
-        bcftools index --threads {threads} {output.TBullsFiltered} -o {output.csi} ; 
-
-        rm -r results/03_filtered/isec_freebayes_TBulls ;
-
-        echo "Total snps in {output.TBullsFiltered}: $(bcftools view --threads {threads} {output.TBullsFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
-
-        """
-
-
-rule isec_haplotypeCaller_TBulls:
-    priority:100
-    input:
-        LICFiltered = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.vcf.gz",
-        csi = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.vcf.gz.csi",
-        snps_TBulls = "resources/ARS_1000bullsgenome.frmt.sorted.vcf.gz",
-        snps_TBulls_csi = "resources/ARS_1000bullsgenome.frmt.sorted.vcf.gz.csi",
-    output:
-        TBullsFiltered = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.vcf.gz",
-        csi = "results/03_filtered/merged.chrom.private.DPFilt.QUAL60.haplotypeCaller.LIC565.TBulls.vcf.gz.csi"
-    threads:8
-    conda:
-        "bcftools"
-    resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
-        partition = "large,milan",
-        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        """
-        bcftools isec -O v -p results/03_filtered/isec_haplotypeCaller_TBulls {input.snps_TBulls} {input.LICFiltered} ;
-
-        bcftools view --threads {threads} -O z8 results/03_filtered/isec_haplotypeCaller_TBulls/0001.vcf -o {output.TBullsFiltered} ;
-
-        bcftools index --threads {threads} {output.TBullsFiltered} -o {output.csi} ; 
-
-        rm -r results/03_filtered/isec_haplotypeCaller_TBulls ;
-
-        echo "Total snps in {output.TBullsFiltered}: $(bcftools view --threads {threads} {output.TBullsFiltered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
+        echo "Total snps in {output.eva_filtered}: $(bcftools view --threads {threads} {output.eva_filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
 
         """
 
