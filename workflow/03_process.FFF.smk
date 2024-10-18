@@ -39,11 +39,11 @@ rule all:
 
 rule get_eva_snvs:
     output:
-        vcf = "resources/eva/9913_GCA_002263795.2_current_ids.vcf.gz",
-        csi = "resources/eva/9913_GCA_002263795.2_current_ids.vcf.gz.csi",
+        vcf = "resources/eva/9940_GCA_016772045.1_current_ids.vcf.gz",
+        csi = "resources/eva/9940_GCA_016772045.1_current_ids.vcf.gz.csi",
     params:
-        vcf = "https://ftp.ebi.ac.uk/pub/databases/eva/rs_releases/release_6/by_species/bos_taurus/ARSUCD1.2/9913_GCA_002263795.2_current_ids.vcf.gz",
-        index = "https://ftp.ebi.ac.uk/pub/databases/eva/rs_releases/release_6/by_species/bos_taurus/ARSUCD1.2/9913_GCA_002263795.2_current_ids.vcf.gz.csi",
+        vcf = "https://ftp.ebi.ac.uk/pub/databases/eva/rs_releases/release_6/by_species/ovis_aries/ARSUI_Ramb_v2.0/9940_GCA_016772045.1_current_ids.vcf.gz",
+        index = "https://ftp.ebi.ac.uk/pub/databases/eva/rs_releases/release_6/by_species/ovis_aries/ARSUI_Ramb_v2.0/9940_GCA_016772045.1_current_ids.vcf.gz.csi",
     threads: 2
     shell:
         """
@@ -56,8 +56,8 @@ rule get_eva_snvs:
 
 rule rename_eva_snvs:
     input:
-        vcf = "resources/eva/9913_GCA_002263795.2_current_ids.vcf.gz",
-        csi = "resources/eva/9913_GCA_002263795.2_current_ids.vcf.gz.csi",
+        vcf = "resources/eva/9940_GCA_016772045.1_current_ids.vcf.gz",
+        csi = "resources/eva/9940_GCA_016772045.1_current_ids.vcf.gz.csi",
         sed_file = "resources/eva_rename.sed",
     output:
         vcf = "resources/eva/9913_GCA_002263795.2_current_ids.sed.vcf.gz",
