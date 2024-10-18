@@ -34,12 +34,13 @@ SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam
 
 rule all:
     input:
-        "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.eva.vcf.gz"
+        "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.eva.vcf.gz",
+
 
 rule get_eva_snvs:
     output:
         vcf = "resources/eva/9913_GCA_002263795.2_current_ids.vcf.gz",
-        csi = "resources/eva/9913_GCA_002263795.2_current_ids.vcf.gz.csi"
+        csi = "resources/eva/9913_GCA_002263795.2_current_ids.vcf.gz.csi",
     params:
         vcf = "https://ftp.ebi.ac.uk/pub/databases/eva/rs_releases/release_6/by_species/bos_taurus/ARSUCD1.2/9913_GCA_002263795.2_current_ids.vcf.gz",
         index = "https://ftp.ebi.ac.uk/pub/databases/eva/rs_releases/release_6/by_species/bos_taurus/ARSUCD1.2/9913_GCA_002263795.2_current_ids.vcf.gz.csi",
@@ -56,11 +57,11 @@ rule get_eva_snvs:
 rule rename_eva_snvs:
     input:
         vcf = "resources/eva/9913_GCA_002263795.2_current_ids.vcf.gz",
-        csi = "resources/eva/9913_GCA_002263795.2_current_ids.vcf.gz.csi"
-        sed_file = "eva_rename.sed"
+        csi = "resources/eva/9913_GCA_002263795.2_current_ids.vcf.gz.csi",
+        sed_file = "eva_rename.sed",
     output:
         vcf = "resources/eva/9913_GCA_002263795.2_current_ids.sed.vcf.gz",
-        csi = "resources/eva/9913_GCA_002263795.2_current_ids.sed.vcf.gz.csi"
+        csi = "resources/eva/9913_GCA_002263795.2_current_ids.sed.vcf.gz.csi",
     threads: 8
     conda:
         "bcftools"
