@@ -64,7 +64,7 @@ rule rename_eva_snvs:
         csi = "resources/eva/9913_GCA_002263795.2_current_ids.sed.vcf.gz.csi",
     threads: 8
     conda:
-        "bcftools"
+        "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
@@ -91,7 +91,7 @@ rule isec_bcftools_eva:
         csi = "results/04_merged/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.eva.vcf.gz.csi",
     threads:8
     conda:
-        "bcftools"
+        "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
