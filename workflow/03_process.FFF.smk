@@ -58,7 +58,7 @@ rule rename_eva_snvs:
     input:
         vcf = "resources/eva/9913_GCA_002263795.2_current_ids.vcf.gz",
         csi = "resources/eva/9913_GCA_002263795.2_current_ids.vcf.gz.csi",
-        sed_file = "eva_rename.sed",
+        sed_file = "resources/eva_rename.sed",
     output:
         vcf = "resources/eva/9913_GCA_002263795.2_current_ids.sed.vcf.gz",
         csi = "resources/eva/9913_GCA_002263795.2_current_ids.sed.vcf.gz.csi",
