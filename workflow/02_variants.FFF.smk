@@ -130,66 +130,6 @@ rule norm_samples_bcftools:
         """
 
 
-# rule filter_DP_bcftools:
-#     priority:100
-#     input:
-#         norm = "results/03_filtered/{samples}.chrom.norm.bcftools.vcf.gz",
-#         csi = "results/03_filtered/{samples}.chrom.norm.bcftools.vcf.gz.csi",
-#     output:
-#         filtered = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.bcftools.vcf.gz"),
-#         csi = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.bcftools.vcf.gz.csi"),
-#     threads: 8
-#     conda:
-#         "bcftools-1.19"
-#     resources:
-#         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-#         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
-#         partition = "compute",
-#         DTMP = "tmp",
-#         attempt = lambda wildcards, attempt: attempt,
-#     shell:
-#         """
-#         # -e is 'exclude'
-
-#         bcftools view --threads {threads} -e 'INFO/DP<5 || INFO/DP>2500' {input.norm} -O z8 -o {output.filtered};
-
-#         bcftools index --threads {threads} {output.filtered} -o {output.csi};
-
-#         echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-
-#         """
-
-
-# rule filter_QUAL60_bcftools: 
-#     priority:100
-#     input:
-#         dpfiltered = "results/03_filtered/{samples}.chrom.norm.DPFilt.bcftools.vcf.gz",
-#         csi = "results/03_filtered/{samples}.chrom.norm.DPFilt.bcftools.vcf.gz.csi",
-#     output:
-#         filtered = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz"),
-#         csi = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi"),
-#     threads:8
-#     conda:
-#         "bcftools-1.19"
-#     resources:
-#         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-#         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
-#         partition = "compute",
-#         DTMP = "tmp",
-#         attempt = lambda wildcards, attempt: attempt,
-#     shell:
-#         '''
-#         # -e is 'exclude'
-
-#         bcftools view -e 'QUAL<60' {input.dpfiltered} -O z8 -o {output.filtered};
-
-#         bcftools index --threads {threads} {output.filtered} -o {output.csi};
-
-#         echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-
-#         '''
-
-
 rule merge_bcftools_vcf:
     priority:100
     input:
@@ -319,66 +259,6 @@ rule norm_samples_freebayes:
         bcftools index --threads {threads} {output.norm};
     
         """
-
-
-# rule filter_DP_freebayes:
-#     priority:100
-#     input:
-#         norm = "results/03_filtered/{samples}.chrom.norm.freebayes.vcf.gz",
-#         csi = "results/03_filtered/{samples}.chrom.norm.freebayes.vcf.gz.csi",
-#     output:
-#         filtered = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.freebayes.vcf.gz"),
-#         csi = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.freebayes.vcf.gz.csi"),
-#     threads: 8
-#     conda:
-#         "bcftools-1.19"
-#     resources:
-#         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-#         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
-#         partition = "compute",
-#         DTMP = "tmp",
-#         attempt = lambda wildcards, attempt: attempt,
-#     shell:
-#         """
-#         # -e is 'exclude'
-
-#         bcftools view --threads {threads} -e 'INFO/DP<5 || INFO/DP>2500' {input.norm} -O z8 -o {output.filtered};
-
-#         bcftools index --threads {threads} {output.filtered} -o {output.csi};
-
-#         echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-
-#         """
-
-
-# rule filter_QUAL60_freebayes: 
-#     priority:100
-#     input:
-#         dpfiltered = "results/03_filtered/{samples}.chrom.norm.DPFilt.freebayes.vcf.gz",
-#         csi = "results/03_filtered/{samples}.chrom.norm.DPFilt.freebayes.vcf.gz.csi",
-#     output:
-#         filtered = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz"),
-#         csi = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz.csi"),
-#     threads:8
-#     conda:
-#         "bcftools-1.19"
-#     resources:
-#         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-#         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
-#         partition = "compute",
-#         DTMP = "tmp",
-#         attempt = lambda wildcards, attempt: attempt,
-#     shell:
-#         '''
-#         # -e is 'exclude'
-
-#         bcftools view -e 'QUAL<60' {input.dpfiltered} -O z8 -o {output.filtered};
-
-#         bcftools index --threads {threads} {output.filtered} -o {output.csi};
-
-#         echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-
-#         '''
 
 
 rule merge_freebayes_vcf:

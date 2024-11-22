@@ -168,66 +168,6 @@ rule bcftools_norm_samples:
         """
 
 
-# rule filter_DP:
-#     priority:100
-#     input:
-#         norm = "results/03_filtered/{samples}.chrom.norm.haplotypeCaller.vcf.gz", 
-#         csi = "results/03_filtered/{samples}.chrom.norm.haplotypeCaller.vcf.gz.csi", 
-#     output:
-#         filtered = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.haplotypeCaller.vcf.gz"),
-#         csi = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.haplotypeCaller.vcf.gz.csi"),
-#     threads: 8
-#     conda:
-#         "bcftools-1.19"
-#     resources:
-#         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-#         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
-#         partition = "compute",
-#         DTMP = "tmp",
-#         attempt = lambda wildcards, attempt: attempt,
-#     shell:
-#         """
-#         # -e is 'exclude'
-
-#         bcftools view --threads {threads} -e 'INFO/DP<2 || INFO/DP>2500' {input.norm} -O z8 -o {output.filtered};
-
-#         bcftools index --threads {threads} {output.filtered} -o {output.csi};
-
-#         echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-
-#         """
-
-
-# rule filter_QUAL60: 
-#     priority:100
-#     input:
-#         filtered = "results/03_filtered/{samples}.chrom.norm.DPFilt.haplotypeCaller.vcf.gz",
-#         csi = "results/03_filtered/{samples}.chrom.norm.DPFilt.haplotypeCaller.vcf.gz.csi",
-#     output:
-#         filtered = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz"),
-#         csi = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi"),
-#     threads:8
-#     conda:
-#         "bcftools-1.19"
-#     resources:
-#         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-#         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
-#         partition = "compute",
-#         DTMP = "tmp",
-#         attempt = lambda wildcards, attempt: attempt,
-#     shell:
-#         '''
-#         # -e is 'exclude'
-
-#         bcftools view -e 'QUAL<60' {input.filtered} -O z8 -o {output.filtered};
-
-#         bcftools index --threads {threads} {output.filtered} -o {output.csi};
-
-#         echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-
-#         '''
-
-
 rule merge_animals_vcf:
     priority:100
     input:
