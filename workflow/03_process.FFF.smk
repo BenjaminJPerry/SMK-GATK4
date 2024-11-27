@@ -458,7 +458,7 @@ rule ensemble_intersection:
         bcftools_csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.bcftools.vcf.gz.csi",
         freebayes = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.freebayes.vcf.gz",
         freebayes_csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.freebayes.vcf.gz.csi",
-        haplotypeCaller = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.haplotypeCaller.vcf.gz,
+        haplotypeCaller = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.haplotypeCaller.vcf.gz",
         haplotypeCaller_csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.haplotypeCaller.vcf.gz.csi",
     output:
         bcftools_common = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.bcftools.intersect.vcf.gz",
