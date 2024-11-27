@@ -34,9 +34,9 @@ SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam
 
 rule all:
     input:
-        "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.bcftools.intersect.vcf.gz",
-        "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.freebayes.intersect.vcf.gz",
-        "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.haplotypeCaller.intersect.vcf.gz",
+        "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.bcftools.intersect.vcf.gz",
+        "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.freebayes.intersect.vcf.gz",
+        "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.haplotypeCaller.intersect.vcf.gz",
 
 
 rule get_eva_snvs:
@@ -112,14 +112,14 @@ rule filter_DP_bcftools:
         """
 
 
-rule filter_QUAL60_bcftools: 
+rule filter_QUAL30_bcftools: 
     priority:100
     input:
         filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.bcftools.vcf.gz",
         csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.bcftools.vcf.gz.csi",
     output:
-        filtered = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz"),
-        csi = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi"),
+        filtered = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.bcftools.vcf.gz"),
+        csi = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.bcftools.vcf.gz.csi"),
     threads:8
     conda:
         "bcftools-1.19"
@@ -133,7 +133,7 @@ rule filter_QUAL60_bcftools:
         '''
         # -e is 'exclude'
 
-        bcftools view -e 'QUAL<60' {input.filtered} -O z8 -o {output.filtered};
+        bcftools view -e 'QUAL<30' {input.filtered} -O z8 -o {output.filtered};
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi};
 
@@ -145,13 +145,13 @@ rule filter_QUAL60_bcftools:
 rule isec_bcftools_eva:
     priority:100
     input:
-        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz",
-        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi",
+        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.bcftools.vcf.gz",
+        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.bcftools.vcf.gz.csi",
         eva = "resources/eva/9940_GCA_016772045.1_current_ids.sed.vcf.gz",
         eva_csi = "resources/eva/9940_GCA_016772045.1_current_ids.sed.vcf.gz.csi"
     output:
-        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.bcftools.vcf.gz",
-        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.bcftools.vcf.gz.csi",
+        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.bcftools.vcf.gz",
+        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.bcftools.vcf.gz.csi",
     threads:8
     conda:
         "bcftools-1.19"
@@ -178,11 +178,11 @@ rule isec_bcftools_eva:
 rule filter_monomorphic_bcftools: 
     priority:100
     input:
-        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.bcftools.vcf.gz",
-        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.bcftools.vcf.gz.csi",
+        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.bcftools.vcf.gz",
+        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.bcftools.vcf.gz.csi",
     output:
-        filtered = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.bcftools.vcf.gz"),
-        csi = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.bcftools.vcf.gz.csi"),
+        filtered = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.bcftools.vcf.gz"),
+        csi = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.bcftools.vcf.gz.csi"),
     threads:8
     conda:
         "bcftools-1.19"
@@ -235,14 +235,14 @@ rule filter_DP_freebayes:
         """
 
 
-rule filter_QUAL60_freebayes: 
+rule filter_QUAL30_freebayes: 
     priority:100
     input:
         filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.freebayes.vcf.gz",
         csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.freebayes.vcf.gz.csi",
     output:
-        filtered = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz"),
-        csi = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz.csi"),
+        filtered = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.freebayes.vcf.gz"),
+        csi = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.freebayes.vcf.gz.csi"),
     threads:8
     conda:
         "bcftools-1.19"
@@ -256,7 +256,7 @@ rule filter_QUAL60_freebayes:
         '''
         # -e is 'exclude'
 
-        bcftools view -e 'QUAL<60' {input.filtered} -O z8 -o {output.filtered};
+        bcftools view -e 'QUAL<30' {input.filtered} -O z8 -o {output.filtered};
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi};
 
@@ -268,13 +268,13 @@ rule filter_QUAL60_freebayes:
 rule isec_freebayes_eva:
     priority:100
     input:
-        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz",
-        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.freebayes.vcf.gz.csi",
+        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.freebayes.vcf.gz",
+        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.freebayes.vcf.gz.csi",
         eva = "resources/eva/9940_GCA_016772045.1_current_ids.sed.vcf.gz",
         eva_csi = "resources/eva/9940_GCA_016772045.1_current_ids.sed.vcf.gz.csi"
     output:
-        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.freebayes.vcf.gz",
-        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.freebayes.vcf.gz.csi",
+        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.freebayes.vcf.gz",
+        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.freebayes.vcf.gz.csi",
     threads:8
     conda:
         "bcftools-1.19"
@@ -301,11 +301,11 @@ rule isec_freebayes_eva:
 rule filter_monomorphic_freebayes: 
     priority:100
     input:
-        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.freebayes.vcf.gz",
-        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.freebayes.vcf.gz.csi",
+        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.freebayes.vcf.gz",
+        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.freebayes.vcf.gz.csi",
     output:
-        filtered = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.freebayes.vcf.gz"),
-        csi = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.freebayes.vcf.gz.csi"),
+        filtered = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.freebayes.vcf.gz"),
+        csi = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.freebayes.vcf.gz.csi"),
     threads:8
     conda:
         "bcftools-1.19"
@@ -358,14 +358,14 @@ rule filter_DP_haplotypeCaller:
         """
 
 
-rule filter_QUAL60_haplotypeCaller: 
+rule filter_QUAL30_haplotypeCaller: 
     priority:100
     input:
         filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.haplotypeCaller.vcf.gz",
         csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.haplotypeCaller.vcf.gz.csi",
     output:
-        filtered = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz"),
-        csi = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi"),
+        filtered = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.haplotypeCaller.vcf.gz"),
+        csi = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.haplotypeCaller.vcf.gz.csi"),
     threads:8
     conda:
         "bcftools-1.19"
@@ -379,7 +379,7 @@ rule filter_QUAL60_haplotypeCaller:
         '''
         # -e is 'exclude'
 
-        bcftools view -e 'QUAL<60' {input.filtered} -O z8 -o {output.filtered};
+        bcftools view -e 'QUAL<30' {input.filtered} -O z8 -o {output.filtered};
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi};
 
@@ -391,13 +391,13 @@ rule filter_QUAL60_haplotypeCaller:
 rule isec_haplotypeCaller_eva:
     priority:100
     input:
-        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz",
-        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.haplotypeCaller.vcf.gz.csi",
+        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.haplotypeCaller.vcf.gz",
+        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.haplotypeCaller.vcf.gz.csi",
         eva = "resources/eva/9940_GCA_016772045.1_current_ids.sed.vcf.gz",
         eva_csi = "resources/eva/9940_GCA_016772045.1_current_ids.sed.vcf.gz.csi"
     output:
-        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.haplotypeCaller.vcf.gz",
-        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.haplotypeCaller.vcf.gz.csi",
+        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.haplotypeCaller.vcf.gz",
+        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.haplotypeCaller.vcf.gz.csi",
     threads:8
     conda:
         "bcftools-1.19"
@@ -424,11 +424,11 @@ rule isec_haplotypeCaller_eva:
 rule filter_monomorphic_haplotypeCaller: 
     priority:100
     input:
-        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.haplotypeCaller.vcf.gz",
-        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.haplotypeCaller.vcf.gz.csi",
+        filtered = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.haplotypeCaller.vcf.gz",
+        csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.haplotypeCaller.vcf.gz.csi",
     output:
-        filtered = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.haplotypeCaller.vcf.gz"),
-        csi = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.haplotypeCaller.vcf.gz.csi"),
+        filtered = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.haplotypeCaller.vcf.gz"),
+        csi = temp("results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.haplotypeCaller.vcf.gz.csi"),
     threads:8
     conda:
         "bcftools-1.19"
@@ -454,16 +454,16 @@ rule filter_monomorphic_haplotypeCaller:
 rule ensemble_intersection:
     priority: 100
     input:
-        bcftools = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.bcftools.vcf.gz",
-        bcftools_csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.bcftools.vcf.gz.csi",
-        freebayes = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.freebayes.vcf.gz",
-        freebayes_csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.freebayes.vcf.gz.csi",
-        haplotypeCaller = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.haplotypeCaller.vcf.gz,
-        haplotypeCaller_csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.haplotypeCaller.vcf.gz.csi",
+        bcftools = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.bcftools.vcf.gz",
+        bcftools_csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.bcftools.vcf.gz.csi",
+        freebayes = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.freebayes.vcf.gz",
+        freebayes_csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.freebayes.vcf.gz.csi",
+        haplotypeCaller = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.haplotypeCaller.vcf.gz,
+        haplotypeCaller_csi = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.haplotypeCaller.vcf.gz.csi",
     output:
-        bcftools_common = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.bcftools.intersect.vcf.gz",
-        freebayes_common = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.freebayes.intersect.vcf.gz",
-        haplotypeCaller_common = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL60.eva.monomorphic.haplotypeCaller.intersect.vcf.gz",
+        bcftools_common = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.bcftools.intersect.vcf.gz",
+        freebayes_common = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.freebayes.intersect.vcf.gz",
+        haplotypeCaller_common = "results/03_filtered/merged.FFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.haplotypeCaller.intersect.vcf.gz",
     threads:6
     conda:
         "bcftools-1.19"
