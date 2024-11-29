@@ -285,13 +285,13 @@ rule isec_freebayes_eva:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        bcftools isec -O v -p results/03_merged/isec_bcftools_eva {input.eva} {input.filtered} ;
+        bcftools isec -O v -p results/03_merged/isec_freebayes_eva {input.eva} {input.filtered} ;
 
-        bcftools view --threads {threads} -O z8 results/03_merged/isec_bcftools_eva/0001.vcf -o {output.filtered} ;
+        bcftools view --threads {threads} -O z8 results/03_merged/isec_freebayes_eva/0001.vcf -o {output.filtered} ;
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi} ; 
 
-        rm -r results/03_merged/isec_bcftools_eva ;
+        rm -r results/03_merged/isec_freebayes_eva ;
 
         echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
 
@@ -408,13 +408,13 @@ rule isec_haplotypeCaller_eva:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        bcftools isec -O v -p results/03_merged/isec_bcftools_eva {input.eva} {input.filtered} ;
+        bcftools isec -O v -p results/03_merged/isec_haplotypeCaller_eva {input.eva} {input.filtered} ;
 
-        bcftools view --threads {threads} -O z8 results/03_merged/isec_bcftools_eva/0001.vcf -o {output.filtered} ;
+        bcftools view --threads {threads} -O z8 results/03_merged/isec_haplotypeCaller_eva/0001.vcf -o {output.filtered} ;
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi} ; 
 
-        rm -r results/03_merged/isec_bcftools_eva ;
+        rm -r results/03_merged/isec_haplotypeCaller_eva ;
 
         echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
 
