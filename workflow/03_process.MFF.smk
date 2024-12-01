@@ -195,7 +195,7 @@ rule filter_monomorphic_bcftools:
     shell:
         '''
 
-        zcat {input.filtered} | grep -P -v "0\/1\S+\t0\/1\S+\t0\/1\S+\t0\/1\S+" | grep -P -v "1\/1\S+\t1\/1\S+\t1\/1\S+\t1\/1\S+" |  bcftools view - -O z8 -o {output.filtered};
+        zcat {input.filtered} | grep -P -v "0\/1\S+\t0\/1\S+" | grep -P -v "1\/1\S+\t1\/1\S+" |  bcftools view - -O z8 -o {output.filtered};
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi};
 
