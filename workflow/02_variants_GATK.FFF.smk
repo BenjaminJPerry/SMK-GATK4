@@ -64,8 +64,10 @@ rule gatk_HaplotypeCaller_vcf:
         'gatk --java-options "-Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}"  '
         'HaplotypeCaller '
         '--pileup-detection '
-        '--min-base-quality-score 30 '
-        '--minimum-mapping-quality 30 '
+        '--min-base-quality-score 10 ' # default 10
+        '--minimum-mapping-quality 20 ' # default 20
+        '--standard-min-confidence-threshold-for-calling 10 ' # default 30; default 10 pre v4.1
+        '--indel-size-to-eliminate-in-ref-model 20 ' #default 10
         '--create-output-variant-index '
         '-R {input.referenceGenome} '
         '-I {input.bam} '

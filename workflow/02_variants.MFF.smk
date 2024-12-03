@@ -56,10 +56,10 @@ rule bcftools_vcf:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         "bcftools mpileup --seed 1953 --threads {threads} "
-        # "--max-depth 250 " # Max raw per-file depth; avoids excessive memory usage [250]
-        "-q 30 " # skip alignment with mapQ less than
-        "-Q 30 " # Skip bases with baseQ/BAQ less than
-        "-m 2 " # Minimum number gapped reads for indel candidates; default 2
+        "--max-depth 250 " # default 250
+        "--min-MQ 20 " # default 0
+        "--min-BQ 10 " # default 1
+        "--min-ireads 2 " # default 2
         "-f {input.referenceGenome} "
         "{input.bam} "
         "| bcftools call "
@@ -130,66 +130,6 @@ rule norm_samples_bcftools:
         """
 
 
-# rule filter_DP_bcftools:
-#     priority:100
-#     input:
-#         norm = "results/03_filtered/{samples}.chrom.norm.bcftools.vcf.gz",
-#         csi = "results/03_filtered/{samples}.chrom.norm.bcftools.vcf.gz.csi",
-#     output:
-#         filtered = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.bcftools.vcf.gz"),
-#         csi = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.bcftools.vcf.gz.csi"),
-#     threads: 8
-#     conda:
-#         "bcftools-1.19"
-#     resources:
-#         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-#         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
-#         partition = "compute",
-#         DTMP = "tmp",
-#         attempt = lambda wildcards, attempt: attempt,
-#     shell:
-#         """
-#         # -e is 'exclude'
-
-#         bcftools view --threads {threads} -e 'INFO/DP<2 || INFO/DP>2500' {input.norm} -O z8 -o {output.filtered};
-
-#         bcftools index --threads {threads} {output.filtered} -o {output.csi};
-
-#         echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-
-#         """
-
-
-# rule filter_QUAL60_bcftools: 
-#     priority:100
-#     input:
-#         dpfiltered = "results/03_filtered/{samples}.chrom.norm.DPFilt.bcftools.vcf.gz",
-#         csi = "results/03_filtered/{samples}.chrom.norm.DPFilt.bcftools.vcf.gz.csi",
-#     output:
-#         filtered = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz"),
-#         csi = temp("results/03_filtered/{samples}.chrom.norm.DPFilt.QUAL60.bcftools.vcf.gz.csi"),
-#     threads:8
-#     conda:
-#         "bcftools-1.19"
-#     resources:
-#         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-#         time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
-#         partition = "compute",
-#         DTMP = "tmp",
-#         attempt = lambda wildcards, attempt: attempt,
-#     shell:
-#         '''
-#         # -e is 'exclude'
-
-#         bcftools view -e 'QUAL<60' {input.dpfiltered} -O z8 -o {output.filtered};
-
-#         bcftools index --threads {threads} {output.filtered} -o {output.csi};
-
-#         echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-
-#         '''
-
-
 rule merge_bcftools_vcf:
     priority:100
     input:
@@ -246,15 +186,13 @@ rule freebayes_vcf:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         "freebayes "
-        "-m 30 "
-        "-q 30 "
-        #"--min-coverage 2 "
-        # "--standard-filters " # Use stringent input base and mapping quality filters. Equivalent to -m 30 -q 20 -R 0 -S 0
-        # "--limit-coverage 250 " # Match the other variant callers
+        "--min-base-quality 10 " # default 0
+        "--min-mapping-quality 20 " # default 1
+        "--haplotype-length 0 " # default 3
         "--pooled-continuous " # Output all alleles which pass input filters, regardles of genotyping outcome or model.
-        #"--trim-complex-tail " # Trim complex tails.
-        "-F 0.05 " # minimum fraction of observations supporting alternate allele within one individual [0.05]
-        "-C 2 "
+        "--min-alternate-fraction 0.05 " # default 0.05
+        "--min-alternate-count 2 "
+        "--limit-coverage 250 "
         "-f {input.referenceGenome} {input.bam} "
         "| bcftools view --threads {threads} -O z8 -o {output.vcfgz}; "
         "bcftools index --threads {threads} {output.vcfgz} -o  {output.csi} "
