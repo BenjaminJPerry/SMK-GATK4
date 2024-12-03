@@ -55,7 +55,7 @@ rule gatk_HaplotypeCaller_vcf:
     threads: 4
     resources:
         mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 12),
-        time = lambda wildcards, attempt: 240 + ((attempt - 1) * 240),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
         partition = "compute",
         DTMP = "tmp",
         attempt = lambda wildcards, attempt: attempt,

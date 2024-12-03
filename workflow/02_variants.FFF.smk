@@ -50,7 +50,7 @@ rule bcftools_vcf:
         "bcftools-1.19"
     resources:
         mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-        time = lambda wildcards, attempt: 720 + ((attempt - 1) * 720),
+        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
         partition = "compute",
         DTMP = "tmp",
         attempt = lambda wildcards, attempt: attempt,
@@ -180,7 +180,7 @@ rule freebayes_vcf:
         "freebayes-1.3.8"
     resources:
         mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 12),
-        time = lambda wildcards, attempt: 1440 + ((attempt - 1) * 1440),
+        time = lambda wildcards, attempt: 2880 + ((attempt - 1) * 1440),
         partition = "compute",
         DTMP = "tmp",
         attempt = lambda wildcards, attempt: attempt,
