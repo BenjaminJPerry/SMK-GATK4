@@ -28,8 +28,8 @@ SAMPLES = ('1941', '1927', '1936', '1938')
 
 rule all:
     input:
-        "results/04_merged/merged.FFF.chrom.norm.bcftools.vcf.gz",
-        "results/04_merged/merged.FFF.chrom.norm.freebayes.vcf.gz",
+        "results/03_merged/merged.FFF.chrom.norm.bcftools.vcf.gz",
+        "results/03_merged/merged.FFF.chrom.norm.freebayes.vcf.gz",
 
 
 ### bcftools 
