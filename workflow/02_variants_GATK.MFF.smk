@@ -32,8 +32,8 @@ wildcard_constraints:
 
 rule all:
     input:
-        "results/04_merged/merged.MFF.chrom.norm.haplotypeCaller.vcf.gz",
-        "results/04_merged/merged.MFF.chrom.norm.haplotypeCaller.vcf.gz.csi"
+        "results/03_merged/merged.MFF.chrom.norm.haplotypeCaller.vcf.gz",
+        "results/03_merged/merged.MFF.chrom.norm.haplotypeCaller.vcf.gz.csi"
 
 
 rule gatk_HaplotypeCaller_vcf:
@@ -62,7 +62,7 @@ rule gatk_HaplotypeCaller_vcf:
     shell:
         'gatk --java-options "-Xmx{resources.mem_gb}G -XX:ParallelGCThreads={threads}"  '
         'HaplotypeCaller '
-        # '--base-quality-score-threshold 30 ' 
+        '--pileup-detection '
         '--min-base-quality-score 30 '
         '--minimum-mapping-quality 30 '
         '--create-output-variant-index '
@@ -111,8 +111,8 @@ rule view_haplotype_chrom:
         vcf = "results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz",
         csi = "results/02_snvs/{samples}.rawsnvs.haplotypeCaller.vcf.gz.csi",
     output:
-        filtered_vcf = temp("results/03_filtered/{samples}.chrom.haplotypeCaller.vcf.gz",),
-        filtered_vcf_csi = temp("results/03_filtered/{samples}.chrom.haplotypeCaller.vcf.gz.csi"),
+        filtered_vcf = temp("results/03_merged/{samples}.chrom.haplotypeCaller.vcf.gz",),
+        filtered_vcf_csi = temp("results/03_merged/{samples}.chrom.haplotypeCaller.vcf.gz.csi"),
     params:
         chromosomes = "NC_056054.1,NC_056055.1,NC_056056.1,NC_056057.1,NC_056058.1,NC_056059.1,NC_056060.1,NC_056061.1,NC_056062.1,NC_056063.1,NC_056064.1,NC_056065.1,NC_056066.1,NC_056067.1,NC_056068.1,NC_056069.1,NC_056070.1,NC_056071.1,NC_056072.1,NC_056073.1,NC_056074.1,NC_056075.1,NC_056076.1,NC_056077.1,NC_056078.1,NC_056079.1,NC_056080.1"
 
@@ -142,11 +142,11 @@ rule view_haplotype_chrom:
 rule bcftools_norm_samples:
     priority: 100
     input:
-        unnormal = "results/03_filtered/{samples}.chrom.haplotypeCaller.vcf.gz",
-        filtered_vcf_csi = "results/03_filtered/{samples}.chrom.haplotypeCaller.vcf.gz.csi"
+        unnormal = "results/03_merged/{samples}.chrom.haplotypeCaller.vcf.gz",
+        filtered_vcf_csi = "results/03_merged/{samples}.chrom.haplotypeCaller.vcf.gz.csi"
     output:
-        norm = temp("results/03_filtered/{samples}.chrom.norm.haplotypeCaller.vcf.gz"),
-        csi = temp("results/03_filtered/{samples}.chrom.norm.haplotypeCaller.vcf.gz.csi"),
+        norm = temp("results/03_merged/{samples}.chrom.norm.haplotypeCaller.vcf.gz"),
+        csi = temp("results/03_merged/{samples}.chrom.norm.haplotypeCaller.vcf.gz.csi"),
     threads:6
     conda:
         "bcftools-1.19"
@@ -231,11 +231,11 @@ rule bcftools_norm_samples:
 rule merge_animals_vcf:
     priority:100
     input:
-        vcfgz = expand("results/03_filtered/{samples}.chrom.norm.haplotypeCaller.vcf.gz", samples = SAMPLES),
-        csi = expand("results/03_filtered/{samples}.chrom.norm.haplotypeCaller.vcf.gz.csi", samples = SAMPLES),
+        vcfgz = expand("results/03_merged/{samples}.chrom.norm.haplotypeCaller.vcf.gz", samples = SAMPLES),
+        csi = expand("results/03_merged/{samples}.chrom.norm.haplotypeCaller.vcf.gz.csi", samples = SAMPLES),
     output:
-        merged = "results/04_merged/merged.MFF.chrom.norm.haplotypeCaller.vcf.gz",
-        csi = "results/04_merged/merged.MFF.chrom.norm.haplotypeCaller.vcf.gz.csi",
+        merged = "results/03_merged/merged.MFF.chrom.norm.haplotypeCaller.vcf.gz",
+        csi = "results/03_merged/merged.MFF.chrom.norm.haplotypeCaller.vcf.gz.csi",
     benchmark:
         "benchmarks/merge_animals_vcf.tsv"
     threads: 16
