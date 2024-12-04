@@ -375,9 +375,9 @@ rule ensemble_intersection:
         bcftools_common = "results/04_filtered/merged.FFF.chrom.norm.monomorphic.DPFilt.eva.bcftools.intersection.vcf.gz",
         bcftools_common_csi = "results/04_filtered/merged.FFF.chrom.norm.monomorphic.DPFilt.eva.bcftools.intersection.vcf.gz.csi",
         freebayes_common = "results/04_filtered/merged.FFF.chrom.norm.monomorphic.DPFilt.eva.freebayes.intersection.vcf.gz",
-        bcftools_common_csi = "results/04_filtered/merged.FFF.chrom.norm.monomorphic.DPFilt.eva.freebayes.intersection.vcf.gz.csi",
+        freebayes_common_csi = "results/04_filtered/merged.FFF.chrom.norm.monomorphic.DPFilt.eva.freebayes.intersection.vcf.gz.csi",
         haplotypeCaller_common = "results/04_filtered/merged.FFF.chrom.norm.monomorphic.DPFilt.eva.haplotypeCaller.intersection.vcf.gz",
-        bcftools_common_csi = "results/04_filtered/merged.FFF.chrom.norm.monomorphic.DPFilt.eva.haplotypeCaller.intersection.vcf.gz.csi",
+        haplotypeCaller_common_csi = "results/04_filtered/merged.FFF.chrom.norm.monomorphic.DPFilt.eva.haplotypeCaller.intersection.vcf.gz.csi",
     threads:6
     conda:
         "bcftools-1.19"
