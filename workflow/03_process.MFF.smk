@@ -23,20 +23,21 @@ onstart:
     os.system('echo "  CONDA VERSION: $(conda --version)"')
 
 
-SAMPLES, = glob_wildcards("results/01_mapping/{samples}.sorted.mkdups.merged.bam")
+SAMPLES = ('1945', 'OFF3')
 
 
 # ENTRY POINTS
-        # "results/04_merged/merged.MFF.chrom.norm.bcftools.vcf.gz",
-        # "results/04_merged/merged.MFF.chrom.norm.freebayes.vcf.gz",
-        # "results/04_merged/merged.MFF.chrom.norm.haplotypeCaller.vcf.gz",
+        # "results/03_merged/merged.MFF.chrom.norm.bcftools.vcf.gz",
+        # "results/03_merged/merged.MFF.chrom.norm.freebayes.vcf.gz",
+        # "results/03_merged/merged.MFF.chrom.norm.haplotypeCaller.vcf.gz",
 
 
 rule all:
     input:
-        "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.bcftools.intersect.vcf.gz",
-        "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.freebayes.intersect.vcf.gz",
-        "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.haplotypeCaller.intersect.vcf.gz",
+        "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.bcftools.intersection.vcf.gz",
+        "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.freebayes.intersection.vcf.gz",
+        "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.haplotypeCaller.intersection.vcf.gz",
+        expand("results/05_private/{samples}.MFF.norm.monomorphic.DPFilt.eva.bcftools.intersection.vcf.gz", samples = SAMPLES),
 
 
 rule get_eva_snvs:
@@ -82,14 +83,43 @@ rule rename_eva_snvs:
 
 
 # BCFTOOLS
+rule filter_monomorphic_bcftools: 
+    priority:100
+    input:
+        norm = "results/03_merged/merged.MFF.chrom.norm.bcftools.vcf.gz",
+        csi = "results/03_merged/merged.MFF.chrom.norm.bcftools.vcf.gz.csi",
+    output:
+        filtered = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.bcftools.vcf.gz"),
+        csi = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.bcftools.vcf.gz.csi"),
+    threads:8
+    conda:
+        "bcftools-1.19"
+    resources:
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
+        partition = "compute",
+        DTMP = "tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        '''
+
+        zcat {input.filtered} | grep -P -v "0\/1\S+\t0\/1\S+" | grep -P -v "1\/1\S+\t1\/1\S+" |  bcftools view - -O z8 -o {output.filtered};
+
+        bcftools index --threads {threads} {output.filtered} -o {output.csi};
+
+        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
+
+        '''
+
+
 rule filter_DP_bcftools:
     priority:100
     input:
-        norm = "results/04_merged/merged.MFF.chrom.norm.bcftools.vcf.gz",
-        csi = "results/04_merged/merged.MFF.chrom.norm.bcftools.vcf.gz.csi",
+        norm = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.bcftools.vcf.gz",
+        csi = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.bcftools.vcf.gz.csi",
     output:
-        filtered = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.bcftools.vcf.gz"),
-        csi = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.bcftools.vcf.gz.csi"),
+        filtered = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.bcftools.vcf.gz"),
+        csi = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.bcftools.vcf.gz.csi"),
     threads: 8
     conda:
         "bcftools-1.19"
@@ -110,48 +140,18 @@ rule filter_DP_bcftools:
         echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
         """
-
-
-rule filter_QUAL30_bcftools: 
-    priority:100
-    input:
-        filtered = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.bcftools.vcf.gz",
-        csi = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.bcftools.vcf.gz.csi",
-    output:
-        filtered = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.bcftools.vcf.gz"),
-        csi = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.bcftools.vcf.gz.csi"),
-    threads:8
-    conda:
-        "bcftools-1.19"
-    resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
-        partition = "compute",
-        DTMP = "tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        '''
-        # -e is 'exclude'
-
-        bcftools view -e 'QUAL<30' {input.filtered} -O z8 -o {output.filtered};
-
-        bcftools index --threads {threads} {output.filtered} -o {output.csi};
-
-        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-
-        '''
 
 
 rule isec_bcftools_eva:
     priority:100
     input:
-        filtered = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.bcftools.vcf.gz",
-        csi = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.bcftools.vcf.gz.csi",
+        filtered = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.bcftools.vcf.gz",
+        csi = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.bcftools.vcf.gz.csi",
         eva = "resources/eva/9940_GCA_016772045.1_current_ids.sed.vcf.gz",
         eva_csi = "resources/eva/9940_GCA_016772045.1_current_ids.sed.vcf.gz.csi"
     output:
-        filtered = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.bcftools.vcf.gz",
-        csi = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.bcftools.vcf.gz.csi",
+        filtered = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.bcftools.vcf.gz"),
+        csi = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.bcftools.vcf.gz.csi"),
     threads:8
     conda:
         "bcftools-1.19"
@@ -162,27 +162,28 @@ rule isec_bcftools_eva:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        bcftools isec -O v -p results/03_merged/isec_bcftools_eva {input.eva} {input.filtered} ;
+        bcftools isec -O v -p results/04_filtered/isec_bcftools_eva {input.eva} {input.filtered} ;
 
-        bcftools view --threads {threads} -O z8 results/03_merged/isec_bcftools_eva/0001.vcf -o {output.filtered} ;
+        bcftools view --threads {threads} -O z8 results/04_filtered/isec_bcftools_eva/0001.vcf -o {output.filtered} ;
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi} ; 
 
-        rm -r results/03_merged/isec_bcftools_eva ;
+        rm -r results/04_filtered/isec_bcftools_eva ;
 
         echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
 
         """
 
 
-rule filter_monomorphic_bcftools: 
+# FREEBAYES
+rule filter_monomorphic_freebayes: 
     priority:100
     input:
-        filtered = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.bcftools.vcf.gz",
-        csi = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.bcftools.vcf.gz.csi",
+        norm = "results/03_merged/merged.MFF.chrom.norm.freebayes.vcf.gz",
+        csi = "results/03_merged/merged.MFF.chrom.norm.freebayes.vcf.gz.csi",
     output:
-        filtered = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.bcftools.vcf.gz"),
-        csi = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.bcftools.vcf.gz.csi"),
+        filtered = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.freebayes.vcf.gz"),
+        csi = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.freebayes.vcf.gz.csi"),
     threads:8
     conda:
         "bcftools-1.19"
@@ -204,15 +205,14 @@ rule filter_monomorphic_bcftools:
         '''
 
 
-# FREEBAYES
 rule filter_DP_freebayes:
     priority:100
     input:
-        norm = "results/04_merged/merged.MFF.chrom.norm.freebayes.vcf.gz",
-        csi = "results/04_merged/merged.MFF.chrom.norm.freebayes.vcf.gz.csi",
+        norm = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.freebayes.vcf.gz",
+        csi = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.freebayes.vcf.gz.csi",
     output:
-        filtered = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.freebayes.vcf.gz"),
-        csi = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.freebayes.vcf.gz.csi"),
+        filtered = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.freebayes.vcf.gz"),
+        csi = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.freebayes.vcf.gz.csi"),
     threads: 8
     conda:
         "bcftools-1.19"
@@ -233,48 +233,18 @@ rule filter_DP_freebayes:
         echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
         """
-
-
-rule filter_QUAL30_freebayes: 
-    priority:100
-    input:
-        filtered = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.freebayes.vcf.gz",
-        csi = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.freebayes.vcf.gz.csi",
-    output:
-        filtered = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.freebayes.vcf.gz"),
-        csi = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.freebayes.vcf.gz.csi"),
-    threads:8
-    conda:
-        "bcftools-1.19"
-    resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
-        partition = "compute",
-        DTMP = "tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        '''
-        # -e is 'exclude'
-
-        bcftools view -e 'QUAL<30' {input.filtered} -O z8 -o {output.filtered};
-
-        bcftools index --threads {threads} {output.filtered} -o {output.csi};
-
-        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-
-        '''
 
 
 rule isec_freebayes_eva:
     priority:100
     input:
-        filtered = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.freebayes.vcf.gz",
-        csi = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.freebayes.vcf.gz.csi",
+        filtered = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.freebayes.vcf.gz",
+        csi = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.freebayes.vcf.gz.csi",
         eva = "resources/eva/9940_GCA_016772045.1_current_ids.sed.vcf.gz",
         eva_csi = "resources/eva/9940_GCA_016772045.1_current_ids.sed.vcf.gz.csi"
     output:
-        filtered = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.freebayes.vcf.gz",
-        csi = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.freebayes.vcf.gz.csi",
+        filtered = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.freebayes.vcf.gz"),
+        csi = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.freebayes.vcf.gz.csi"),
     threads:8
     conda:
         "bcftools-1.19"
@@ -285,27 +255,28 @@ rule isec_freebayes_eva:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        bcftools isec -O v -p results/03_merged/isec_freebayes_eva {input.eva} {input.filtered} ;
+        bcftools isec -O v -p results/04_filtered/isec_freebayes_eva {input.eva} {input.filtered} ;
 
-        bcftools view --threads {threads} -O z8 results/03_merged/isec_freebayes_eva/0001.vcf -o {output.filtered} ;
+        bcftools view --threads {threads} -O z8 results/04_filtered/isec_freebayes_eva/0001.vcf -o {output.filtered} ;
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi} ; 
 
-        rm -r results/03_merged/isec_freebayes_eva ;
+        rm -r results/04_filtered/isec_freebayes_eva ;
 
         echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
 
         """
 
 
-rule filter_monomorphic_freebayes: 
+# GATK
+rule filter_monomorphic_haplotypeCaller: 
     priority:100
     input:
-        filtered = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.freebayes.vcf.gz",
-        csi = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.freebayes.vcf.gz.csi",
+        norm = "results/03_merged/merged.MFF.chrom.norm.haplotypeCaller.vcf.gz",
+        csi = "results/03_merged/merged.MFF.chrom.norm.haplotypeCaller.vcf.gz.csi",
     output:
-        filtered = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.freebayes.vcf.gz"),
-        csi = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.freebayes.vcf.gz.csi"),
+        filtered = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.haplotypeCaller.vcf.gz"),
+        csi = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.haplotypeCaller.vcf.gz.csi"),
     threads:8
     conda:
         "bcftools-1.19"
@@ -327,15 +298,14 @@ rule filter_monomorphic_freebayes:
         '''
 
 
-# GATK
 rule filter_DP_haplotypeCaller:
     priority:100
     input:
-        norm = "results/04_merged/merged.MFF.chrom.norm.haplotypeCaller.vcf.gz",
-        csi = "results/04_merged/merged.MFF.chrom.norm.haplotypeCaller.vcf.gz.csi",
+        norm = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.haplotypeCaller.vcf.gz",
+        csi = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.haplotypeCaller.vcf.gz.csi",
     output:
-        filtered = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.haplotypeCaller.vcf.gz"),
-        csi = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.haplotypeCaller.vcf.gz.csi"),
+        filtered = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.haplotypeCaller.vcf.gz"),
+        csi = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.haplotypeCaller.vcf.gz.csi"),
     threads: 8
     conda:
         "bcftools-1.19"
@@ -358,46 +328,16 @@ rule filter_DP_haplotypeCaller:
         """
 
 
-rule filter_QUAL30_haplotypeCaller: 
-    priority:100
-    input:
-        filtered = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.haplotypeCaller.vcf.gz",
-        csi = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.haplotypeCaller.vcf.gz.csi",
-    output:
-        filtered = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.haplotypeCaller.vcf.gz"),
-        csi = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.haplotypeCaller.vcf.gz.csi"),
-    threads:8
-    conda:
-        "bcftools-1.19"
-    resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
-        partition = "compute",
-        DTMP = "tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        '''
-        # -e is 'exclude'
-
-        bcftools view -e 'QUAL<30' {input.filtered} -O z8 -o {output.filtered};
-
-        bcftools index --threads {threads} {output.filtered} -o {output.csi};
-
-        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-
-        '''
-
-
 rule isec_haplotypeCaller_eva:
     priority:100
     input:
-        filtered = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.haplotypeCaller.vcf.gz",
-        csi = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.haplotypeCaller.vcf.gz.csi",
+        filtered = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.haplotypeCaller.vcf.gz",
+        csi = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.haplotypeCaller.vcf.gz.csi",
         eva = "resources/eva/9940_GCA_016772045.1_current_ids.sed.vcf.gz",
         eva_csi = "resources/eva/9940_GCA_016772045.1_current_ids.sed.vcf.gz.csi"
     output:
-        filtered = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.haplotypeCaller.vcf.gz",
-        csi = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.haplotypeCaller.vcf.gz.csi",
+        filtered = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.haplotypeCaller.vcf.gz"),
+        csi = temp("results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.haplotypeCaller.vcf.gz.csi"),
     threads:8
     conda:
         "bcftools-1.19"
@@ -408,62 +348,33 @@ rule isec_haplotypeCaller_eva:
         attempt = lambda wildcards, attempt: attempt,
     shell:
         """
-        bcftools isec -O v -p results/03_merged/isec_haplotypeCaller_eva {input.eva} {input.filtered} ;
+        bcftools isec -O v -p results/04_filtered/isec_haplotypeCaller_eva {input.eva} {input.filtered} ;
 
-        bcftools view --threads {threads} -O z8 results/03_merged/isec_haplotypeCaller_eva/0001.vcf -o {output.filtered} ;
+        bcftools view --threads {threads} -O z8 results/04_filtered/isec_haplotypeCaller_eva/0001.vcf -o {output.filtered} ;
 
         bcftools index --threads {threads} {output.filtered} -o {output.csi} ; 
 
-        rm -r results/03_merged/isec_haplotypeCaller_eva ;
+        rm -r results/04_filtered/isec_haplotypeCaller_eva ;
 
         echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt; 
 
         """
-
-
-rule filter_monomorphic_haplotypeCaller: 
-    priority:100
-    input:
-        filtered = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.haplotypeCaller.vcf.gz",
-        csi = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.haplotypeCaller.vcf.gz.csi",
-    output:
-        filtered = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.haplotypeCaller.vcf.gz"),
-        csi = temp("results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.haplotypeCaller.vcf.gz.csi"),
-    threads:8
-    conda:
-        "bcftools-1.19"
-    resources:
-        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
-        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 120),
-        partition = "compute",
-        DTMP = "tmp",
-        attempt = lambda wildcards, attempt: attempt,
-    shell:
-        '''
-
-        zcat {input.filtered} | grep -P -v "0\/1\S+\t0\/1\S+" | grep -P -v "1\/1\S+\t1\/1\S+" |  bcftools view - -O z8 -o {output.filtered};
-
-        bcftools index --threads {threads} {output.filtered} -o {output.csi};
-
-        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
-
-        '''
 
 
 # INTERSECTION
 rule ensemble_intersection:
     priority: 100
     input:
-        bcftools = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.bcftools.vcf.gz",
-        bcftools_csi = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.bcftools.vcf.gz.csi",
-        freebayes = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.freebayes.vcf.gz",
-        freebayes_csi = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.freebayes.vcf.gz.csi",
-        haplotypeCaller = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.haplotypeCaller.vcf.gz",
-        haplotypeCaller_csi = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.haplotypeCaller.vcf.gz.csi",
+        bcftools = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.bcftools.vcf.gz",
+        bcftools_csi = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.bcftools.vcf.gz.csi",
+        freebayes = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.freebayes.vcf.gz",
+        freebayes_csi = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.freebayes.vcf.gz.csi",
+        haplotypeCaller = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.haplotypeCaller.vcf.gz",
+        haplotypeCaller_csi = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.haplotypeCaller.vcf.gz.csi",
     output:
-        bcftools_common = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.bcftools.intersect.vcf.gz",
-        freebayes_common = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.freebayes.intersect.vcf.gz",
-        haplotypeCaller_common = "results/03_filtered/merged.MFF.chrom.norm.DPFilt.QUAL30.eva.monomorphic.haplotypeCaller.intersect.vcf.gz",
+        bcftools_common = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.bcftools.intersection.vcf.gz",
+        freebayes_common = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.freebayes.intersection.vcf.gz",
+        haplotypeCaller_common = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.haplotypeCaller.intersection.vcf.gz",
     threads:6
     conda:
         "bcftools-1.19"
@@ -475,15 +386,15 @@ rule ensemble_intersection:
     shell:
         """
 
-        bcftools isec -O z8 -p results/05_ensemble -n~111 --threads {threads} {input.bcftools} {input.freebayes} {input.haplotypeCaller};
+        bcftools isec -O z8 -p results/04_filtered -n~111 --threads {threads} {input.bcftools} {input.freebayes} {input.haplotypeCaller};
 
-        mv results/05_ensemble/0000.vcf.gz {output.bcftools_common};
+        mv results/04_filtered/0000.vcf.gz {output.bcftools_common};
         echo "Total snps in {output.bcftools_common}: $(bcftools view --threads {threads} {output.bcftools_common} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
-        mv results/05_ensemble/0001.vcf.gz {output.freebayes_common};
+        mv results/04_filtered/0001.vcf.gz {output.freebayes_common};
         echo "Total snps in {output.freebayes_common}: $(bcftools view --threads {threads} {output.freebayes_common} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
-        mv results/05_ensemble/0002.vcf.gz {output.haplotypeCaller_common};
+        mv results/04_filtered/0002.vcf.gz {output.haplotypeCaller_common};
         echo "Total snps in {output.haplotypeCaller_common}: $(bcftools view --threads {threads} {output.haplotypeCaller_common} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
         bcftools index --threads {threads} {output.bcftools_common};
@@ -492,82 +403,38 @@ rule ensemble_intersection:
 
         bcftools index --threads {threads} {output.haplotypeCaller_common};
 
-        rm results/05_ensemble/0000.vcf.gz.tbi
-        rm results/05_ensemble/0001.vcf.gz.tbi
-        rm results/05_ensemble/0002.vcf.gz.tbi
+        rm results/04_filtered/0000.vcf.gz.tbi
+        rm results/04_filtered/0001.vcf.gz.tbi
+        rm results/04_filtered/0002.vcf.gz.tbi
 
         """
 
 
-# rule view_bcftools_regions: #TODO Updated files
-#     priority:100
-#     input:
-#         filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz",
-#         regions = "resources/snp_targets_100bp.txt"
-#     output:
-#         filtered_snps = "results/03_filtered/merged.filteredsnvs.QUAL60.bcftools.vcf.gz.pigmentSNPs.vcf"
-#     threads:2
-#     conda:
-#         "bcftools"
-#     resources:
-#         mem_gb = lambda wildcards, attempt: 4 + ((attempt - 1) * 8),
-#         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
-#         partition = "large,milan",
-#         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-#         attempt = lambda wildcards, attempt: attempt,
-#     shell:
-#         " bcftools view "
-#         "-R {input.regions} "
-#         "--threads {threads} "
-#         "{input.filtered} "
-#         "> {output.filtered_snps} "
+rule bcftools_private_snps:
+    priority:100
+    input:
+        merged = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.bcftools.intersection.vcf.gz",
+        csi = "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.bcftools.intersection.vcf.gz.csi",
+    output:
+        private = "results/05_private/{samples}.MFF.norm.monomorphic.DPFilt.eva.bcftools.intersection.vcf.gz",
+        csi = "results/05_private/{samples}.MFF.norm.monomorphic.DPFilt.eva.bcftools.intersection.vcf.gz.csi",
+    threads:6
+    conda:
+        "bcftools-1.19"
+    resources:
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
+        partition = "compute",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """ 
+        sleep 5;
 
+        bcftools view -O z8 --samples {wildcards.samples} --private --threads {threads} {input.merged} -o {output.private};
 
-# rule view_freebayes_regions: #TODO Updated files
-#     priority:100
-#     input:
-#         filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf.gz",
-#         regions = "resources/snp_targets_100bp.txt"
-#     output:
-#         filtered_snps = "results/03_filtered/merged.filteredsnvs.QUAL60.freebayes.vcf.gz.pigmentSNPs.vcf"
-#     threads:2
-#     conda:
-#         "bcftools"
-#     resources:
-#         mem_gb = lambda wildcards, attempt: 4 + ((attempt - 1) * 8),
-#         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
-#         partition = "large,milan",
-#         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-#         attempt = lambda wildcards, attempt: attempt,
-#     shell:
-#         " bcftools view "
-#         "-R {input.regions} "
-#         "--threads {threads} "
-#         "{input.filtered} "
-#         "> {output.filtered_snps} "
+        bcftools index --threads {threads} {output.private} -o {output.csi};
 
+        echo "Total snps in {output.private}: $(bcftools view --threads {threads} {output.private} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
-# rule view_haplotypeCaller_regions: #TODO Updated files
-#     priority:100
-#     input:
-#         filtered = "results/03_filtered/merged.filteredsnvs.QUAL60.haplotypeCaller.vcf.gz",
-#         regions = "resources/snp_targets_100bp.txt"
-#     output:
-#         filtered_snps = "results/03_filtered/merged.filteredsnvs.QUAL60.haplotypeCaller.vcf.gz.pigmentSNPs.vcf"
-#     threads:2
-#     conda:
-#         "bcftools"
-#     resources:
-#         mem_gb = lambda wildcards, attempt: 4 + ((attempt - 1) * 8),
-#         time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
-#         partition = "large,milan",
-#         DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
-#         attempt = lambda wildcards, attempt: attempt,
-#     shell:
-#         " bcftools view "
-#         "-R {input.regions} "
-#         "--threads {threads} "
-#         "{input.filtered} "
-#         "> {output.filtered_snps} "
-
+        """
 
