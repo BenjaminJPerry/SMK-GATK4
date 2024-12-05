@@ -37,7 +37,7 @@ rule all:
         "results/04_filtered/merged.FFF.chrom.norm.monomorphic.DPFilt.eva.bcftools.intersection.vcf.gz",
         "results/04_filtered/merged.FFF.chrom.norm.monomorphic.DPFilt.eva.freebayes.intersection.vcf.gz",
         "results/04_filtered/merged.FFF.chrom.norm.monomorphic.DPFilt.eva.haplotypeCaller.intersection.vcf.gz",
-        expand("results/05_private/{samples}.MFF.norm.monomorphic.DPFilt.eva.bcftools.intersection.MQ60.vcf.gz", samples = SAMPLES),
+        expand("results/05_private/{samples}.FFF.norm.monomorphic.DPFilt.eva.bcftools.intersection.MQ60.vcf.gz", samples = SAMPLES),
 
 
 rule get_eva_snvs:
