@@ -37,7 +37,7 @@ rule all:
         "results/04_filtered/merged.FFF.chrom.norm.monomorphic.DPFilt.eva.bcftools.intersection.vcf.gz",
         "results/04_filtered/merged.FFF.chrom.norm.monomorphic.DPFilt.eva.freebayes.intersection.vcf.gz",
         "results/04_filtered/merged.FFF.chrom.norm.monomorphic.DPFilt.eva.haplotypeCaller.intersection.vcf.gz",
-        expand("results/05_private/{samples}.FFF.norm.monomorphic.DPFilt.eva.bcftools.intersection.vcf.gz", samples = SAMPLES),
+        expand("results/05_private/{samples}.MFF.norm.monomorphic.DPFilt.eva.bcftools.intersection.MQ60.vcf.gz", samples = SAMPLES),
 
 
 rule get_eva_snvs:
@@ -441,3 +441,31 @@ rule bcftools_private_snps:
 
         """
 
+
+rule filter_MQ60_bcftools:
+    priority:100
+    input:
+        private = "results/05_private/{samples}.FFF.norm.monomorphic.DPFilt.eva.bcftools.intersection.vcf.gz",
+        csi = "results/05_private/{samples}.FFF.norm.monomorphic.DPFilt.eva.bcftools.intersection.vcf.gz.csi",
+    output:
+        filtered = "results/05_private/{samples}.FFF.norm.monomorphic.DPFilt.eva.bcftools.intersection.MQ60.vcf.gz",
+        csi = "results/05_private/{samples}.FFF.norm.monomorphic.DPFilt.eva.bcftools.intersection.MQ60.vcf.gz.csi",
+    threads: 8
+    conda:
+        "bcftools-1.19"
+    resources:
+        mem_gb = lambda wildcards, attempt: 8 + ((attempt - 1) * 8),
+        time = lambda wildcards, attempt: 60 + ((attempt - 1) * 60),
+        partition = "compute",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        """
+        # -e is 'exclude'
+
+        bcftools view --threads {threads} -e 'INFO/MQ<60' {input.private} -O z8 -o {output.filtered};
+
+        bcftools index --threads {threads} {output.filtered} -o {output.csi};
+
+        echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
+
+        """
