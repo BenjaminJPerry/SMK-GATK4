@@ -38,7 +38,9 @@ rule all:
         "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.freebayes.intersection.vcf.gz",
         "results/04_filtered/merged.MFF.chrom.norm.monomorphic.DPFilt.eva.haplotypeCaller.intersection.vcf.gz",
         expand("results/05_private/{samples}.MFF.norm.monomorphic.DPFilt.eva.bcftools.intersection.MQ60.vcf.gz", samples = SAMPLES),
-
+        expand("results/00_stats/{samples}.mosdepth.summary.txt", samples = SAMPLES),
+        expand("results/00_stats/{samples}.sorted.mkdups.merged.bam.samtools-stats.txt", samples = SAMPLES),
+        expand("results/00_stats/{samples}.MFF.norm.monomorphic.DPFilt.eva.bcftools.intersection.MQ60.vcf.gz.bcftools-stats.txt", samples = SAMPLES),
 
 rule get_eva_snvs:
     output:
@@ -470,3 +472,79 @@ rule filter_MQ60_bcftools:
         echo "Total snps in {output.filtered}: $(bcftools view --threads {threads} {output.filtered} | grep -v "#" | wc -l)" | tee -a snps.counts.summary.txt;
 
         """
+
+
+rule bcftools_stats_private_MQ:
+    priority: 100
+    input:
+        filtered = "results/05_private/{samples}.MFF.norm.monomorphic.DPFilt.eva.bcftools.intersection.MQ60.vcf.gz",
+    output:
+        stats = "results/00_stats/{samples}.MFF.norm.monomorphic.DPFilt.eva.bcftools.intersection.MQ60.vcf.gz.bcftools-stats.txt",
+    threads: 6
+    conda:
+        "bcftools-1.19"
+    resources:
+        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 60),
+        partition = "compute",
+        DTMP = "/nesi/nobackup/agresearch03735/SMK-SNVS/tmp",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        "bcftools stats "
+        "--fasta-ref resources/GCF_016772045.1_ARS-UI_Ramb_v2.0_genomic.fna "
+        "--samples - "
+        "--threads 6 "
+        "{input.filtered} > "
+        "{output.stats} "
+
+
+rule samtools_stats_merged:
+    priority: 100
+    input:
+        bam = "results/01_mapping/{samples}.sorted.mkdups.bam",
+        referenceGenome = "resources/GCF_016772045.1_ARS-UI_Ramb_v2.0_genomic.fna"
+    output:
+        stats = "results/00_stats/{samples}.sorted.mkdups.merged.bam.samtools-stats.txt"
+    log:
+        "logs/samtools_stats_merged.{samples}.log"
+    benchmark:
+        "benchmarks/samtools_stats_merged.{samples}.tsv"
+    conda:
+        "samtools-1.17"
+    threads: 12
+    resources:
+        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 60),
+        partition = "compute",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        "samtools stats --threads {threads} -r {input.referenceGenome} {input.bam} > {output.stats} "
+
+
+rule mosdepth_stats_merged:
+    priority: 100
+    input:
+        bam = "results/01_mapping/{samples}.sorted.mkdups.bam",
+    output:
+        stats = "results/00_stats/{samples}.mosdepth.summary.txt",
+    log:
+        "logs/mosdepth_stats_merged.{samples}.log"
+    benchmark:
+        "benchmarks/mosdepth_stats_merged.{samples}.tsv"
+    conda:
+        "mosdepth-0.3.6"
+    threads: 12
+    resources:
+        mem_gb = lambda wildcards, attempt: 12 + ((attempt - 1) * 64),
+        time = lambda wildcards, attempt: 120 + ((attempt - 1) * 60),
+        partition = "compute",
+        attempt = lambda wildcards, attempt: attempt,
+    shell:
+        "mosdepth "
+        "--use-median "
+        "--fast-mode " # dont look at internal cigar operations or correct mate overlaps (recommended for most use-cases).
+        "--no-per-base " # dont output per-base depth.
+        "--threads {threads} "
+        "results/00_stats/{wildcards.samples} " # output prefix
+        "{input.bam} "
+
